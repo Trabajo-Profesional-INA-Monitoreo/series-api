@@ -1,0 +1,53 @@
+definitions:
+  dtos.ErrorResponse:
+    properties:
+      message:
+        type: string
+      timestamp:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This API manages the inputs of the forecast model
+  title: Inputs API
+  version: "1.0"
+paths:
+  /healthcheck:
+    get:
+      consumes:
+      - '*/*'
+      description: get the status of the server.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Show the status of the server.
+  /test:
+    get:
+      consumes:
+      - application/json
+      description: Get a greeting
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get a greeting
+    post:
+      consumes:
+      - application/json
+      description: Post a greeting
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Post a greeting
+swagger: "2.0"
