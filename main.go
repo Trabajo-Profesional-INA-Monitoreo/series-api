@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/inputs-api/config"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/inputs-api/endpoints"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/inputs-api/middlewares"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/config"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/endpoints"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/middlewares"
 	"github.com/gin-gonic/gin"
 	"log"
 )

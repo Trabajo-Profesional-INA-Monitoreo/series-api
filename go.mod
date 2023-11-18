@@ -1,4 +1,4 @@
-module github.com/Trabajo-Profesional-INA-Monitoreo/inputs-api
+module github.com/Trabajo-Profesional-INA-Monitoreo/series-api
 
 go 1.21
 

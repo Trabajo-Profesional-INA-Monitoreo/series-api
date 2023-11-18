@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"github.com/Trabajo-Profesional-INA-Monitoreo/inputs-api/dtos"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/inputs-api/services"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

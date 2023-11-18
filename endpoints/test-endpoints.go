@@ -1,8 +1,8 @@
 package endpoints
 
 import (
-	"github.com/Trabajo-Profesional-INA-Monitoreo/inputs-api/controllers"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/inputs-api/services"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/controllers"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"github.com/Trabajo-Profesional-INA-Monitoreo/inputs-api/docs"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/docs"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"

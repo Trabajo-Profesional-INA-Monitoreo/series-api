@@ -1,6 +1,6 @@
 package services
 
-import "github.com/Trabajo-Profesional-INA-Monitoreo/inputs-api/dtos"
+import "github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 
 type TestService interface {
 	GetTest() string
