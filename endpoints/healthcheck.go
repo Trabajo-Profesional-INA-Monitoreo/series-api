@@ -2,11 +2,13 @@ package endpoints
 
 import (
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
 func setUpHealthCheck(r *gin.RouterGroup) {
 	r.GET("/healthcheck", healthcheck)
+	log.Infof("Configured healthcheck endpoint")
 }
 
 // healthcheck godoc

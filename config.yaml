@@ -4,3 +4,6 @@ log:
 
 server:
   port: "8080"
+
+datasource:
+  connection: "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"

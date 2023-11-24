@@ -9,6 +9,7 @@ import (
 type ApiConfig struct {
 	LogLevel   string
 	ServerPort string
+	DbUrl      string
 }
 
 // initEnv Initializes the configuration properties from a config file and environment
@@ -26,6 +27,7 @@ func initEnv() (*viper.Viper, error) {
 	// Add env variables supported
 	_ = v.BindEnv("log", "level")
 	_ = v.BindEnv("server", "port")
+	_ = v.BindEnv("datasource", "connection")
 
 	// Try to read configuration from config file. If config file
 	// does not exist then ReadInConfig will fail but configuration
@@ -53,8 +55,13 @@ func GetConfig() *ApiConfig {
 	if serverPort == "" {
 		log.Fatalf("Missing server port, exiting")
 	}
+	dbConnection := env.GetString("datasource.connection")
+	if serverPort == "" {
+		log.Fatalf("Missing server port, exiting")
+	}
 	return &ApiConfig{
 		LogLevel:   logLevel,
 		ServerPort: serverPort,
+		DbUrl:      dbConnection,
 	}
 }

@@ -17,7 +17,7 @@ func main() {
 	server := gin.New()
 
 	middlewares.SetUpMiddlewares(server)
-	endpoints.SetUpEndpoints(server)
+	endpoints.SetUpEndpoints(server, apiConfig)
 
 	err := server.Run(fmt.Sprintf(":%v", apiConfig.ServerPort))
 	if err != nil {
