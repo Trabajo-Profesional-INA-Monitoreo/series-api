@@ -3,9 +3,9 @@ package entities
 type Stream struct {
 	StreamId   uint64 `gorm:"primary_key"`
 	StationId  uint64
-	Station    *Station `gorm:"foreignKey:StationId;references:StationId"`
+	Station    *Station `gorm:"references:StationId"`
 	NetworkId  uint64
-	Network    *Network `gorm:"foreignKey:NetworkId;references:NetworkId"`
+	Network    *Network `gorm:"references:NetworkId"`
 	Variable   string   `gorm:"type:varchar(100)"`
 	VariableId uint64
 	ProcId     uint64

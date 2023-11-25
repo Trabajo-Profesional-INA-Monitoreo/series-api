@@ -3,10 +3,10 @@ package entities
 type ConfiguredStream struct {
 	ConfiguredStreamId uint64 `gorm:"primary_key;auto_increment"`
 	StreamId           uint64
-	Stream             *Stream `gorm:"foreignKey:StreamId;references:StreamId"`
+	Stream             *Stream `gorm:"references:StreamId"`
 	UpdateFrequency    uint64
 	// TODO revisar esta relacion
-	RedundantStreams       []*ConfiguredStream `gorm:"foreignKey:ConfiguredStreamId;references:ConfiguredStreamId"`
+	RedundantStreams       []*ConfiguredStream `gorm:"references:ConfiguredStreamId"`
 	CheckErrors            bool
 	NormalUpperThreshold   uint64
 	NormalLowerThreshold   uint64

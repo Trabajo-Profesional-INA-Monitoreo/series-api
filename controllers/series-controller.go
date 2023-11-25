@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type SeriesController interface {
@@ -19,7 +20,8 @@ func NewSeriesController(seriesService services.StreamService) SeriesController 
 }
 
 func (s seriesController) GetNetworks(ctx *gin.Context) {
-
+	res := s.seriesService.GetNetworks()
+	ctx.JSON(http.StatusOK, res)
 }
 
 func (s seriesController) GetStations(ctx *gin.Context) {
