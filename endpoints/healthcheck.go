@@ -17,7 +17,7 @@ func setUpHealthCheck(r *gin.RouterGroup) {
 //	@Description	get the status of the server.
 //	@Accept			*/*
 //	@Produce		json
-//	@Success		200	{string}	Server is up and running
+//	@Success		200	{string}	string "Server is up and running"
 //	@Router			/healthcheck [get]
 func healthcheck(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "Server is up and running")

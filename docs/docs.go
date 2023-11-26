@@ -27,7 +27,7 @@ const docTemplate = `{
                 "summary": "Show the status of the server.",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Server is up and running",
                         "schema": {
                             "type": "string"
                         }
@@ -35,39 +35,33 @@ const docTemplate = `{
                 }
             }
         },
-        "/test": {
+        "/series/estaciones": {
             "get": {
-                "description": "Get a greeting",
-                "consumes": [
-                    "application/json"
-                ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get a greeting",
+                "summary": "Endpoint para obtener el resumen de las series agrupado por estacion",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/dtos.StreamsPerStationResponse"
                         }
                     }
                 }
-            },
-            "post": {
-                "description": "Post a greeting",
-                "consumes": [
+            }
+        },
+        "/series/redes": {
+            "get": {
+                "produces": [
                     "application/json"
                 ],
-                "summary": "Post a greeting",
+                "summary": "Endpoint para obtener el resumen de las series agrupado por red",
                 "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request",
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
+                            "$ref": "#/definitions/dtos.StreamsPerNetworkResponse"
                         }
                     }
                 }
@@ -75,14 +69,53 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dtos.ErrorResponse": {
+        "dtos.StreamsPerNetwork": {
             "type": "object",
             "properties": {
-                "message": {
+                "networkId": {
                     "type": "string"
                 },
-                "timestamp": {
+                "networkName": {
                     "type": "string"
+                },
+                "streamsCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.StreamsPerNetworkResponse": {
+            "type": "object",
+            "properties": {
+                "networks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.StreamsPerNetwork"
+                    }
+                }
+            }
+        },
+        "dtos.StreamsPerStation": {
+            "type": "object",
+            "properties": {
+                "stationId": {
+                    "type": "string"
+                },
+                "stationName": {
+                    "type": "string"
+                },
+                "streamsCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.StreamsPerStationResponse": {
+            "type": "object",
+            "properties": {
+                "stations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.StreamsPerStation"
+                    }
                 }
             }
         }
