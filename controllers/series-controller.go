@@ -25,5 +25,6 @@ func (s seriesController) GetNetworks(ctx *gin.Context) {
 }
 
 func (s seriesController) GetStations(ctx *gin.Context) {
-
+	res := s.seriesService.GetStations()
+	ctx.JSON(http.StatusOK, res)
 }

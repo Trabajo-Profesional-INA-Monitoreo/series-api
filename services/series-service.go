@@ -7,7 +7,7 @@ import (
 
 type StreamService interface {
 	GetNetworks() dtos.StreamsPerNetworkResponse
-	GetStations()
+	GetStations() dtos.StreamsPerStationResponse
 }
 
 type streamService struct {
@@ -23,6 +23,7 @@ func (s streamService) GetNetworks() dtos.StreamsPerNetworkResponse {
 	return dtos.StreamsPerNetworkResponse{Networks: networks}
 }
 
-func (s streamService) GetStations() {
-
+func (s streamService) GetStations() dtos.StreamsPerStationResponse {
+	stations := s.repository.GetStations()
+	return dtos.StreamsPerStationResponse{Stations: stations}
 }

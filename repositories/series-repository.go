@@ -11,6 +11,7 @@ import (
 
 type StreamRepository interface {
 	GetNetworks() []dtos.StreamsPerNetwork
+	GetStations() []dtos.StreamsPerStation
 }
 
 type dbRepository struct {
@@ -37,7 +38,7 @@ func NewDbRepository(connectionData string) StreamRepository {
 
 func (db *dbRepository) GetNetworks() []dtos.StreamsPerNetwork {
 	var networks []dtos.StreamsPerNetwork
-	//var results []map[string]interface{}
+
 	db.connection.Model(
 		&entities.Stream{},
 	).Select(
@@ -45,6 +46,20 @@ func (db *dbRepository) GetNetworks() []dtos.StreamsPerNetwork {
 		"networks.network_id as networkid",
 		"count(streams.stream_id) as streamscount",
 	).Joins("JOIN networks ON streams.network_id = networks.network_id").Group("networks.name, networks.network_id").Scan(&networks)
-	log.Infof("Query result: %v", networks)
+	log.Debugf("Get network query result: %v", networks)
 	return networks
+}
+
+func (db *dbRepository) GetStations() []dtos.StreamsPerStation {
+	var stations []dtos.StreamsPerStation
+
+	db.connection.Model(
+		&entities.Stream{},
+	).Select(
+		"stations.name as stationname",
+		"stations.station_id as stationid",
+		"count(streams.stream_id) as streamscount",
+	).Joins("JOIN stations ON streams.station_id = stations.station_id").Group("stations.name, stations.station_id").Scan(&stations)
+	log.Debugf("Get stations query result: %v", stations)
+	return stations
 }
