@@ -12,5 +12,6 @@ func SetUpEndpoints(server *gin.Engine, config *config.ApiConfig) {
 	log.Infof("Setting up endpoints")
 	api := server.Group("/api/v1")
 	setSeriesEndpoints(api, config)
+	setInputsEndpoints(api, config)
 	setUpHealthCheck(api)
 }

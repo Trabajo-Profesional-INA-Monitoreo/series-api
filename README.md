@@ -17,6 +17,9 @@ Se deben de configurar las siguientes propiedades:
 ```yaml
 server:
   port: 1234 # puerto de la aplicacion
+
+datasource:
+  connection: "host={URL} user={USUARIO} password={PASSWORD} dbname={NOMBRE DE DB} port={PUERTO DE DB}"
 ```
 
 ## Documentación

@@ -35,6 +35,22 @@ const docTemplate = `{
                 }
             }
         },
+        "/inputs/metricas-generales": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Endpoint para obtener las metricas generales de inputs",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InputsGeneralMetrics"
+                        }
+                    }
+                }
+            }
+        },
         "/series/estaciones": {
             "get": {
                 "produces": [
@@ -69,6 +85,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dtos.InputsGeneralMetrics": {
+            "type": "object",
+            "properties": {
+                "totalNetworks": {
+                    "type": "integer"
+                },
+                "totalStations": {
+                    "type": "integer"
+                },
+                "totalStreams": {
+                    "type": "integer"
+                }
+            }
+        },
         "dtos.StreamsPerNetwork": {
             "type": "object",
             "properties": {

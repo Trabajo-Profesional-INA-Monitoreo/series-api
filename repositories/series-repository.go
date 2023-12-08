@@ -12,6 +12,10 @@ import (
 type StreamRepository interface {
 	GetNetworks() []dtos.StreamsPerNetwork
 	GetStations() []dtos.StreamsPerStation
+
+	GetTotalStreams() int
+	GetTotalNetworks() int
+	GetTotalStations() int
 }
 
 type dbRepository struct {
@@ -62,4 +66,28 @@ func (db *dbRepository) GetStations() []dtos.StreamsPerStation {
 	).Joins("JOIN stations ON streams.station_id = stations.station_id").Group("stations.name, stations.station_id").Scan(&stations)
 	log.Debugf("Get stations query result: %v", stations)
 	return stations
+}
+
+func (db *dbRepository) GetTotalStreams() int {
+	var count int64
+	db.connection.Model(
+		&entities.Stream{},
+	).Count(&count)
+	return int(count)
+}
+
+func (db *dbRepository) GetTotalStations() int {
+	var count int64
+	db.connection.Model(
+		&entities.Station{},
+	).Count(&count)
+	return int(count)
+}
+
+func (db *dbRepository) GetTotalNetworks() int {
+	var count int64
+	db.connection.Model(
+		&entities.Network{},
+	).Count(&count)
+	return int(count)
 }

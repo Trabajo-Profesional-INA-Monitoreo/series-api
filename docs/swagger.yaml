@@ -1,4 +1,13 @@
 definitions:
+  dtos.InputsGeneralMetrics:
+    properties:
+      totalNetworks:
+        type: integer
+      totalStations:
+        type: integer
+      totalStreams:
+        type: integer
+    type: object
   dtos.StreamsPerNetwork:
     properties:
       networkId:
@@ -50,6 +59,16 @@ paths:
           schema:
             type: string
       summary: Show the status of the server.
+  /inputs/metricas-generales:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.InputsGeneralMetrics'
+      summary: Endpoint para obtener las metricas generales de inputs
   /series/estaciones:
     get:
       produces:
