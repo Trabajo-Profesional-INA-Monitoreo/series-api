@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/config"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/controllers"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
@@ -9,8 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func setInputsEndpoints(apiGroup *gin.RouterGroup, config *config.ApiConfig) {
-	controller := controllers.NewInputsController(services.NewInputsService(repositories.NewDbRepository(config.DbUrl)))
+func setInputsEndpoints(apiGroup *gin.RouterGroup, streamsRepository repositories.StreamRepository) {
+	controller := controllers.NewInputsController(services.NewInputsService(streamsRepository))
 	testApi := apiGroup.Group("/inputs")
 	{
 		testApi.GET("/metricas-generales", controller.GetGeneralMetrics)

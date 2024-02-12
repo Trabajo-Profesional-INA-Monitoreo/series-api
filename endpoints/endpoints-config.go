@@ -8,10 +8,11 @@ import (
 
 // @BasePath /api/v1
 
-func SetUpEndpoints(server *gin.Engine, config *config.ApiConfig) {
+func SetUpEndpoints(server *gin.Engine, configArguments *config.ApiConfig) {
+	repositories := config.CreateRepositories(configArguments.DbUrl)
 	log.Infof("Setting up endpoints")
 	api := server.Group("/api/v1")
-	setSeriesEndpoints(api, config)
-	setInputsEndpoints(api, config)
+	setSeriesEndpoints(api, repositories.StreamsRepository)
+	setInputsEndpoints(api, repositories.StreamsRepository)
 	setUpHealthCheck(api)
 }

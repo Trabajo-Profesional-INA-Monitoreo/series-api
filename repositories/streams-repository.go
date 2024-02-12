@@ -4,9 +4,7 @@ import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	log "github.com/sirupsen/logrus"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type StreamRepository interface {
@@ -18,29 +16,15 @@ type StreamRepository interface {
 	GetTotalStations() int
 }
 
-type dbRepository struct {
+type streamsRepository struct {
 	connection *gorm.DB
 }
 
-func NewDbRepository(connectionData string) StreamRepository {
-	log.Infof("Attempting connection to DB")
-	connection, err := gorm.Open(postgres.Open(connectionData), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
-	if err != nil {
-		log.Fatalf("Failed to connect to DB: %v", err)
-	}
-	log.Infof("Connected to DB successfully")
-	log.Infof("Executing auto migrate")
-	err = connection.AutoMigrate(&entities.ConfiguredStream{}, &entities.Stream{}, &entities.Station{}, &entities.Network{})
-	if err != nil {
-		log.Fatalf("Failed to auto migrate model to DB: %v", err)
-	}
-	log.Infof("Executed automigrate successfully")
-	return &dbRepository{connection}
+func NewStreamRepository(connection *gorm.DB) StreamRepository {
+	return &streamsRepository{connection}
 }
 
-func (db *dbRepository) GetNetworks() []dtos.StreamsPerNetwork {
+func (db *streamsRepository) GetNetworks() []dtos.StreamsPerNetwork {
 	var networks []dtos.StreamsPerNetwork
 
 	db.connection.Model(
@@ -54,7 +38,7 @@ func (db *dbRepository) GetNetworks() []dtos.StreamsPerNetwork {
 	return networks
 }
 
-func (db *dbRepository) GetStations() []dtos.StreamsPerStation {
+func (db *streamsRepository) GetStations() []dtos.StreamsPerStation {
 	var stations []dtos.StreamsPerStation
 
 	db.connection.Model(
@@ -68,7 +52,7 @@ func (db *dbRepository) GetStations() []dtos.StreamsPerStation {
 	return stations
 }
 
-func (db *dbRepository) GetTotalStreams() int {
+func (db *streamsRepository) GetTotalStreams() int {
 	var count int64
 	db.connection.Model(
 		&entities.Stream{},
@@ -76,7 +60,7 @@ func (db *dbRepository) GetTotalStreams() int {
 	return int(count)
 }
 
-func (db *dbRepository) GetTotalStations() int {
+func (db *streamsRepository) GetTotalStations() int {
 	var count int64
 	db.connection.Model(
 		&entities.Station{},
@@ -84,7 +68,7 @@ func (db *dbRepository) GetTotalStations() int {
 	return int(count)
 }
 
-func (db *dbRepository) GetTotalNetworks() int {
+func (db *streamsRepository) GetTotalNetworks() int {
 	var count int64
 	db.connection.Model(
 		&entities.Network{},
