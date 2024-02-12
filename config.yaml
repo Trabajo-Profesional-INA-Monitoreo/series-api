@@ -7,3 +7,6 @@ server:
 
 datasource:
   connection: "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"
+
+faults-detector:
+  cron: "@every 20s"

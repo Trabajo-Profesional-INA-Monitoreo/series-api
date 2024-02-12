@@ -7,9 +7,10 @@ import (
 )
 
 type ApiConfig struct {
-	LogLevel   string
-	ServerPort string
-	DbUrl      string
+	LogLevel      string
+	ServerPort    string
+	DbUrl         string
+	FaultCronTime string
 }
 
 // initEnv Initializes the configuration properties from a config file and environment
@@ -28,6 +29,7 @@ func initEnv() (*viper.Viper, error) {
 	_ = v.BindEnv("log", "level")
 	_ = v.BindEnv("server", "port")
 	_ = v.BindEnv("datasource", "connection")
+	_ = v.BindEnv("faults-detector", "cron")
 
 	// Try to read configuration from config file. If config file
 	// does not exist then ReadInConfig will fail but configuration
@@ -59,9 +61,15 @@ func GetConfig() *ApiConfig {
 	if serverPort == "" {
 		log.Fatalf("Missing server port, exiting")
 	}
+
+	faultsDetectorCron := env.GetString("faults-detector.cron")
+	if serverPort == "" {
+		log.Fatalf("Missing faults detector cron")
+	}
 	return &ApiConfig{
-		LogLevel:   logLevel,
-		ServerPort: serverPort,
-		DbUrl:      dbConnection,
+		LogLevel:      logLevel,
+		ServerPort:    serverPort,
+		DbUrl:         dbConnection,
+		FaultCronTime: faultsDetectorCron,
 	}
 }

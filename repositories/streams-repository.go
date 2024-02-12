@@ -14,6 +14,7 @@ type StreamRepository interface {
 	GetTotalStreams() int
 	GetTotalNetworks() int
 	GetTotalStations() int
+	GetStreams() []entities.Stream
 }
 
 type streamsRepository struct {
@@ -74,4 +75,14 @@ func (db *streamsRepository) GetTotalNetworks() int {
 		&entities.Network{},
 	).Count(&count)
 	return int(count)
+}
+
+func (db *streamsRepository) GetStreams() []entities.Stream {
+	var streams []entities.Stream
+
+	db.connection.Model(
+		&entities.Stream{},
+	).Select(streams)
+
+	return streams
 }

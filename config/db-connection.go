@@ -13,7 +13,7 @@ type Repositories struct {
 	StreamsRepository repositories.StreamRepository
 }
 
-func CreateRepositories(connectionData string) Repositories {
+func CreateRepositories(connectionData string) *Repositories {
 	log.Infof("Attempting connection to DB")
 	connection, err := gorm.Open(postgres.Open(connectionData), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
@@ -34,5 +34,5 @@ func CreateRepositories(connectionData string) Repositories {
 		StreamsRepository: repositories.NewStreamRepository(connection),
 	}
 	log.Infof("Done creating repositories")
-	return repos
+	return &repos
 }
