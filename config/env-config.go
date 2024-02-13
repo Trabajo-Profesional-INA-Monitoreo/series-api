@@ -11,6 +11,8 @@ type ApiConfig struct {
 	ServerPort    string
 	DbUrl         string
 	FaultCronTime string
+	InaToken      string
+	InaBaseUrl    string
 }
 
 // initEnv Initializes the configuration properties from a config file and environment
@@ -30,6 +32,8 @@ func initEnv() (*viper.Viper, error) {
 	_ = v.BindEnv("server", "port")
 	_ = v.BindEnv("datasource", "connection")
 	_ = v.BindEnv("faults-detector", "cron")
+	_ = v.BindEnv("ina-client", "token")
+	_ = v.BindEnv("ina-client", "base-url")
 
 	// Try to read configuration from config file. If config file
 	// does not exist then ReadInConfig will fail but configuration
@@ -66,10 +70,22 @@ func GetConfig() *ApiConfig {
 	if serverPort == "" {
 		log.Fatalf("Missing faults detector cron")
 	}
+
+	inaBaseUrl := env.GetString("ina-client.base-url")
+	if serverPort == "" {
+		log.Fatalf("Missing INA Base URL")
+	}
+
+	inaToken := env.GetString("ina-client.token")
+	if serverPort == "" {
+		log.Fatalf("Missing INA Access token")
+	}
 	return &ApiConfig{
 		LogLevel:      logLevel,
 		ServerPort:    serverPort,
 		DbUrl:         dbConnection,
 		FaultCronTime: faultsDetectorCron,
+		InaBaseUrl:    inaBaseUrl,
+		InaToken:      inaToken,
 	}
 }

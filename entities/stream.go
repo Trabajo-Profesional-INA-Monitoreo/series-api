@@ -23,3 +23,11 @@ func NewStream(streamId uint64, station *Station, network *Network, variable str
 		StreamType: streamType,
 	}
 }
+
+func (s Stream) IsForecasted() bool {
+	return s.StreamType == Forecasted
+}
+
+func (s Stream) IsObserved() bool {
+	return s.StreamType == Observed
+}

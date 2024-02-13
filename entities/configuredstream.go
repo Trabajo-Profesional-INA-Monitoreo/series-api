@@ -12,6 +12,7 @@ type ConfiguredStream struct {
 	NormalLowerThreshold   uint64
 	UnusualNormalThreshold uint64
 	UnusualLowerThreshold  uint64
+	CalibrationId          uint64
 }
 
 func NewConfiguredStream(
@@ -19,6 +20,7 @@ func NewConfiguredStream(
 	redundantStreams []*ConfiguredStream, checkErrors bool,
 	normalUpperThreshold uint64, normalLowerThreshold uint64,
 	unusualNormalThreshold uint64, unusualLowerThreshold uint64,
+	calibrationId uint64,
 ) *ConfiguredStream {
 	return &ConfiguredStream{
 		Stream:                 stream,
@@ -29,5 +31,6 @@ func NewConfiguredStream(
 		NormalLowerThreshold:   normalLowerThreshold,
 		UnusualNormalThreshold: unusualNormalThreshold,
 		UnusualLowerThreshold:  unusualLowerThreshold,
+		CalibrationId:          calibrationId,
 	}
 }

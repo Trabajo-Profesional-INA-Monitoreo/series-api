@@ -10,7 +10,8 @@ import (
 )
 
 type Repositories struct {
-	StreamsRepository repositories.StreamRepository
+	StreamsRepository          repositories.StreamRepository
+	ConfiguredStreamRepository repositories.ConfiguredStreamsRepository
 }
 
 func CreateRepositories(connectionData string) *Repositories {
@@ -31,7 +32,8 @@ func CreateRepositories(connectionData string) *Repositories {
 
 	log.Infof("Creating repositories...")
 	repos := Repositories{
-		StreamsRepository: repositories.NewStreamRepository(connection),
+		StreamsRepository:          repositories.NewStreamRepository(connection),
+		ConfiguredStreamRepository: repositories.NewConfiguredStreamsRepository(connection),
 	}
 	log.Infof("Done creating repositories")
 	return &repos
