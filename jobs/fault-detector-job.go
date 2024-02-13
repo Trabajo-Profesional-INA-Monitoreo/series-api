@@ -10,7 +10,11 @@ import (
 
 func SetUpJobs(repositories *config.Repositories, apiConfig *config.ApiConfig) {
 	c := cron.New()
-	faultDetector := services.NewFaultDetectorService(repositories.StreamsRepository, repositories.ConfiguredStreamRepository, clients.NewInaApiClientImpl(apiConfig))
+	faultDetector := services.NewFaultDetectorService(repositories.StreamsRepository,
+		repositories.ConfiguredStreamRepository,
+		repositories.ErrorsRepository,
+		clients.NewInaApiClientImpl(apiConfig),
+		apiConfig.ForecastMaxWaitingTimeHours)
 	entryId, err := c.AddFunc(apiConfig.FaultCronTime, faultDetector.DetectFaults)
 	if err != nil {
 		log.Fatalf("Error starting fault detector service, stopping... | Err: %v", err)
