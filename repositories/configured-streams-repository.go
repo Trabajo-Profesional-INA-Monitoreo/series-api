@@ -17,7 +17,12 @@ func NewConfiguredStreamsRepository(connection *gorm.DB) ConfiguredStreamsReposi
 	return &configuredStreamsRepository{connection}
 }
 
-func (c configuredStreamsRepository) FindConfiguredStreamsForStream(stream entities.Stream) []entities.ConfiguredStream {
-	//TODO implement me
-	panic("implement me")
+func (db configuredStreamsRepository) FindConfiguredStreamsForStream(stream entities.Stream) []entities.ConfiguredStream {
+	var configured []entities.ConfiguredStream
+
+	db.connection.Model(
+		&entities.ConfiguredStream{},
+	).Where("stream_id = ?", stream.StreamId).Find(&configured)
+
+	return configured
 }
