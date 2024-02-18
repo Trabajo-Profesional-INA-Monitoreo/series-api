@@ -82,7 +82,7 @@ func (db *streamsRepository) GetStreams() []entities.Stream {
 
 	db.connection.Model(
 		&entities.Stream{},
-	).Select(streams)
+	).Find(&streams)
 
 	return streams
 }
