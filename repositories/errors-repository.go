@@ -20,10 +20,10 @@ func NewErrorsRepository(connection *gorm.DB) ErrorsRepository {
 
 func (e errorsRepository) AlreadyDetectedErrorWithIdAndType(requestId string, errorType entities.ErrorType) bool {
 	var detectedError entities.DetectedError
-	e.connection.Model(&entities.DetectedError{}).Where("RequestId = ? AND ErrorType = ?", requestId, errorType).First(&detectedError)
+	e.connection.Model(&entities.DetectedError{}).Where("request_id = ? AND error_type = ?", requestId, errorType).First(&detectedError)
 	return detectedError.RequestId == requestId
 }
 
 func (e errorsRepository) Save(detectedError entities.DetectedError) {
-	e.connection.Save(detectedError)
+	e.connection.Create(&detectedError)
 }
