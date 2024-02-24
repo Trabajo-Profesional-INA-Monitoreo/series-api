@@ -14,5 +14,6 @@ func SetUpEndpoints(server *gin.Engine, configArguments *config.ApiConfig) {
 	api := server.Group("/api/v1")
 	setSeriesEndpoints(api, repositories.StreamsRepository)
 	setInputsEndpoints(api, repositories.StreamsRepository)
+	setConfigurationEndpoints(api, repositories.ConfigurationRepository)
 	setUpHealthCheck(api)
 }

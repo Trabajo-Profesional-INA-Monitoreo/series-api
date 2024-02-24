@@ -10,7 +10,8 @@ import (
 )
 
 type Repositories struct {
-	StreamsRepository repositories.StreamRepository
+	StreamsRepository       repositories.StreamRepository
+	ConfigurationRepository repositories.ConfigurationRepository
 }
 
 func CreateRepositories(connectionData string) Repositories {
@@ -23,7 +24,7 @@ func CreateRepositories(connectionData string) Repositories {
 	}
 	log.Infof("Connected to DB successfully")
 	log.Infof("Executing auto migrate")
-	err = connection.AutoMigrate(&entities.ConfiguredStream{}, &entities.Stream{}, &entities.Station{}, &entities.Network{})
+	err = connection.AutoMigrate(&entities.ConfiguredStream{}, &entities.Stream{}, &entities.Station{}, &entities.Network{}, &entities.Configuration{})
 	if err != nil {
 		log.Fatalf("Failed to auto migrate model to DB: %v", err)
 	}
@@ -31,7 +32,8 @@ func CreateRepositories(connectionData string) Repositories {
 
 	log.Infof("Creating repositories...")
 	repos := Repositories{
-		StreamsRepository: repositories.NewStreamRepository(connection),
+		StreamsRepository:       repositories.NewStreamRepository(connection),
+		ConfigurationRepository: repositories.NewConfigurationRepository(connection),
 	}
 	log.Infof("Done creating repositories")
 	return repos
