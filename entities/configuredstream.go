@@ -6,7 +6,7 @@ type ConfiguredStream struct {
 	Stream             *Stream `gorm:"references:StreamId"`
 	UpdateFrequency    float64
 	// TODO revisar esta relacion
-	RedundantStreams       []*ConfiguredStream `gorm:"references:ConfiguredStreamId"`
+	RedundantStreams       []ConfiguredStream `gorm:"many2many:redundancies;"`
 	CheckErrors            bool
 	NormalUpperThreshold   uint64
 	NormalLowerThreshold   uint64
@@ -17,7 +17,7 @@ type ConfiguredStream struct {
 
 func NewConfiguredStream(
 	stream *Stream, updateFrequency float64,
-	redundantStreams []*ConfiguredStream, checkErrors bool,
+	redundantStreams []ConfiguredStream, checkErrors bool,
 	normalUpperThreshold uint64, normalLowerThreshold uint64,
 	calibrationId uint64,
 ) *ConfiguredStream {
