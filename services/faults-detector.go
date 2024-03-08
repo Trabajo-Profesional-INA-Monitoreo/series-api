@@ -34,6 +34,15 @@ func NewFaultDetectorService(streamsRepository repositories.StreamRepository,
 	}
 }
 
+func contains(configuredStreams []entities.ConfiguredStream, configuredStream entities.ConfiguredStream) bool {
+	for _, cs := range configuredStreams {
+		if cs.ConfiguredStreamId == configuredStream.ConfiguredStreamId {
+			return true
+		}
+	}
+	return false
+}
+
 func (f faultDetectorService) handleMissingForecast(stream entities.Stream, configuredStream entities.ConfiguredStream, res *responses.LastForecast) {
 	now := time.Now()
 	diff := now.Sub(res.ForecastDate)
@@ -53,7 +62,7 @@ func (f faultDetectorService) handleMissingForecast(stream entities.Stream, conf
 			ErrorType:        entities.ForecastMissing,
 		}
 		f.errorsRepository.Create(detected)
-	} else if detected {
+	} else if detected && contains(detectedError.ConfiguredStream, configuredStream) {
 		// We already detected the error, we need to save the relationship to the current ConfiguredStream
 		detectedError := f.errorsRepository.GetDetectedErrorForStreamWithIdAndType(stream.StreamId, reqErrorId, entities.ForecastMissing)
 		detectedError.ConfiguredStream = append(detectedError.ConfiguredStream, configuredStream)
