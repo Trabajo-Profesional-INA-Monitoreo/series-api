@@ -14,7 +14,7 @@ func SetUpJobs(repositories *config.Repositories, apiConfig *config.ApiConfig) {
 		repositories.ConfiguredStreamRepository,
 		repositories.ErrorsRepository,
 		clients.NewInaApiClientImpl(apiConfig),
-		apiConfig.ForecastMaxWaitingTimeHours)
+	)
 	entryId, err := c.AddFunc(apiConfig.FaultCronTime, faultDetector.DetectFaults)
 	if err != nil {
 		log.Fatalf("Error starting fault detector service, stopping... | Err: %v", err)

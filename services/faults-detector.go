@@ -19,76 +19,97 @@ type faultDetectorService struct {
 	configuredStreamsRepository repositories.ConfiguredStreamsRepository
 	errorsRepository            repositories.ErrorsRepository
 	inaApiClient                clients.InaAPiClient
-	forecastMaxWaitingTimeHours float64
 }
 
 func NewFaultDetectorService(streamsRepository repositories.StreamRepository,
 	configuredStreamsRepository repositories.ConfiguredStreamsRepository,
 	errorsRepository repositories.ErrorsRepository,
 	inaApiClient clients.InaAPiClient,
-	forecastMaxWaitingTimeHours float64,
 ) FaultDetector {
 	return &faultDetectorService{
 		streamsRepository:           streamsRepository,
 		configuredStreamsRepository: configuredStreamsRepository,
 		errorsRepository:            errorsRepository,
 		inaApiClient:                inaApiClient,
-		forecastMaxWaitingTimeHours: forecastMaxWaitingTimeHours,
 	}
-}
-
-func (f faultDetectorService) handleForecastedStream(stream entities.Stream, configuredStream entities.ConfiguredStream) {
-	res, err := f.inaApiClient.GetLastForecast(configuredStream.CalibrationId)
-	if err != nil {
-		log.Errorf("Error performing check for stream %v with configuration %v", stream.StreamId, configuredStream.ConfiguredStreamId)
-		return
-	}
-	f.handleMissingForecast(stream, configuredStream, res)
-	// TODO handle 4 days forecast horizon
 }
 
 func (f faultDetectorService) handleMissingForecast(stream entities.Stream, configuredStream entities.ConfiguredStream, res *responses.LastForecast) {
 	now := time.Now()
 	diff := now.Sub(res.ForecastDate)
-	if diff.Hours() > f.forecastMaxWaitingTimeHours && !f.errorsRepository.AlreadyDetectedErrorWithIdAndType(fmt.Sprintf("%v", res.RunId), entities.ForecastMissing) {
+	reqErrorId := fmt.Sprintf("%v", res.RunId)
+	detectedError := f.errorsRepository.GetDetectedErrorForStreamWithIdAndType(stream.StreamId, reqErrorId, entities.ForecastMissing)
+	detected := detectedError.RequestId == reqErrorId
+	if diff.Hours() > configuredStream.UpdateFrequency && !detected {
 		// There should be a new forecast already
 		// We save the detected error
 		log.Debugf("Detected missing forecast for: %v", stream.StreamId)
 		detected := entities.DetectedError{
-			StreamId:           stream.StreamId,
-			Stream:             &stream,
-			ConfiguredStreamId: configuredStream.ConfiguredStreamId,
-			ConfiguredStream:   &configuredStream,
-			DetectedDate:       time.Now(),
-			RequestId:          fmt.Sprintf("%v", res.RunId),
-			ErrorType:          entities.ForecastMissing,
+			StreamId:         stream.StreamId,
+			Stream:           &stream,
+			ConfiguredStream: []entities.ConfiguredStream{configuredStream},
+			DetectedDate:     time.Now(),
+			RequestId:        reqErrorId,
+			ErrorType:        entities.ForecastMissing,
 		}
-		f.errorsRepository.Save(detected)
+		f.errorsRepository.Create(detected)
+	} else if detected {
+		// We already detected the error, we need to save the relationship to the current ConfiguredStream
+		detectedError := f.errorsRepository.GetDetectedErrorForStreamWithIdAndType(stream.StreamId, reqErrorId, entities.ForecastMissing)
+		detectedError.ConfiguredStream = append(detectedError.ConfiguredStream, configuredStream)
+		f.errorsRepository.Update(detectedError)
 	}
 }
 
-func (f faultDetectorService) handleNullValues(stream entities.Stream, configuredStream entities.ConfiguredStream) {
-	res, err := f.inaApiClient.GetObservedData(stream.StreamId, time.Now().Add(time.Duration(-24)*time.Hour), time.Now())
-	if err != nil {
-		log.Errorf("Error performing check for stream %v with configuration %v", stream.StreamId, configuredStream.ConfiguredStreamId)
-		return
-	}
-	for _, observed := range res {
+func (f faultDetectorService) handleNullValues(data []responses.ObservedDataResponse, stream entities.Stream, configuredStreams []entities.ConfiguredStream) {
+	for _, observed := range data {
 		isNull := observed.Value == 0 || observed.DataId == ""
-		if isNull && !f.errorsRepository.AlreadyDetectedErrorWithIdAndType(fmt.Sprintf("%v", observed.TimeStart), entities.NullValue) {
+		reqId := fmt.Sprintf("%v", observed.TimeStart)
+		if isNull && !f.errorsRepository.AlreadyDetectedErrorForStreamWithIdAndType(stream.StreamId, reqId, entities.NullValue) {
 			// We detected a new null value
 			log.Debugf("Detected null value for: %v", stream.StreamId)
 			detected := entities.DetectedError{
-				StreamId:           stream.StreamId,
-				Stream:             &stream,
-				ConfiguredStreamId: configuredStream.ConfiguredStreamId,
-				ConfiguredStream:   &configuredStream,
-				DetectedDate:       time.Now(),
-				RequestId:          fmt.Sprintf("%v", observed.TimeStart),
-				ErrorType:          entities.NullValue,
+				StreamId:         stream.StreamId,
+				Stream:           &stream,
+				ConfiguredStream: configuredStreams,
+				DetectedDate:     time.Now(),
+				RequestId:        reqId,
+				ErrorType:        entities.NullValue,
 			}
-			f.errorsRepository.Save(detected)
+			f.errorsRepository.Create(detected)
 		}
+	}
+}
+
+func (f faultDetectorService) getObservedDataFromStream(streamId uint64) ([]responses.ObservedDataResponse, error) {
+	res, err := f.inaApiClient.GetObservedData(streamId, time.Now().Add(time.Duration(-24)*time.Hour), time.Now())
+	if err != nil {
+		return nil, fmt.Errorf("error performing check for stream %v: %v", streamId, err)
+	}
+	return res, nil
+}
+
+func (f faultDetectorService) handleObservedStreams(stream entities.Stream) {
+	configuredStreams := f.configuredStreamsRepository.FindConfiguredStreamsWithCheckErrorsForStream(stream)
+	data, err := f.getObservedDataFromStream(stream.StreamId)
+	if err != nil {
+		log.Errorf("Error detecting observed errors: %v", err)
+		return
+	}
+	f.handleNullValues(data, stream, configuredStreams)
+}
+
+func (f faultDetectorService) handleForecastedStream(stream entities.Stream) {
+	configuredStreams := f.configuredStreamsRepository.FindConfiguredStreamsWithCheckErrorsForStream(stream)
+	for _, configuredStream := range configuredStreams {
+		res, err := f.inaApiClient.GetLastForecast(configuredStream.CalibrationId)
+		if err != nil {
+			log.Errorf("Error performing check for stream %v with configuration %v", stream.StreamId, configuredStream.ConfiguredStreamId)
+			return
+		}
+		f.handleMissingForecast(stream, configuredStream, res)
+
+		// TODO handle 4 days forecast horizon
 	}
 }
 
@@ -97,14 +118,11 @@ func (f faultDetectorService) DetectFaults() {
 	log.Debugf("Performing fault checks...")
 	streams := f.streamsRepository.GetStreams()
 	for _, stream := range streams {
-		configuredStreams := f.configuredStreamsRepository.FindConfiguredStreamsForStream(stream)
-		for _, configuredStream := range configuredStreams {
-			if stream.IsObserved() {
-				f.handleNullValues(stream, configuredStream)
-			}
-			if stream.IsForecasted() {
-				f.handleForecastedStream(stream, configuredStream)
-			}
+		if stream.IsObserved() {
+			f.handleObservedStreams(stream)
+		} else if stream.IsForecasted() {
+			f.handleForecastedStream(stream)
 		}
+
 	}
 }

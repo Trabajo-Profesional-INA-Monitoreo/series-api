@@ -6,7 +6,7 @@ import (
 )
 
 type ConfiguredStreamsRepository interface {
-	FindConfiguredStreamsForStream(stream entities.Stream) []entities.ConfiguredStream
+	FindConfiguredStreamsWithCheckErrorsForStream(stream entities.Stream) []entities.ConfiguredStream
 }
 
 type configuredStreamsRepository struct {
@@ -17,12 +17,12 @@ func NewConfiguredStreamsRepository(connection *gorm.DB) ConfiguredStreamsReposi
 	return &configuredStreamsRepository{connection}
 }
 
-func (db configuredStreamsRepository) FindConfiguredStreamsForStream(stream entities.Stream) []entities.ConfiguredStream {
+func (db configuredStreamsRepository) FindConfiguredStreamsWithCheckErrorsForStream(stream entities.Stream) []entities.ConfiguredStream {
 	var configured []entities.ConfiguredStream
 
 	db.connection.Model(
 		&entities.ConfiguredStream{},
-	).Where("stream_id = ?", stream.StreamId).Find(&configured)
+	).Where("stream_id = ? AND check_errors = true", stream.StreamId).Find(&configured)
 
 	return configured
 }

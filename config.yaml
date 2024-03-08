@@ -10,7 +10,6 @@ datasource:
 
 faults-detector:
   cron: "@every 1h"
-  max-forecast-waiting-time-in-hours: 6
 
 ina-client:
   base-url: "https://alerta.ina.gob.ar/a6"

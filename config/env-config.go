@@ -33,7 +33,6 @@ func initEnv() (*viper.Viper, error) {
 	_ = v.BindEnv("server", "port")
 	_ = v.BindEnv("datasource", "connection")
 	_ = v.BindEnv("faults-detector", "cron")
-	_ = v.BindEnv("faults-detector", "max-forecast-waiting-time-in-hours")
 	_ = v.BindEnv("ina-client", "token")
 	_ = v.BindEnv("ina-client", "base-url")
 
@@ -62,16 +61,13 @@ func GetConfig() *ApiConfig {
 	inaBaseUrl := getEnvString(env, "ina-client.base-url")
 	inaToken := getEnvString(env, "ina-client.token")
 
-	forecastMaxWaitingTimeHours := getEnvFloat(env, "faults-detector.max-forecast-waiting-time-in-hours")
-
 	return &ApiConfig{
-		LogLevel:                    logLevel,
-		ServerPort:                  serverPort,
-		DbUrl:                       dbConnection,
-		FaultCronTime:               faultsDetectorCron,
-		InaBaseUrl:                  inaBaseUrl,
-		InaToken:                    inaToken,
-		ForecastMaxWaitingTimeHours: forecastMaxWaitingTimeHours,
+		LogLevel:      logLevel,
+		ServerPort:    serverPort,
+		DbUrl:         dbConnection,
+		FaultCronTime: faultsDetectorCron,
+		InaBaseUrl:    inaBaseUrl,
+		InaToken:      inaToken,
 	}
 }
 
