@@ -7,9 +7,13 @@ import (
 )
 
 type ApiConfig struct {
-	LogLevel   string
-	ServerPort string
-	DbUrl      string
+	LogLevel                    string
+	ServerPort                  string
+	DbUrl                       string
+	FaultCronTime               string
+	InaToken                    string
+	InaBaseUrl                  string
+	ForecastMaxWaitingTimeHours float64
 }
 
 // initEnv Initializes the configuration properties from a config file and environment
@@ -28,6 +32,9 @@ func initEnv() (*viper.Viper, error) {
 	_ = v.BindEnv("log", "level")
 	_ = v.BindEnv("server", "port")
 	_ = v.BindEnv("datasource", "connection")
+	_ = v.BindEnv("faults-detector", "cron")
+	_ = v.BindEnv("ina-client", "token")
+	_ = v.BindEnv("ina-client", "base-url")
 
 	// Try to read configuration from config file. If config file
 	// does not exist then ReadInConfig will fail but configuration
@@ -46,22 +53,36 @@ func GetConfig() *ApiConfig {
 	if err != nil {
 		log.Fatalf("Failed to read environment, exiting")
 	}
-	logLevel := env.GetString("log.level")
-	if logLevel == "" {
-		log.Warnf("Missing log level, using info")
-		logLevel = "info"
-	}
-	serverPort := env.GetString("server.port")
-	if serverPort == "" {
-		log.Fatalf("Missing server port, exiting")
-	}
-	dbConnection := env.GetString("datasource.connection")
-	if serverPort == "" {
-		log.Fatalf("Missing server port, exiting")
-	}
+
+	logLevel := getEnvString(env, "log.level")
+	serverPort := getEnvString(env, "server.port")
+	dbConnection := getEnvString(env, "datasource.connection")
+	faultsDetectorCron := getEnvString(env, "faults-detector.cron")
+	inaBaseUrl := getEnvString(env, "ina-client.base-url")
+	inaToken := getEnvString(env, "ina-client.token")
+
 	return &ApiConfig{
-		LogLevel:   logLevel,
-		ServerPort: serverPort,
-		DbUrl:      dbConnection,
+		LogLevel:      logLevel,
+		ServerPort:    serverPort,
+		DbUrl:         dbConnection,
+		FaultCronTime: faultsDetectorCron,
+		InaBaseUrl:    inaBaseUrl,
+		InaToken:      inaToken,
 	}
+}
+
+func getEnvFloat(env *viper.Viper, key string) float64 {
+	value := env.GetFloat64(key)
+	if value == 0 {
+		log.Fatalf("Missing value in configuration: %v", key)
+	}
+	return value
+}
+
+func getEnvString(env *viper.Viper, key string) string {
+	value := env.GetString(key)
+	if value == "" {
+		log.Fatalf("Missing value in configuration: %v", key)
+	}
+	return value
 }
