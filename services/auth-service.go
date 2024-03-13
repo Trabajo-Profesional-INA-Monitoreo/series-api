@@ -5,7 +5,11 @@ import (
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/config"
 	log "github.com/sirupsen/logrus"
+	"strings"
 )
+
+const adminScope = "admin"
+const tokenScopes = "scope"
 
 type AuthService interface {
 	IsAValidToken(ctx context.Context, token string) bool
@@ -40,23 +44,11 @@ func (k keycloakAuthService) IsAValidToken(ctx context.Context, token string) bo
 }
 
 func (k keycloakAuthService) IsAnAdminToken(ctx context.Context, token string) bool {
-	rptResult, err := k.client.RetrospectToken(ctx, token, k.clientId, k.clientSecret, k.realm)
+	_, claims, err := k.client.DecodeAccessToken(ctx, token, k.realm)
 	if err != nil {
-		log.Errorf("Error validating token: %v", err)
+		log.Errorf("Error decoding token: %v", err)
 		return false
 	}
-
-	if !*rptResult.Active {
-		log.Warnf("Recived a token that is not valid")
-		return false
-	}
-	// TODO revisar
-	for _, permission := range *rptResult.Permissions {
-		for _, scope := range *permission.Scopes {
-			if scope == "admin" {
-				return true
-			}
-		}
-	}
-	return false
+	scopes := (*claims)[tokenScopes].(string)
+	return strings.Contains(scopes, adminScope)
 }
