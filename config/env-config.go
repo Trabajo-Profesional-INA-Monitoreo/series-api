@@ -14,6 +14,8 @@ type ApiConfig struct {
 	InaToken                    string
 	InaBaseUrl                  string
 	ForecastMaxWaitingTimeHours float64
+	SecurityEnabled             bool
+	KeycloakConfig              *KeycloakConfiguration
 }
 
 // initEnv Initializes the configuration properties from a config file and environment
@@ -35,6 +37,11 @@ func initEnv() (*viper.Viper, error) {
 	_ = v.BindEnv("faults-detector", "cron")
 	_ = v.BindEnv("ina-client", "token")
 	_ = v.BindEnv("ina-client", "base-url")
+	_ = v.BindEnv("security", "enabled")
+	_ = v.BindEnv("keycloak", "url")
+	_ = v.BindEnv("keycloak", "realm")
+	_ = v.BindEnv("keycloak", "client")
+	_ = v.BindEnv("keycloak", "secret")
 
 	// Try to read configuration from config file. If config file
 	// does not exist then ReadInConfig will fail but configuration
@@ -60,29 +67,17 @@ func GetConfig() *ApiConfig {
 	faultsDetectorCron := getEnvString(env, "faults-detector.cron")
 	inaBaseUrl := getEnvString(env, "ina-client.base-url")
 	inaToken := getEnvString(env, "ina-client.token")
+	securityEnabled := getEnvBool(env, "security.enabled")
+	kcConfig := getKeycloakConfig(env, securityEnabled)
 
 	return &ApiConfig{
-		LogLevel:      logLevel,
-		ServerPort:    serverPort,
-		DbUrl:         dbConnection,
-		FaultCronTime: faultsDetectorCron,
-		InaBaseUrl:    inaBaseUrl,
-		InaToken:      inaToken,
+		LogLevel:        logLevel,
+		ServerPort:      serverPort,
+		DbUrl:           dbConnection,
+		FaultCronTime:   faultsDetectorCron,
+		InaBaseUrl:      inaBaseUrl,
+		InaToken:        inaToken,
+		SecurityEnabled: securityEnabled,
+		KeycloakConfig:  kcConfig,
 	}
-}
-
-func getEnvFloat(env *viper.Viper, key string) float64 {
-	value := env.GetFloat64(key)
-	if value == 0 {
-		log.Fatalf("Missing value in configuration: %v", key)
-	}
-	return value
-}
-
-func getEnvString(env *viper.Viper, key string) string {
-	value := env.GetString(key)
-	if value == "" {
-		log.Fatalf("Missing value in configuration: %v", key)
-	}
-	return value
 }

@@ -20,7 +20,7 @@ func main() {
 
 	repositories := config.CreateRepositories(apiConfig.DbUrl)
 	middlewares.SetUpMiddlewares(server)
-	endpoints.SetUpEndpoints(server, repositories)
+	endpoints.SetUpEndpoints(server, repositories, apiConfig)
 	jobs.SetUpJobs(repositories, apiConfig)
 
 	err := server.Run(fmt.Sprintf(":%v", apiConfig.ServerPort))
