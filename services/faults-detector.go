@@ -72,7 +72,7 @@ func (f faultDetectorService) handleMissingForecast(stream entities.Stream, conf
 
 func (f faultDetectorService) handleNullValues(data []responses.ObservedDataResponse, stream entities.Stream, configuredStreams []entities.ConfiguredStream) {
 	for _, observed := range data {
-		isNull := observed.Value == 0 || observed.DataId == ""
+		isNull := observed.Value == nil || observed.DataId == ""
 		reqId := fmt.Sprintf("%v", observed.TimeStart)
 		if isNull && !f.errorsRepository.AlreadyDetectedErrorForStreamWithIdAndType(stream.StreamId, reqId, entities.NullValue) {
 			// We detected a new null value

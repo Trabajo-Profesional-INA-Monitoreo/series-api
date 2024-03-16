@@ -18,5 +18,6 @@ func SetUpEndpoints(server *gin.Engine, repositories *config.Repositories, apiCo
 	}
 	setSeriesEndpoints(api, repositories.StreamsRepository)
 	setInputsEndpoints(api, repositories.StreamsRepository)
+	setErrorEndpoints(api, repositories.ErrorsRepository)
 	setUpHealthCheck(api)
 }
