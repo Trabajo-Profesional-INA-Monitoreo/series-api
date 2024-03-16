@@ -11,8 +11,8 @@ import (
 type StreamService interface {
 	GetNetworks() dtos.StreamsPerNetworkResponse
 	GetStations() dtos.StreamsPerStationResponse
-	GetCuredSerieById(id string) dtos.StreamsDataResponse
-	GetObservatedSerieById(id string) dtos.StreamsDataResponse
+	GetCuredSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse
+	GetObservatedSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse
 	GetPredictedSerieById(id string) dtos.CalibratedStreamsDataResponse
 }
 
@@ -35,10 +35,9 @@ func (s streamService) GetStations() dtos.StreamsPerStationResponse {
 	return dtos.StreamsPerStationResponse{Stations: stations}
 }
 
-func (s streamService) GetCuredSerieById(id string) dtos.StreamsDataResponse {
-	today := time.Now()
+func (s streamService) GetCuredSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse {
 	num, _ := strconv.ParseUint(id, 10, 64)
-	streams, _ := s.inaApiClient.GetObservedData(num, today.Add(time.Duration(-24*5)*time.Hour), today.Add(time.Duration(24*5)*time.Hour))
+	streams, _ := s.inaApiClient.GetObservedData(num, start, end)
 	var streamsData []dtos.StreamsData
 	for _, stream := range streams {
 		streamsData = append(streamsData, stream.ConvertToStreamData())
@@ -46,10 +45,9 @@ func (s streamService) GetCuredSerieById(id string) dtos.StreamsDataResponse {
 	return dtos.StreamsDataResponse{Streams: streamsData}
 }
 
-func (s streamService) GetObservatedSerieById(id string) dtos.StreamsDataResponse {
-	today := time.Now()
+func (s streamService) GetObservatedSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse {
 	num, _ := strconv.ParseUint(id, 10, 64)
-	streams, _ := s.inaApiClient.GetObservedData(num, today.Add(time.Duration(-24*5)*time.Hour), today.Add(time.Duration(24*1)*time.Hour))
+	streams, _ := s.inaApiClient.GetObservedData(num, start, end)
 	var streamsData []dtos.StreamsData
 	for _, stream := range streams {
 		streamsData = append(streamsData, stream.ConvertToStreamData())

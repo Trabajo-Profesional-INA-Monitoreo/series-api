@@ -98,11 +98,33 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Endpoint para obtener los valores de una serie curada por id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: 5 dias despues",
+                        "name": "timeEnd",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.StreamsDataResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
                         }
                     }
                 }
@@ -130,11 +152,33 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Endpoint para obtener los valores de una serie observada por id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.StreamsDataResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
                         }
                     }
                 }
@@ -151,6 +195,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.CalibratedStreamsDataResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
                         }
                     }
                 }
