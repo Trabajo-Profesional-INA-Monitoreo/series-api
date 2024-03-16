@@ -92,6 +92,22 @@ const docTemplate = `{
                 }
             }
         },
+        "/series/curadas/{serie_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Endpoint para obtener los valores de una serie curada por id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StreamsDataResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/series/estaciones": {
             "get": {
                 "produces": [
@@ -103,6 +119,38 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.StreamsPerStationResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/series/observadas/{serie_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Endpoint para obtener los valores de una serie observada por id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StreamsDataResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/series/pronosticadas/{calibrado_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Endpoint para obtener los valores de una serie pronosticadas por id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.CalibratedStreamsDataResponse"
                         }
                     }
                 }
@@ -126,6 +174,55 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dtos.CalibratedStreamsData": {
+            "type": "object",
+            "properties": {
+                "qualifier": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "dtos.CalibratedStreamsDataResponse": {
+            "type": "object",
+            "properties": {
+                "mainStreams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "p05Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "p25Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "p75Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "p95Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                }
+            }
+        },
         "dtos.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -162,6 +259,28 @@ const docTemplate = `{
                 },
                 "totalStreams": {
                     "type": "integer"
+                }
+            }
+        },
+        "dtos.StreamsData": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "dtos.StreamsDataResponse": {
+            "type": "object",
+            "properties": {
+                "streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.StreamsData"
+                    }
                 }
             }
         },
