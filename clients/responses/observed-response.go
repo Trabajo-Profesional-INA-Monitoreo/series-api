@@ -8,6 +8,6 @@ type ObservedDataResponse struct {
 	TimeStart  time.Time `json:"timestart"`
 	TimeEnd    time.Time `json:"timeend"`
 	TimeUpdate time.Time `json:"timeupdate"`
-	Value      float64   `json:"valor"`
+	Value      *float64  `json:"valor"` // TODO probar si podemos mapearlo a null
 	DataId     string    `json:"id"`
 }
