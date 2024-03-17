@@ -1,4 +1,36 @@
 definitions:
+  dtos.CalibratedStreamsData:
+    properties:
+      qualifier:
+        type: string
+      time:
+        type: string
+      value:
+        type: number
+    type: object
+  dtos.CalibratedStreamsDataResponse:
+    properties:
+      mainStreams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      p05Streams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      p25Streams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      p75Streams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      p95Streams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+    type: object
   dtos.ErrorResponse:
     properties:
       message:
@@ -23,6 +55,20 @@ definitions:
         type: integer
       totalStreams:
         type: integer
+    type: object
+  dtos.StreamsData:
+    properties:
+      time:
+        type: string
+      value:
+        type: number
+    type: object
+  dtos.StreamsDataResponse:
+    properties:
+      streams:
+        items:
+          $ref: '#/definitions/dtos.StreamsData'
+        type: array
     type: object
   dtos.StreamsPerNetwork:
     properties:
@@ -112,6 +158,31 @@ paths:
           schema:
             $ref: '#/definitions/dtos.InputsGeneralMetrics'
       summary: Endpoint para obtener las metricas generales de inputs
+  /series/curadas/{serie_id}:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: 5 dias despues'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StreamsDataResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los valores de una serie curada por id
   /series/estaciones:
     get:
       produces:
@@ -122,6 +193,45 @@ paths:
           schema:
             $ref: '#/definitions/dtos.StreamsPerStationResponse'
       summary: Endpoint para obtener el resumen de las series agrupado por estacion
+  /series/observadas/{serie_id}:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StreamsDataResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los valores de una serie observada por id
+  /series/pronosticadas/{calibrado_id}:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.CalibratedStreamsDataResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los valores de una serie pronosticadas por id
   /series/redes:
     get:
       produces:

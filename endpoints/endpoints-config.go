@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/config"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/middlewares"
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,7 @@ func SetUpEndpoints(server *gin.Engine, repositories *config.Repositories, apiCo
 	if apiConfig.SecurityEnabled {
 		api.Use(middlewares.IsAValidToken(apiConfig))
 	}
-	setSeriesEndpoints(api, repositories.StreamsRepository)
+	setSeriesEndpoints(api, repositories.StreamsRepository, clients.NewInaApiClientImpl(apiConfig))
 	setInputsEndpoints(api, repositories.StreamsRepository)
 	setErrorEndpoints(api, repositories.ErrorsRepository)
 	setUpHealthCheck(api)
