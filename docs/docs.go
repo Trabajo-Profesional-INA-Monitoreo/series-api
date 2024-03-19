@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/configuration": {
+        "/configuracion": {
             "get": {
                 "produces": [
                     "application/json"
@@ -33,6 +33,29 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Endpoint para modificar una configuracion",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
                         "schema": {
                             "$ref": "#/definitions/dtos.ErrorResponse"
                         }
@@ -63,7 +86,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/configuration/{id}": {
+        "/configuracion/{id}": {
             "get": {
                 "produces": [
                     "application/json"
@@ -78,29 +101,6 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Endpoint para modificar una configuracion",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict",
                         "schema": {
                             "$ref": "#/definitions/dtos.ErrorResponse"
                         }
@@ -337,6 +337,9 @@ const docTemplate = `{
         "dtos.AllConfigurations": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 }
@@ -397,6 +400,9 @@ const docTemplate = `{
                 "name"
             ],
             "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 }

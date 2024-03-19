@@ -10,12 +10,12 @@ import (
 
 func setConfigurationEndpoints(apiGroup *gin.RouterGroup, configurationRepository repositories.ConfigurationRepository) {
 	controller := controllers.NewConfigurationController(services.NewConfigurationService(configurationRepository))
-	testApi := apiGroup.Group("/configuration")
+	testApi := apiGroup.Group("/configuracion")
 	{
 		testApi.GET("", controller.GetAllConfigurations)
 		testApi.GET("/:id", controller.GetConfigurationById)
 		testApi.POST("", controller.CreateConfiguration)
-		testApi.PUT("/:id", controller.ModifyConfiguration)
+		testApi.PUT("", controller.ModifyConfiguration)
 		testApi.DELETE("/:id", controller.DeleteConfiguration)
 	}
 	log.Infof("Configured configuration endpoints")
