@@ -1,11 +1,10 @@
 package entities
 
 type ConfiguredStream struct {
-	ConfiguredStreamId uint64 `gorm:"primary_key;auto_increment"`
-	StreamId           uint64
-	Stream             *Stream `gorm:"references:StreamId"`
-	UpdateFrequency    float64
-	// TODO revisar esta relacion
+	ConfiguredStreamId     uint64 `gorm:"primary_key;auto_increment"`
+	StreamId               uint64
+	Stream                 *Stream `gorm:"references:StreamId"`
+	UpdateFrequency        float64
 	RedundantStreams       []ConfiguredStream `gorm:"many2many:redundancies;"`
 	CheckErrors            bool
 	NormalUpperThreshold   uint64
@@ -13,13 +12,14 @@ type ConfiguredStream struct {
 	UnusualNormalThreshold uint64
 	UnusualLowerThreshold  uint64
 	CalibrationId          uint64
+	Metrics                []ConfiguredMetric
 }
 
 func NewConfiguredStream(
 	stream *Stream, updateFrequency float64,
 	redundantStreams []ConfiguredStream, checkErrors bool,
 	normalUpperThreshold uint64, normalLowerThreshold uint64,
-	calibrationId uint64,
+	calibrationId uint64, Metrics []ConfiguredMetric,
 ) *ConfiguredStream {
 	return &ConfiguredStream{
 		Stream:               stream,
@@ -29,5 +29,6 @@ func NewConfiguredStream(
 		NormalUpperThreshold: normalUpperThreshold,
 		NormalLowerThreshold: normalLowerThreshold,
 		CalibrationId:        calibrationId,
+		Metrics:              Metrics,
 	}
 }

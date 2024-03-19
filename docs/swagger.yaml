@@ -72,6 +72,42 @@ definitions:
       totalStreams:
         type: integer
     type: object
+  dtos.MetricCard:
+    properties:
+      name:
+        type: string
+      value:
+        type: number
+    type: object
+  dtos.StreamData:
+    properties:
+      alertLevel:
+        type: number
+      evacuationLevel:
+        type: number
+      lowLevel:
+        type: number
+      metrics:
+        items:
+          $ref: '#/definitions/dtos.MetricCard'
+        type: array
+      network:
+        type: string
+      procedure:
+        type: string
+      station:
+        type: string
+      streamType:
+        type: integer
+      totalCount:
+        type: string
+      unit:
+        type: string
+      updateFrequency:
+        type: number
+      varName:
+        type: string
+    type: object
   dtos.StreamsData:
     properties:
       time:
@@ -172,6 +208,12 @@ paths:
       summary: Endpoint para modificar una configuracion
   /configuracion/{id}:
     delete:
+      parameters:
+      - description: ID de la configuracion
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -183,6 +225,12 @@ paths:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para eliminar una configuracion por id
     get:
+      parameters:
+      - description: ID de la configuracion
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -195,21 +243,6 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener una configuracion por id
-    put:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-        "409":
-          description: Conflict
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-      summary: Endpoint para modificar una configuracion
   /errores/por-dia:
     get:
       parameters:
@@ -260,6 +293,42 @@ paths:
           schema:
             $ref: '#/definitions/dtos.InputsGeneralMetrics'
       summary: Endpoint para obtener las metricas generales de inputs
+  /series/{serie_id}:
+    get:
+      parameters:
+      - description: Id de la configuracion de la serie
+        format: string
+        in: query
+        name: configuredStreamId
+        required: true
+        type: string
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la serie
+        in: path
+        name: serie_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StreamData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los datos de una serie dado un id y su configuracion
   /series/curadas/{serie_id}:
     get:
       parameters:
@@ -273,6 +342,11 @@ paths:
         in: query
         name: timeEnd
         type: string
+      - description: ID de la serie
+        in: path
+        name: serie_id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -308,6 +382,11 @@ paths:
         in: query
         name: timeEnd
         type: string
+      - description: ID de la serie
+        in: path
+        name: serie_id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -322,6 +401,12 @@ paths:
       summary: Endpoint para obtener los valores de una serie observada por id
   /series/pronosticadas/{calibrado_id}:
     get:
+      parameters:
+      - description: ID del calibrado
+        in: path
+        name: calibrado_id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:

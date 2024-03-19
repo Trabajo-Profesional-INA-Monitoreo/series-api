@@ -3,7 +3,9 @@ package services
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
+	log "github.com/sirupsen/logrus"
 	"strconv"
 	"time"
 )
@@ -14,15 +16,17 @@ type StreamService interface {
 	GetCuredSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse
 	GetObservatedSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse
 	GetPredictedSerieById(id string) dtos.CalibratedStreamsDataResponse
+	GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error)
 }
 
 type streamService struct {
-	repository   repositories.StreamRepository
-	inaApiClient clients.InaAPiClient
+	repository                  repositories.StreamRepository
+	inaApiClient                clients.InaAPiClient
+	configuredStreamsRepository repositories.ConfiguredStreamsRepository
 }
 
-func NewSeriesService(repository repositories.StreamRepository, inaApiClient clients.InaAPiClient) StreamService {
-	return &streamService{repository, inaApiClient}
+func NewSeriesService(repository repositories.StreamRepository, inaApiClient clients.InaAPiClient, configuredStreamsRepository repositories.ConfiguredStreamsRepository) StreamService {
+	return &streamService{repository, inaApiClient, configuredStreamsRepository}
 }
 
 func (s streamService) GetNetworks() dtos.StreamsPerNetworkResponse {
@@ -59,4 +63,36 @@ func (s streamService) GetPredictedSerieById(id string) dtos.CalibratedStreamsDa
 	num, _ := strconv.ParseUint(id, 10, 64)
 	streams, _ := s.inaApiClient.GetLastForecast(num)
 	return streams.ConvertToCalibratedStreamsDataResponse()
+}
+
+func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, configured entities.ConfiguredStream, timeStart time.Time, timeEnd time.Time) *[]dtos.MetricCard {
+	neededMetrics := configured.Metrics
+	if len(neededMetrics) == 0 {
+		return nil
+	}
+	if stream.IsForecasted() {
+		values, err := s.inaApiClient.GetLastForecast(configured.CalibrationId)
+		if err != nil {
+			log.Errorf("Could not get metrics with calibration id %v: %v", configured.CalibrationId, err)
+			return nil
+		}
+		return getMetricsForForecastedStream(values, neededMetrics)
+	}
+	values, err := s.inaApiClient.GetObservedData(stream.StreamId, timeStart, timeEnd)
+	if err != nil {
+		log.Errorf("Could not get metrics for stream with id %v: %v", stream.StreamId, err)
+		return nil
+	}
+	return getMetricsForObservedOrCuratedStream(values, neededMetrics)
+}
+
+func (s streamService) GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error) {
+	stream, err := s.repository.GetStreamWithAssociatedData(streamId)
+	if err != nil {
+		return nil, err
+	}
+	configured := s.configuredStreamsRepository.FindConfiguredStreamById(configId)
+	streamData := dtos.NewStreamData(stream, configured)
+	streamData.Metrics = s.getMetricsFromConfiguredStream(stream, configured, timeStart, timeEnd)
+	return streamData, nil
 }

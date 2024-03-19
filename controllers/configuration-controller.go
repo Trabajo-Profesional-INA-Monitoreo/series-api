@@ -36,6 +36,7 @@ func (c configurationController) GetAllConfigurations(ctx *gin.Context) {
 //
 //		@Summary		Endpoint para obtener una configuracion por id
 //		@Produce		json
+//	    @Param          id     path      string     true  "ID de la configuracion"
 //		@Success		200	{object} dtos.Configuration
 //	    @Failure        400 {object} dtos.ErrorResponse
 //		@Router			/configuracion/{id} [get]
@@ -112,6 +113,7 @@ func (c configurationController) ModifyConfiguration(ctx *gin.Context) {
 //
 //		@Summary		Endpoint para eliminar una configuracion por id
 //		@Produce		json
+//	    @Param          id     path      string     true  "ID de la configuracion"
 //		@Success		204
 //	    @Failure        400 {object} dtos.ErrorResponse
 //		@Router			/configuracion/{id} [delete]

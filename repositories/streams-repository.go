@@ -15,6 +15,7 @@ type StreamRepository interface {
 	GetTotalNetworks() int
 	GetTotalStations() int
 	GetStreams() []entities.Stream
+	GetStreamWithAssociatedData(streamId uint64) (entities.Stream, error)
 }
 
 type streamsRepository struct {
@@ -85,4 +86,21 @@ func (db *streamsRepository) GetStreams() []entities.Stream {
 	).Find(&streams)
 
 	return streams
+}
+
+func (db *streamsRepository) GetStreamWithAssociatedData(streamId uint64) (entities.Stream, error) {
+	var stream entities.Stream
+
+	result := db.connection.Model(
+		&entities.Stream{},
+	).Joins("Network").Joins("Station").Where(
+		"streams.stream_id = ?", streamId,
+	).Find(&stream)
+
+	if result.Error != nil {
+		log.Errorf("Error executing GetStreamWithAssociatedData query: %v", result.Error)
+		return stream, result.Error
+	}
+
+	return stream, nil
 }

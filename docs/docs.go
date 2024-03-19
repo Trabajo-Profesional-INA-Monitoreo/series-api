@@ -92,6 +92,15 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Endpoint para obtener una configuracion por id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -112,6 +121,15 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Endpoint para eliminar una configuracion por id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "204": {
                         "description": "No Content"
@@ -222,6 +240,13 @@ const docTemplate = `{
                         "description": "Fecha del final del periodo - valor por defecto: 5 dias despues",
                         "name": "timeEnd",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la serie",
+                        "name": "serie_id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -276,6 +301,13 @@ const docTemplate = `{
                         "description": "Fecha del final del periodo - valor por defecto: mañana",
                         "name": "timeEnd",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la serie",
+                        "name": "serie_id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -300,6 +332,15 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Endpoint para obtener los valores de una serie pronosticadas por id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID del calibrado",
+                        "name": "calibrado_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -327,6 +368,59 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.StreamsPerNetworkResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/series/{serie_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Endpoint para obtener los datos de una serie dado un id y su configuracion",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "string",
+                        "description": "Id de la configuracion de la serie",
+                        "name": "configuredStreamId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la serie",
+                        "name": "serie_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StreamData"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
                         }
                     }
                 }
@@ -444,6 +538,61 @@ const docTemplate = `{
                 },
                 "totalStreams": {
                     "type": "integer"
+                }
+            }
+        },
+        "dtos.MetricCard": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "dtos.StreamData": {
+            "type": "object",
+            "properties": {
+                "alertLevel": {
+                    "type": "number"
+                },
+                "evacuationLevel": {
+                    "type": "number"
+                },
+                "lowLevel": {
+                    "type": "number"
+                },
+                "metrics": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.MetricCard"
+                    }
+                },
+                "network": {
+                    "type": "string"
+                },
+                "procedure": {
+                    "type": "string"
+                },
+                "station": {
+                    "type": "string"
+                },
+                "streamType": {
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "type": "string"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "updateFrequency": {
+                    "type": "number"
+                },
+                "varName": {
+                    "type": "string"
                 }
             }
         },
