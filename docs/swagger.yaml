@@ -1,11 +1,15 @@
 definitions:
   dtos.AllConfigurations:
     properties:
+      id:
+        type: integer
       name:
         type: string
     type: object
   dtos.Configuration:
     properties:
+      id:
+        type: integer
       name:
         type: string
     required:
@@ -65,7 +69,7 @@ info:
   title: Inputs API
   version: "1.0"
 paths:
-  /configuration:
+  /configuracion:
     get:
       produces:
       - application/json
@@ -96,7 +100,22 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para crear una configuracion
-  /configuration/{id}:
+    put:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para modificar una configuracion
+  /configuracion/{id}:
     delete:
       produces:
       - application/json
@@ -121,21 +140,6 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener una configuracion por id
-    put:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-        "409":
-          description: Conflict
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-      summary: Endpoint para modificar una configuracion
   /healthcheck:
     get:
       consumes:

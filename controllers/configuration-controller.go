@@ -26,7 +26,7 @@ type configurationController struct {
 //		@Produce		json
 //		@Success		200	{array} dtos.AllConfigurations
 //	    @Failure        400 {object} dtos.ErrorResponse
-//		@Router			/configuration [get]
+//		@Router			/configuracion [get]
 func (c configurationController) GetAllConfigurations(ctx *gin.Context) {
 	res := c.configurationService.GetAllConfigurations()
 	ctx.JSON(http.StatusOK, res)
@@ -38,7 +38,7 @@ func (c configurationController) GetAllConfigurations(ctx *gin.Context) {
 //		@Produce		json
 //		@Success		200	{object} dtos.Configuration
 //	    @Failure        400 {object} dtos.ErrorResponse
-//		@Router			/configuration/{id} [get]
+//		@Router			/configuracion/{id} [get]
 func (c configurationController) GetConfigurationById(ctx *gin.Context) {
 	id, userSentId := ctx.Params.Get("id")
 	if !userSentId {
@@ -62,7 +62,7 @@ func (c configurationController) GetConfigurationById(ctx *gin.Context) {
 //		@Success		201
 //	    @Failure        400 {object} dtos.ErrorResponse
 //	    @Failure        409 {object} dtos.ErrorResponse
-//		@Router			/configuration [post]
+//		@Router			/configuracion [post]
 func (c configurationController) CreateConfiguration(ctx *gin.Context) {
 
 	var configuration dtos.Configuration
@@ -89,10 +89,23 @@ func (c configurationController) CreateConfiguration(ctx *gin.Context) {
 //		@Success		200
 //	    @Failure        400 {object} dtos.ErrorResponse
 //	    @Failure        409 {object} dtos.ErrorResponse
-//		@Router			/configuration/{id} [put]
+//		@Router			/configuracion [put]
 func (c configurationController) ModifyConfiguration(ctx *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	var configuration dtos.Configuration
+
+	if err := ctx.ShouldBindJSON(&configuration); err != nil {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(err))
+		return
+	}
+
+	err := c.configurationService.ModifyConfiguration(configuration)
+
+	if err != nil {
+		ctx.JSON(http.StatusConflict, dtos.NewErrorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "Configuration modified")
 }
 
 // DeleteConfiguration godoc
@@ -101,7 +114,7 @@ func (c configurationController) ModifyConfiguration(ctx *gin.Context) {
 //		@Produce		json
 //		@Success		204
 //	    @Failure        400 {object} dtos.ErrorResponse
-//		@Router			/configuration/{id} [delete]
+//		@Router			/configuracion/{id} [delete]
 func (c configurationController) DeleteConfiguration(ctx *gin.Context) {
 	id, userSentId := ctx.Params.Get("id")
 	if !userSentId {

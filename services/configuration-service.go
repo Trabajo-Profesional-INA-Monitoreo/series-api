@@ -12,11 +12,17 @@ type (
 		GetConfigurationById(id string) *dtos.Configuration
 		CreateConfiguration(configuration dtos.Configuration) error
 		DeleteConfiguration(id string)
+		ModifyConfiguration(configuration dtos.Configuration) error
 	}
 )
 
 type configurationService struct {
 	repository repositories.ConfigurationRepository
+}
+
+func (c configurationService) ModifyConfiguration(configuration dtos.Configuration) error {
+	newConfiguration := entities.NewConfiguration(configuration)
+	return c.repository.Update(newConfiguration)
 }
 
 func (c configurationService) DeleteConfiguration(id string) {
@@ -25,7 +31,7 @@ func (c configurationService) DeleteConfiguration(id string) {
 
 func (c configurationService) CreateConfiguration(configuration dtos.Configuration) error {
 	newConfiguration := entities.NewConfiguration(configuration)
-	return c.repository.Save(newConfiguration)
+	return c.repository.Create(newConfiguration)
 }
 
 func (c configurationService) GetAllConfigurations() []dtos.AllConfigurations {
