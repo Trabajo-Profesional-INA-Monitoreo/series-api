@@ -1,15 +1,35 @@
 definitions:
-  dtos.AllConfigurations:
+  dtos.CalibratedStreamsData:
     properties:
-      name:
+      qualifier:
         type: string
+      time:
+        type: string
+      value:
+        type: number
     type: object
-  dtos.Configuration:
+  dtos.CalibratedStreamsDataResponse:
     properties:
-      name:
-        type: string
-    required:
-    - name
+      mainStreams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      p05Streams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      p25Streams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      p75Streams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      p95Streams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
     type: object
   dtos.ErrorResponse:
     properties:
@@ -17,6 +37,15 @@ definitions:
         type: string
       timestamp:
         type: string
+    type: object
+  dtos.ErrorsCountPerDayAndType:
+    properties:
+      date:
+        type: string
+      errorType:
+        type: string
+      total:
+        type: integer
     type: object
   dtos.InputsGeneralMetrics:
     properties:
@@ -26,6 +55,20 @@ definitions:
         type: integer
       totalStreams:
         type: integer
+    type: object
+  dtos.StreamsData:
+    properties:
+      time:
+        type: string
+      value:
+        type: number
+    type: object
+  dtos.StreamsDataResponse:
+    properties:
+      streams:
+        items:
+          $ref: '#/definitions/dtos.StreamsData'
+        type: array
     type: object
   dtos.StreamsPerNetwork:
     properties:
@@ -65,8 +108,19 @@ info:
   title: Inputs API
   version: "1.0"
 paths:
-  /configuration:
+  /errores/por-dia:
     get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: hoy'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
       produces:
       - application/json
       responses:
@@ -74,68 +128,13 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/dtos.AllConfigurations'
+              $ref: '#/definitions/dtos.ErrorsCountPerDayAndType'
             type: array
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
-      summary: Endpoint para obtener las configuraciones
-    post:
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-        "409":
-          description: Conflict
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-      summary: Endpoint para crear una configuracion
-  /configuration/{id}:
-    delete:
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-      summary: Endpoint para eliminar una configuracion por id
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dtos.Configuration'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-      summary: Endpoint para obtener una configuracion por id
-    put:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-        "409":
-          description: Conflict
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-      summary: Endpoint para modificar una configuracion
+      summary: Endpoint para obtener las errores detectados por dia
   /healthcheck:
     get:
       consumes:
@@ -159,6 +158,31 @@ paths:
           schema:
             $ref: '#/definitions/dtos.InputsGeneralMetrics'
       summary: Endpoint para obtener las metricas generales de inputs
+  /series/curadas/{serie_id}:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: 5 dias despues'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StreamsDataResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los valores de una serie curada por id
   /series/estaciones:
     get:
       produces:
@@ -169,6 +193,45 @@ paths:
           schema:
             $ref: '#/definitions/dtos.StreamsPerStationResponse'
       summary: Endpoint para obtener el resumen de las series agrupado por estacion
+  /series/observadas/{serie_id}:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StreamsDataResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los valores de una serie observada por id
+  /series/pronosticadas/{calibrado_id}:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.CalibratedStreamsDataResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los valores de una serie pronosticadas por id
   /series/redes:
     get:
       produces:

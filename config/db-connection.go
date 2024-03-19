@@ -10,11 +10,13 @@ import (
 )
 
 type Repositories struct {
-	StreamsRepository       repositories.StreamRepository
-	ConfigurationRepository repositories.ConfigurationRepository
+	StreamsRepository          repositories.StreamRepository
+	ConfigurationRepository    repositories.ConfigurationRepository
+	ConfiguredStreamRepository repositories.ConfiguredStreamsRepository
+	ErrorsRepository           repositories.ErrorsRepository
 }
 
-func CreateRepositories(connectionData string) Repositories {
+func CreateRepositories(connectionData string) *Repositories {
 	log.Infof("Attempting connection to DB")
 	connection, err := gorm.Open(postgres.Open(connectionData), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
@@ -24,7 +26,7 @@ func CreateRepositories(connectionData string) Repositories {
 	}
 	log.Infof("Connected to DB successfully")
 	log.Infof("Executing auto migrate")
-	err = connection.AutoMigrate(&entities.ConfiguredStream{}, &entities.Stream{}, &entities.Station{}, &entities.Network{}, &entities.Configuration{})
+	err = connection.AutoMigrate(&entities.ConfiguredStream{}, &entities.Stream{}, &entities.Station{}, &entities.Network{}, &entities.Configuration{}, &entities.DetectedError{})
 	if err != nil {
 		log.Fatalf("Failed to auto migrate model to DB: %v", err)
 	}
@@ -32,9 +34,11 @@ func CreateRepositories(connectionData string) Repositories {
 
 	log.Infof("Creating repositories...")
 	repos := Repositories{
-		StreamsRepository:       repositories.NewStreamRepository(connection),
-		ConfigurationRepository: repositories.NewConfigurationRepository(connection),
+		StreamsRepository:          repositories.NewStreamRepository(connection),
+		ConfigurationRepository:    repositories.NewConfigurationRepository(connection),
+		ConfiguredStreamRepository: repositories.NewConfiguredStreamsRepository(connection),
+		ErrorsRepository:           repositories.NewErrorsRepository(connection),
 	}
 	log.Infof("Done creating repositories")
-	return repos
+	return &repos
 }

@@ -15,106 +15,37 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/configuration": {
+        "/errores/por-dia": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Endpoint para obtener las configuraciones",
+                "summary": "Endpoint para obtener las errores detectados por dia",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: hoy",
+                        "name": "timeEnd",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dtos.AllConfigurations"
+                                "$ref": "#/definitions/dtos.ErrorsCountPerDayAndType"
                             }
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Endpoint para crear una configuracion",
-                "responses": {
-                    "201": {
-                        "description": "Created"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/configuration/{id}": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Endpoint para obtener una configuracion por id",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.Configuration"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Endpoint para modificar una configuracion",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Endpoint para eliminar una configuracion por id",
-                "responses": {
-                    "204": {
-                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -161,6 +92,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/series/curadas/{serie_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Endpoint para obtener los valores de una serie curada por id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: 5 dias despues",
+                        "name": "timeEnd",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StreamsDataResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/series/estaciones": {
             "get": {
                 "produces": [
@@ -172,6 +141,66 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.StreamsPerStationResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/series/observadas/{serie_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Endpoint para obtener los valores de una serie observada por id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StreamsDataResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/series/pronosticadas/{calibrado_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Endpoint para obtener los valores de una serie pronosticadas por id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.CalibratedStreamsDataResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
                         }
                     }
                 }
@@ -195,22 +224,52 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dtos.AllConfigurations": {
+        "dtos.CalibratedStreamsData": {
             "type": "object",
             "properties": {
-                "name": {
+                "qualifier": {
                     "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
                 }
             }
         },
-        "dtos.Configuration": {
+        "dtos.CalibratedStreamsDataResponse": {
             "type": "object",
-            "required": [
-                "name"
-            ],
             "properties": {
-                "name": {
-                    "type": "string"
+                "mainStreams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "p05Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "p25Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "p75Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "p95Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
                 }
             }
         },
@@ -225,6 +284,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.ErrorsCountPerDayAndType": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "errorType": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "dtos.InputsGeneralMetrics": {
             "type": "object",
             "properties": {
@@ -236,6 +309,28 @@ const docTemplate = `{
                 },
                 "totalStreams": {
                     "type": "integer"
+                }
+            }
+        },
+        "dtos.StreamsData": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "dtos.StreamsDataResponse": {
+            "type": "object",
+            "properties": {
+                "streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.StreamsData"
+                    }
                 }
             }
         },
