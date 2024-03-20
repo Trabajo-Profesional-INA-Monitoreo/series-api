@@ -91,7 +91,10 @@ func (s streamService) GetStreamData(streamId uint64, configId uint64, timeStart
 	if err != nil {
 		return nil, err
 	}
-	configured := s.configuredStreamsRepository.FindConfiguredStreamById(configId)
+	configured, err := s.configuredStreamsRepository.FindConfiguredStreamById(configId)
+	if err != nil {
+		return nil, err
+	}
 	streamData := dtos.NewStreamData(stream, configured)
 	streamData.Metrics = s.getMetricsFromConfiguredStream(stream, configured, timeStart, timeEnd)
 	return streamData, nil

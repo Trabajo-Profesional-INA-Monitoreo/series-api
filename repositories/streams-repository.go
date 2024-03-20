@@ -1,8 +1,11 @@
 package repositories
 
 import (
+	"errors"
+	"fmt"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
+	exceptions "github.com/Trabajo-Profesional-INA-Monitoreo/series-api/errors"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -100,6 +103,10 @@ func (db *streamsRepository) GetStreamWithAssociatedData(streamId uint64) (entit
 	if result.Error != nil {
 		log.Errorf("Error executing GetStreamWithAssociatedData query: %v", result.Error)
 		return stream, result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return stream, errors.Join(exceptions.NewNotFound(), fmt.Errorf("stream with id %v not found", streamId))
 	}
 
 	return stream, nil

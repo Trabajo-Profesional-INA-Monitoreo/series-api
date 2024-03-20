@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
+	exceptions "github.com/Trabajo-Profesional-INA-Monitoreo/series-api/errors"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -185,6 +187,10 @@ func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 		return
 	}
 	streamData, err := s.seriesService.GetStreamData(streamId, configId, timeStart, timeEnd)
+	if errors.Is(err, &exceptions.NotFound{}) {
+		ctx.JSON(http.StatusNotFound, dtos.NewErrorResponse(err))
+		return
+	}
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, dtos.NewErrorResponse(err))
 		return

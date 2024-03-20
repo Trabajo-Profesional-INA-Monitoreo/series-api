@@ -8,10 +8,29 @@ type ConfiguredMetric struct {
 type Metric uint64
 
 const (
-	Mediana Metric = iota
-	Media
-	Maximo
-	Minimo
-	Nulos
-	TasaDeCambio
+	Mediana Metric = iota // Configurable
+	Media                 // Configurable
+	Maximo                // Configurable
+	Minimo                // Configurable
+	Nulos                 // Configurable
+	Observaciones
 )
+
+func MapMetricToString(m Metric) string {
+	switch m {
+	case Mediana:
+		return "Mediana"
+	case Media:
+		return "Media"
+	case Maximo:
+		return "Maximo"
+	case Minimo:
+		return "Minimo"
+	case Nulos:
+		return "Nulos"
+	case Observaciones:
+		return "Observaciones"
+	default:
+		return "Unknown"
+	}
+}
