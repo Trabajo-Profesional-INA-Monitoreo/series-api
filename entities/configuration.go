@@ -5,7 +5,6 @@ type Configuration struct {
 	Id   uint64 `gorm:"primary_key;type:varchar(100)"`
 }
 
-//
 //func NewConfiguration(configuration dtos.Configuration) *Configuration {
 //	return &Configuration{Name: configuration.Name, Id: configuration.Id}
 //}
