@@ -1,8 +1,8 @@
 package services
 
 import (
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/converters"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
 )
 
@@ -21,7 +21,7 @@ type configurationService struct {
 }
 
 func (c configurationService) ModifyConfiguration(configuration dtos.Configuration) error {
-	newConfiguration := entities.NewConfiguration(configuration)
+	newConfiguration := converters.ConvertDtoToConfiguration(configuration)
 	return c.repository.Update(newConfiguration)
 }
 
@@ -30,7 +30,7 @@ func (c configurationService) DeleteConfiguration(id string) {
 }
 
 func (c configurationService) CreateConfiguration(configuration dtos.Configuration) error {
-	newConfiguration := entities.NewConfiguration(configuration)
+	newConfiguration := converters.ConvertDtoToConfiguration(configuration)
 	return c.repository.Create(newConfiguration)
 }
 
