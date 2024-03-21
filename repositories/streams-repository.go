@@ -96,7 +96,7 @@ func (db *streamsRepository) GetStreamWithAssociatedData(streamId uint64) (entit
 
 	result := db.connection.Model(
 		&entities.Stream{},
-	).Joins("Network").Joins("Station").Where(
+	).Joins("Network").Joins("Station").Joins("Procedure").Joins("Unit").Joins("Variable").Where(
 		"streams.stream_id = ?", streamId,
 	).Find(&stream)
 

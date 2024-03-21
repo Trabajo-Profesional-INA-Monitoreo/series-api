@@ -27,10 +27,13 @@ func CreateRepositories(connectionData string) *Repositories {
 	log.Infof("Connected to DB successfully")
 	log.Infof("Executing auto migrate")
 	err = connection.AutoMigrate(
-		&entities.ConfiguredStream{},
-		&entities.Stream{},
+		&entities.Unit{},
+		&entities.Procedure{},
+		&entities.Variable{},
 		&entities.Station{},
 		&entities.Network{},
+		&entities.ConfiguredStream{},
+		&entities.Stream{},
 		&entities.Configuration{},
 		&entities.DetectedError{},
 		&entities.ConfiguredMetric{},
