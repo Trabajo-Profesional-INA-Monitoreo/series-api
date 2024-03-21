@@ -14,6 +14,9 @@ const (
 	Minimo                // Configurable
 	Nulos                 // Configurable
 	Observaciones
+	AguasAlerta
+	AguasEvacuacion
+	AguasBajas
 )
 
 func MapMetricToString(m Metric) string {
@@ -30,6 +33,12 @@ func MapMetricToString(m Metric) string {
 		return "Nulos"
 	case Observaciones:
 		return "Observaciones"
+	case AguasAlerta:
+		return "AguasAlerta"
+	case AguasEvacuacion:
+		return "AguasEvacuacion"
+	case AguasBajas:
+		return "AguasBajas"
 	default:
 		return "Unknown"
 	}

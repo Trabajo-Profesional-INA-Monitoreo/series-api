@@ -70,20 +70,21 @@ func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, co
 	if len(neededMetrics) == 0 {
 		return nil
 	}
+	waterLevelCalculator := NewCalculateWaterLevels(*stream.Station, stream.VariableId)
 	if stream.IsForecasted() {
 		values, err := s.inaApiClient.GetLastForecast(configured.CalibrationId)
 		if err != nil {
 			log.Errorf("Could not get metrics with calibration id %v: %v", configured.CalibrationId, err)
 			return nil
 		}
-		return getMetricsForForecastedStream(values, neededMetrics)
+		return getMetricsForForecastedStream(values, neededMetrics, waterLevelCalculator)
 	}
 	values, err := s.inaApiClient.GetObservedData(stream.StreamId, timeStart, timeEnd)
 	if err != nil {
 		log.Errorf("Could not get metrics for stream with id %v: %v", stream.StreamId, err)
 		return nil
 	}
-	return getMetricsForObservedOrCuratedStream(values, neededMetrics)
+	return getMetricsForObservedOrCuratedStream(values, neededMetrics, waterLevelCalculator)
 }
 
 func (s streamService) GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error) {

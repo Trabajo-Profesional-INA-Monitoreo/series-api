@@ -29,7 +29,10 @@ func NewStreamData(stream entities.Stream, configured entities.ConfiguredStream)
 		EvacuationLevel: &stream.Station.EvacuationLevel,
 		LowWaterLevel:   &stream.Station.LowWaterLevel,
 		Unit:            stream.Unit.Name,
+		UnitId:          stream.UnitId,
 		Procedure:       stream.Procedure.Name,
+		ProcId:          stream.ProcedureId,
+		Owner:           stream.Station.Owner,
 		UpdateFrequency: configured.UpdateFrequency,
 	}
 }

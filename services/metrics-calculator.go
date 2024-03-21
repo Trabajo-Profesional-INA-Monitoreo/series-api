@@ -7,7 +7,7 @@ import (
 	"sort"
 )
 
-func getMetricsForForecastedStream(data *responses.LastForecast, neededMetrics []entities.ConfiguredMetric) *[]dtos.MetricCard {
+func getMetricsForForecastedStream(data *responses.LastForecast, neededMetrics []entities.ConfiguredMetric, waterLevelCalculator WaterLevelsCalculator) *[]dtos.MetricCard {
 	if len(neededMetrics) == 0 {
 		return nil
 	}
@@ -30,6 +30,7 @@ func getMetricsForForecastedStream(data *responses.LastForecast, neededMetrics [
 		if value > maxValue {
 			maxValue = value
 		}
+		waterLevelCalculator.Compute(value)
 		sumOfValues += value
 		validValues = append(validValues, value)
 	}
@@ -54,12 +55,12 @@ func getMetricsForForecastedStream(data *responses.LastForecast, neededMetrics [
 		}
 		metrics = append(metrics, dtos.NewMetricCard(metricName, metricValue))
 	}
-
+	metrics = waterLevelCalculator.AddMetrics(metrics)
 	metrics = append(metrics, dtos.NewMetricCard(entities.MapMetricToString(entities.Observaciones), float64(totalValues)))
 	return &metrics
 }
 
-func getMetricsForObservedOrCuratedStream(data []responses.ObservedDataResponse, neededMetrics []entities.ConfiguredMetric) *[]dtos.MetricCard {
+func getMetricsForObservedOrCuratedStream(data []responses.ObservedDataResponse, neededMetrics []entities.ConfiguredMetric, waterLevelCalculator WaterLevelsCalculator) *[]dtos.MetricCard {
 	if len(neededMetrics) == 0 {
 		return nil
 	}
@@ -84,6 +85,7 @@ func getMetricsForObservedOrCuratedStream(data []responses.ObservedDataResponse,
 			if *dataNode.Value > maxValue {
 				maxValue = *dataNode.Value
 			}
+			waterLevelCalculator.Compute(*dataNode.Value)
 			sumOfValues += *dataNode.Value
 			totalValidValues++
 			validValues = append(validValues, *dataNode.Value)
@@ -114,7 +116,7 @@ func getMetricsForObservedOrCuratedStream(data []responses.ObservedDataResponse,
 		}
 		metrics = append(metrics, dtos.NewMetricCard(metricName, metricValue))
 	}
-
+	metrics = waterLevelCalculator.AddMetrics(metrics)
 	metrics = append(metrics, dtos.NewMetricCard(entities.MapMetricToString(entities.Observaciones), float64(totalValidValues)))
 	return &metrics
 }
