@@ -26,7 +26,18 @@ func CreateRepositories(connectionData string) *Repositories {
 	}
 	log.Infof("Connected to DB successfully")
 	log.Infof("Executing auto migrate")
-	err = connection.AutoMigrate(&entities.ConfiguredStream{}, &entities.Stream{}, &entities.Station{}, &entities.Network{}, &entities.Configuration{}, &entities.DetectedError{})
+	err = connection.AutoMigrate(
+		&entities.Unit{},
+		&entities.Procedure{},
+		&entities.Variable{},
+		&entities.Station{},
+		&entities.Network{},
+		&entities.ConfiguredStream{},
+		&entities.Stream{},
+		&entities.Configuration{},
+		&entities.DetectedError{},
+		&entities.ConfiguredMetric{},
+	)
 	if err != nil {
 		log.Fatalf("Failed to auto migrate model to DB: %v", err)
 	}

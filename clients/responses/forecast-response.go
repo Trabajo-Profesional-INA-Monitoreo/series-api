@@ -19,6 +19,20 @@ type ForecastedStream struct {
 	Forecasts [][]string `json:"pronosticos"`
 }
 
+func (f LastForecast) GetMainForecast() []float64 {
+	for _, stream := range f.Streams {
+		if stream.Qualifier == "main" {
+			var values []float64
+			for _, forecast := range stream.Forecasts {
+				value, _ := strconv.ParseFloat(forecast[2], 64)
+				values = append(values, value)
+			}
+			return values
+		}
+	}
+	return []float64{}
+}
+
 func (f LastForecast) ConvertToCalibratedStreamsDataResponse() dtos.CalibratedStreamsDataResponse {
 	var P05Streams = convertToCalibratedStreamsData(f, "p05")
 	var MainStreams = convertToCalibratedStreamsData(f, "main")

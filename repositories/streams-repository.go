@@ -1,8 +1,11 @@
 package repositories
 
 import (
+	"errors"
+	"fmt"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
+	exceptions "github.com/Trabajo-Profesional-INA-Monitoreo/series-api/errors"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -15,6 +18,7 @@ type StreamRepository interface {
 	GetTotalNetworks() int
 	GetTotalStations() int
 	GetStreams() []entities.Stream
+	GetStreamWithAssociatedData(streamId uint64) (entities.Stream, error)
 }
 
 type streamsRepository struct {
@@ -85,4 +89,25 @@ func (db *streamsRepository) GetStreams() []entities.Stream {
 	).Find(&streams)
 
 	return streams
+}
+
+func (db *streamsRepository) GetStreamWithAssociatedData(streamId uint64) (entities.Stream, error) {
+	var stream entities.Stream
+
+	result := db.connection.Model(
+		&entities.Stream{},
+	).Joins("Network").Joins("Station").Joins("Procedure").Joins("Unit").Joins("Variable").Where(
+		"streams.stream_id = ?", streamId,
+	).Find(&stream)
+
+	if result.Error != nil {
+		log.Errorf("Error executing GetStreamWithAssociatedData query: %v", result.Error)
+		return stream, result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return stream, errors.Join(exceptions.NewNotFound(), fmt.Errorf("stream with id %v not found", streamId))
+	}
+
+	return stream, nil
 }

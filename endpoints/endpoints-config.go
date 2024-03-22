@@ -17,7 +17,7 @@ func SetUpEndpoints(server *gin.Engine, repositories *config.Repositories, apiCo
 	if apiConfig.SecurityEnabled {
 		api.Use(middlewares.IsAValidToken(apiConfig))
 	}
-	setSeriesEndpoints(api, repositories.StreamsRepository, clients.NewInaApiClientImpl(apiConfig))
+	setSeriesEndpoints(api, repositories, clients.NewInaApiClientImpl(apiConfig))
 	setInputsEndpoints(api, repositories.StreamsRepository)
 	setConfigurationEndpoints(api, repositories.ConfigurationRepository)
 	setErrorEndpoints(api, repositories.ErrorsRepository)
