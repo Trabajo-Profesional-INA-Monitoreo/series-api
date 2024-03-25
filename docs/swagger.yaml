@@ -47,6 +47,13 @@ definitions:
     required:
     - name
     type: object
+  dtos.ErrorIndicator:
+    properties:
+      count:
+        type: integer
+      errorType:
+        type: string
+    type: object
   dtos.ErrorResponse:
     properties:
       message:
@@ -79,32 +86,79 @@ definitions:
       value:
         type: number
     type: object
+  dtos.Pageable:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      pages:
+        type: integer
+      totalElements:
+        type: integer
+    type: object
+  dtos.StreamCard:
+    properties:
+      checkErrors:
+        type: boolean
+      configuredStreamId:
+        type: integer
+      procId:
+        type: integer
+      procedureName:
+        type: string
+      stationId:
+        type: integer
+      stationName:
+        type: string
+      streamId:
+        type: integer
+      totalErrors:
+        type: integer
+      varId:
+        type: string
+      variableName:
+        type: string
+    type: object
+  dtos.StreamCardsResponse:
+    properties:
+      content:
+        items:
+          $ref: '#/definitions/dtos.StreamCard'
+        type: array
+      pageable:
+        $ref: '#/definitions/dtos.Pageable'
+    type: object
   dtos.StreamData:
     properties:
       alertLevel:
         type: number
       evacuationLevel:
         type: number
-      lowLevel:
+      lowWaterLevel:
         type: number
       metrics:
         items:
           $ref: '#/definitions/dtos.MetricCard'
         type: array
-      network:
+      owner:
         type: string
+      procId:
+        type: integer
       procedure:
         type: string
       station:
         type: string
       streamType:
         type: integer
-      totalCount:
-        type: string
       unit:
         type: string
+      unitId:
+        type: integer
       updateFrequency:
         type: number
+      varId:
+        type: integer
       varName:
         type: string
     type: object
@@ -213,7 +267,7 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -230,7 +284,7 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -243,6 +297,39 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener una configuracion por id
+  /errores/indicadores:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: hoy'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: Id de la configuracion
+        format: uint
+        in: query
+        name: configurationId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.ErrorIndicator'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las indicadores de errores
   /errores/por-dia:
     get:
       parameters:
@@ -296,12 +383,6 @@ paths:
   /series/{serie_id}:
     get:
       parameters:
-      - description: Id de la configuracion de la serie
-        format: string
-        in: query
-        name: configuredStreamId
-        required: true
-        type: string
       - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
         format: "2006-01-02"
         in: query
@@ -313,9 +394,8 @@ paths:
         name: timeEnd
         type: string
       - description: ID de la serie
-        in: path
-        name: serie_id
-        required: true
+        in: query
+        name: streamId
         type: integer
       produces:
       - application/json
@@ -323,9 +403,13 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dtos.StreamData'
+            $ref: '#/definitions/dtos.StreamCardsResponse'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los datos de una serie dado un id y su configuracion
