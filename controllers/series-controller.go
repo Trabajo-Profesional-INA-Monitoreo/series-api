@@ -22,6 +22,7 @@ type SeriesController interface {
 	GetObservatedSerieById(ctx *gin.Context)
 	GetPredictedSerieById(ctx *gin.Context)
 	GetStreamDataById(ctx *gin.Context)
+	GetStreamCards(ctx *gin.Context)
 }
 
 type seriesController struct {
@@ -152,6 +153,8 @@ func (s seriesController) GetPredictedSerieById(ctx *gin.Context) {
 //	    @Param          serie_id     path      int     true  "ID de la serie"
 //		@Success		200	{object} dtos.StreamData
 //		@Failure        400  {object}  dtos.ErrorResponse
+//		@Failure        404  {object}  dtos.ErrorResponse
+//		@Failure        500  {object}  dtos.ErrorResponse
 //		@Router			/series/{serie_id} [get]
 func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 	streamIdParam, userSentId := ctx.Params.Get("serie_id")
@@ -196,4 +199,19 @@ func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, streamData)
+}
+
+// GetStreamCards godoc
+//
+//		@Summary		Endpoint para obtener los datos de una serie dado un id y su configuracion
+//		@Produce		json
+//		@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
+//		@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: mañana"  Format(2006-01-02)
+//	    @Param          streamId     query      int     false  "ID de la serie"
+//		@Success		200	{object} dtos.StreamCardsResponse
+//		@Failure        400  {object}  dtos.ErrorResponse
+//		@Failure        500  {object}  dtos.ErrorResponse
+//		@Router			/series/{serie_id} [get]
+func (s seriesController) GetStreamCards(ctx *gin.Context) {
+
 }

@@ -17,6 +17,7 @@ type StreamService interface {
 	GetObservatedSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse
 	GetPredictedSerieById(id string) dtos.CalibratedStreamsDataResponse
 	GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error)
+	GetStreamCards(parameters dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error)
 }
 
 type streamService struct {
@@ -99,4 +100,23 @@ func (s streamService) GetStreamData(streamId uint64, configId uint64, timeStart
 	streamData := dtos.NewStreamData(stream, configured)
 	streamData.Metrics = s.getMetricsFromConfiguredStream(stream, configured, timeStart, timeEnd)
 	return streamData, nil
+}
+
+func (s streamService) GetStreamCards(parameters dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error) {
+	result, err := s.repository.GetStreamCards(parameters)
+	if err != nil {
+		return nil, err
+	}
+	var configuredIds []uint64
+	for _, card := range result.Content {
+		configuredIds = append(configuredIds, card.ConfiguredStreamId)
+	}
+	//var errorsPerConfigStream, err = s.configuredStreamsRepository.CountErrorOfConfigurations(configuredIds, parameters)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//for i, i2 := range collection {
+	//
+	//}
+	return result, nil
 }

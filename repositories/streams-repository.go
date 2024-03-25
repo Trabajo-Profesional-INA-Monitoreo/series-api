@@ -19,6 +19,7 @@ type StreamRepository interface {
 	GetTotalStations() int
 	GetStreams() []entities.Stream
 	GetStreamWithAssociatedData(streamId uint64) (entities.Stream, error)
+	GetStreamCards(parameters dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error)
 }
 
 type streamsRepository struct {
@@ -110,4 +111,48 @@ func (db *streamsRepository) GetStreamWithAssociatedData(streamId uint64) (entit
 	}
 
 	return stream, nil
+}
+
+func (db *streamsRepository) GetStreamCards(parameters dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error) {
+	var streamCards []dtos.StreamCard
+	result := db.connection.Model(
+		&entities.ConfiguredStream{},
+	).Joins("Stream").Joins("Station").Joins("Procedure").Joins("Variable").Where(
+		"configured_streams.configured_stream_id = ?", parameters.ConfigurationId,
+	).Where(
+		"(? IS NULL OR streams.stream_id = ?)", parameters.StreamId,
+	).Where(
+		"(? IS NULL OR stations.station_id = ?) ", parameters.StationId,
+	).Where(
+		"(? IS NULL OR procedures.procedure_id = ?)", parameters.ProcId,
+	).Where(
+		"(? IS NULL OR streams.variable_id = ?)", parameters.VarId,
+	).Where(
+		"(? IS NULL OR streams.stream_type = ?)", parameters.StreamType,
+	).Limit(parameters.PageSize).Offset(parameters.Page * parameters.PageSize).Find(&streamCards)
+
+	var totalElements int
+	result = db.connection.Model(
+		&entities.ConfiguredStream{},
+	).Select(
+		"count(configured_streams.configured_stream_id)").Joins("Stream").Where(
+		"configured_streams.configured_stream_id = ?", parameters.ConfigurationId,
+	).Where(
+		"(? IS NULL OR streams.stream_id = ?)", parameters.StreamId,
+	).Where(
+		"(? IS NULL OR stations.station_id = ?) ", parameters.StationId,
+	).Where(
+		"(? IS NULL OR procedures.procedure_id = ?)", parameters.ProcId,
+	).Where(
+		"(? IS NULL OR streams.variable_id = ?)", parameters.VarId,
+	).Where(
+		"(? IS NULL OR streams.stream_type = ?)", parameters.StreamType,
+	).Find(&totalElements)
+
+	if result.Error != nil {
+		log.Errorf("Error executing GetStreamWithAssociatedData query: %v", result.Error)
+		return nil, result.Error
+	}
+
+	return dtos.NewStreamCardsResponse(streamCards, dtos.NewPageable(totalElements, parameters.Page, parameters.PageSize)), nil
 }

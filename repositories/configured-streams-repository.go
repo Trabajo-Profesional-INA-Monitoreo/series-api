@@ -3,6 +3,7 @@ package repositories
 import (
 	"errors"
 	"fmt"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	exceptions "github.com/Trabajo-Profesional-INA-Monitoreo/series-api/errors"
 	log "github.com/sirupsen/logrus"
@@ -12,6 +13,7 @@ import (
 type ConfiguredStreamsRepository interface {
 	FindConfiguredStreamsWithCheckErrorsForStream(stream entities.Stream) []entities.ConfiguredStream
 	FindConfiguredStreamById(configStreamId uint64) (entities.ConfiguredStream, error)
+	CountErrorOfConfigurations(ids []uint64, parameters dtos.StreamCardsParameters) ([]dtos.ErrorsPerConfigStream, error)
 }
 
 type configuredStreamsRepository struct {
@@ -48,4 +50,8 @@ func (db configuredStreamsRepository) FindConfiguredStreamById(configStreamId ui
 	}
 
 	return configured, nil
+}
+
+func (db configuredStreamsRepository) CountErrorOfConfigurations(ids []uint64, parameters dtos.StreamCardsParameters) ([]dtos.ErrorsPerConfigStream, error) {
+	return nil, nil
 }

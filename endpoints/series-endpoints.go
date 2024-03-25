@@ -13,6 +13,7 @@ func setSeriesEndpoints(apiGroup *gin.RouterGroup, repositories *config.Reposito
 	controller := controllers.NewSeriesController(services.NewSeriesService(repositories.StreamsRepository, inaApiClient, repositories.ConfiguredStreamRepository))
 	testApi := apiGroup.Group("/series")
 	{
+		testApi.GET("", controller.GetStreamCards)
 		testApi.GET("/redes", controller.GetNetworks)
 		testApi.GET("/estaciones", controller.GetStations)
 		testApi.GET("/:serie_id", controller.GetStreamDataById)
