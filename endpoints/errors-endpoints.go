@@ -13,6 +13,7 @@ func setErrorEndpoints(apiGroup *gin.RouterGroup, errorsRepository repositories.
 	testApi := apiGroup.Group("/errores")
 	{
 		testApi.GET("/por-dia", controller.GetErrorsPerDay)
+		testApi.GET("/indicadores", controller.GetErrorIndicators)
 	}
 	log.Infof("Configured error endpoints")
 }
