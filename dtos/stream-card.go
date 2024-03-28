@@ -1,15 +1,15 @@
 package dtos
 
 type StreamCard struct {
-	StreamId           uint64
-	ConfiguredStreamId uint64
-	VarId              string
-	VariableName       string
-	ProcId             uint64
-	ProcedureName      string
-	StationId          uint64
-	StationName        string
-	CheckErrors        bool
+	StreamId           uint64 `gorm:"stream_id"`
+	ConfiguredStreamId uint64 `gorm:"configured_stream_id"`
+	VarId              string `gorm:"variable_id"`
+	VariableName       string `gorm:"variable_name"`
+	ProcId             uint64 `gorm:"procedure_id"`
+	ProcedureName      string `gorm:"procedure_name"`
+	StationId          uint64 `gorm:"station_id"`
+	StationName        string `gorm:"station_name"`
+	CheckErrors        bool   `gorm:"check_errors"`
 	TotalErrors        *uint64
 }
 

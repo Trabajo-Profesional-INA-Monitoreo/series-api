@@ -380,7 +380,7 @@ paths:
           schema:
             $ref: '#/definitions/dtos.InputsGeneralMetrics'
       summary: Endpoint para obtener las metricas generales de inputs
-  /series/{serie_id}:
+  /series:
     get:
       parameters:
       - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
@@ -393,9 +393,34 @@ paths:
         in: query
         name: timeEnd
         type: string
-      - description: ID de la serie
+      - description: Filtro por ID de la serie
         in: query
         name: streamId
+        type: integer
+      - description: Filtro por ID de la estacion
+        in: query
+        name: stationId
+        type: integer
+      - description: Filtro por ID de procedimiento
+        in: query
+        name: procId
+        type: integer
+      - description: Filtro por ID de variable
+        in: query
+        name: varId
+        type: integer
+      - description: Numero de pagina, por defecto 0
+        in: query
+        name: page
+        type: integer
+      - description: Cantidad de series por pagina, por defecto 15
+        in: query
+        name: pageSize
+        type: integer
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
         type: integer
       produces:
       - application/json
@@ -406,6 +431,50 @@ paths:
             $ref: '#/definitions/dtos.StreamCardsResponse'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las series configuradas de una configuracion
+  /series/{serie_id}:
+    get:
+      parameters:
+      - description: Id de la configuracion de la serie
+        format: string
+        in: query
+        name: configuredStreamId
+        required: true
+        type: string
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la serie
+        in: path
+        name: serie_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StreamData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
         "500":
