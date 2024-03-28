@@ -3,9 +3,9 @@ package dtos
 type StreamCard struct {
 	StreamId           uint64 `gorm:"stream_id"`
 	ConfiguredStreamId uint64 `gorm:"configured_stream_id"`
-	VarId              string `gorm:"variable_id"`
+	VariableId         uint64 `gorm:"variable_id"`
 	VariableName       string `gorm:"variable_name"`
-	ProcId             uint64 `gorm:"procedure_id"`
+	ProcedureId        uint64 `gorm:"procedure_id"`
 	ProcedureName      string `gorm:"procedure_name"`
 	StationId          uint64 `gorm:"station_id"`
 	StationName        string `gorm:"station_name"`
