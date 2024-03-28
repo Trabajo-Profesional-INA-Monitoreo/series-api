@@ -123,17 +123,18 @@ func (db *streamsRepository) GetStreamCards(parameters dtos.StreamCardsParameter
 	streamType := parameters.GetAsInt("streamType")
 	pageSize := *parameters.GetAsInt("pageSize")
 	page := *parameters.GetAsInt("page")
-	result := db.connection.Model(
+
+	tx := db.connection.Model(
 		&entities.ConfiguredStream{},
 	).Select(
 		"configured_streams.configured_stream_id as configured_stream_id",
 		"configured_streams.stream_id as stream_id",
 		"configured_streams.check_errors as check_errors",
-		"procedures.procedure_id as procedure_id",
+		"streams.procedure_id as procedure_id",
 		"procedures.name as procedure_name",
-		"variables.variable_id as variable_id",
+		"streams.variable_id as variable_id",
 		"variables.name as variable_name",
-		"stations.station_id as station_id",
+		"streams.station_id as station_id",
 		"stations.name as station_name",
 	).Joins(
 		"JOIN streams ON streams.stream_id=configured_streams.stream_id",
@@ -144,52 +145,50 @@ func (db *streamsRepository) GetStreamCards(parameters dtos.StreamCardsParameter
 	).Joins(
 		"JOIN variables ON variables.variable_id=streams.variable_id",
 	).Where(
-		"configured_streams.configuration_id = ?", configId, configId,
-	).Where(
-		"? IS NULL OR streams.stream_id = ?", streamId, streamId,
-	).Where(
-		"? IS NULL OR stations.station_id = ? ", stationId, stationId,
-	).Where(
-		"? IS NULL OR procedures.procedure_id = ?", procId, procId,
-	).Where(
-		"? IS NULL OR streams.variable_id = ?", varId, varId,
-	).Where(
-		"? IS NULL OR streams.stream_type = ?", streamType, streamType,
-	).Limit(
-		pageSize,
-	).Offset(
-		page * pageSize,
-	).Find(&streamCards)
-
-	if result.Error != nil {
-		log.Errorf("Error executing GetStreamCards query: %v", result.Error)
-		return nil, result.Error
-	}
+		"configured_streams.configuration_id = ?", configId,
+	)
 
 	var totalElements int
-	result = db.connection.Model(
+	countTx := db.connection.Model(
 		&entities.ConfiguredStream{},
 	).Select(
 		"count(configured_streams.configured_stream_id)",
 	).Joins(
 		"JOIN streams ON configured_streams.stream_id=streams.stream_id",
-	).Where(
-		"configured_streams.configuration_id = ?", configId, configId,
-	).Where(
-		"? IS NULL OR streams.stream_id = ?", streamId, streamId,
-	).Where(
-		"? IS NULL OR streams.station_id = ?", stationId, stationId,
-	).Where(
-		"? IS NULL OR streams.procedure_id = ?", procId, procId,
-	).Where(
-		"? IS NULL OR streams.variable_id = ?", varId, varId,
-	).Where(
-		"? IS NULL OR streams.stream_type = ?", streamType, streamType,
-	).Find(&totalElements)
+	).Where("configured_streams.configuration_id = ?", configId)
 
-	if result.Error != nil {
-		log.Errorf("Error executing GetStreamCards Count query: %v", result.Error)
-		return nil, result.Error
+	if streamId != nil {
+		tx.Where("streams.stream_id = ?", streamId)
+		countTx.Where("streams.stream_id = ?", streamId)
+	}
+	if stationId != nil {
+		tx.Where("stations.station_id = ? ", stationId)
+		countTx.Where("streams.station_id = ?", stationId)
+	}
+	if procId != nil {
+		tx.Where("procedures.procedure_id = ?", procId)
+		countTx.Where("streams.procedure_id = ?", procId)
+	}
+	if varId != nil {
+		tx.Where("streams.variable_id = ?", varId)
+		countTx.Where("streams.variable_id = ?", varId)
+	}
+	if streamType != nil {
+		tx.Where("streams.stream_type = ?", streamType)
+		countTx.Where("streams.stream_type = ?", streamType)
+	}
+	tx.Limit(pageSize).Offset(page * pageSize).Find(&streamCards)
+
+	if tx.Error != nil {
+		log.Errorf("Error executing GetStreamCards query: %v", tx.Error)
+		return nil, tx.Error
+	}
+
+	countTx.Find(&totalElements)
+
+	if countTx.Error != nil {
+		log.Errorf("Error executing GetStreamCards Count query: %v", countTx.Error)
+		return nil, countTx.Error
 	}
 
 	return dtos.NewStreamCardsResponse(streamCards, dtos.NewPageable(totalElements, page, pageSize)), nil
