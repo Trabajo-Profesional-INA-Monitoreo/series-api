@@ -108,15 +108,22 @@ func (s streamService) GetStreamCards(parameters *dtos.StreamCardsParameters) (*
 		return nil, err
 	}
 	var configuredIds []uint64
-	for _, card := range result.Content {
-		configuredIds = append(configuredIds, card.ConfiguredStreamId)
+	for _, card := range *result.Content {
+		if card.CheckErrors {
+			configuredIds = append(configuredIds, card.ConfiguredStreamId)
+		}
 	}
-	//var errorsPerConfigStream, err = s.configuredStreamsRepository.CountErrorOfConfigurations(configuredIds, parameters)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//for i, i2 := range collection {
-	//
-	//}
+	errorsPerConfigStream, err := s.configuredStreamsRepository.CountErrorOfConfigurations(configuredIds, parameters)
+	if err != nil {
+		return nil, err
+	}
+	for _, errors := range errorsPerConfigStream {
+		for _, card := range *result.Content {
+			if errors.ConfiguredStreamId == card.ConfiguredStreamId {
+				card.TotalErrors = &errors.ErrorsCount
+				break
+			}
+		}
+	}
 	return result, nil
 }

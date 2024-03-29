@@ -114,7 +114,7 @@ func (db *streamsRepository) GetStreamWithAssociatedData(streamId uint64) (entit
 }
 
 func (db *streamsRepository) GetStreamCards(parameters dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error) {
-	var streamCards []dtos.StreamCard
+	var streamCards []*dtos.StreamCard
 	configId := parameters.GetAsInt("configurationId")
 	streamId := parameters.GetAsInt("streamId")
 	stationId := parameters.GetAsInt("stationId")

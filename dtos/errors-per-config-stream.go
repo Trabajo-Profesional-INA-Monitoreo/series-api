@@ -1,6 +1,6 @@
 package dtos
 
 type ErrorsPerConfigStream struct {
-	ConfigurationStreamId uint64
-	ErrorCount            uint64
+	ConfiguredStreamId uint64 `gorm:"configured_stream_id"`
+	ErrorsCount        uint64 `gorm:"errors_count"`
 }

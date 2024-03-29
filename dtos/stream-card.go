@@ -14,10 +14,10 @@ type StreamCard struct {
 }
 
 type StreamCardsResponse struct {
-	Content  []StreamCard
+	Content  *[]*StreamCard
 	Pageable Pageable
 }
 
-func NewStreamCardsResponse(content []StreamCard, pageable Pageable) *StreamCardsResponse {
-	return &StreamCardsResponse{Content: content, Pageable: pageable}
+func NewStreamCardsResponse(content []*StreamCard, pageable Pageable) *StreamCardsResponse {
+	return &StreamCardsResponse{Content: &content, Pageable: pageable}
 }
