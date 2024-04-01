@@ -3,7 +3,6 @@ package services
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
-	log "github.com/sirupsen/logrus"
 )
 
 type WaterLevelsCalculator interface {
@@ -43,7 +42,6 @@ func (c *calculateWaterLevels) Compute(level float64) {
 	if level >= c.evacuationLevel {
 		c.countEvacuationLevel++
 	} else if level >= c.alertLevel {
-		log.Infof("%v", level)
 		c.countAlertLevel++
 	} else if level <= c.lowWaterLevel {
 		c.countLowWaterLevel++
