@@ -6,6 +6,17 @@ definitions:
       name:
         type: string
     type: object
+  dtos.BehaviourStreamsResponse:
+    properties:
+      countAlertLevel:
+        type: integer
+      countEvacuationLevel:
+        type: integer
+      countLowWaterLevel:
+        type: integer
+      totalValuesCount:
+        type: integer
+    type: object
   dtos.CalibratedStreamsData:
     properties:
       qualifier:
@@ -85,49 +96,6 @@ definitions:
         type: string
       value:
         type: number
-    type: object
-  dtos.Pageable:
-    properties:
-      page:
-        type: integer
-      pageSize:
-        type: integer
-      pages:
-        type: integer
-      totalElements:
-        type: integer
-    type: object
-  dtos.StreamCard:
-    properties:
-      checkErrors:
-        type: boolean
-      configuredStreamId:
-        type: integer
-      procId:
-        type: integer
-      procedureName:
-        type: string
-      stationId:
-        type: integer
-      stationName:
-        type: string
-      streamId:
-        type: integer
-      totalErrors:
-        type: integer
-      varId:
-        type: string
-      variableName:
-        type: string
-    type: object
-  dtos.StreamCardsResponse:
-    properties:
-      content:
-        items:
-          $ref: '#/definitions/dtos.StreamCard'
-        type: array
-      pageable:
-        $ref: '#/definitions/dtos.Pageable'
     type: object
   dtos.StreamData:
     properties:
@@ -380,64 +348,6 @@ paths:
           schema:
             $ref: '#/definitions/dtos.InputsGeneralMetrics'
       summary: Endpoint para obtener las metricas generales de inputs
-  /series:
-    get:
-      parameters:
-      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
-        format: "2006-01-02"
-        in: query
-        name: timeStart
-        type: string
-      - description: 'Fecha del final del periodo - valor por defecto: mañana'
-        format: "2006-01-02"
-        in: query
-        name: timeEnd
-        type: string
-      - description: Filtro por ID de la serie
-        in: query
-        name: streamId
-        type: integer
-      - description: Filtro por ID de la estacion
-        in: query
-        name: stationId
-        type: integer
-      - description: Filtro por ID de procedimiento
-        in: query
-        name: procId
-        type: integer
-      - description: Filtro por ID de variable
-        in: query
-        name: varId
-        type: integer
-      - description: Numero de pagina, por defecto 0
-        in: query
-        name: page
-        type: integer
-      - description: Cantidad de series por pagina, por defecto 15
-        in: query
-        name: pageSize
-        type: integer
-      - description: ID de la configuracion
-        in: query
-        name: configurationId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dtos.StreamCardsResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-      summary: Endpoint para obtener las series configuradas de una configuracion
   /series/{serie_id}:
     get:
       parameters:
@@ -482,6 +392,40 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los datos de una serie dado un id y su configuracion
+  /series/comportamiento:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.BehaviourStreamsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las metricas de comportamiento
   /series/curadas/{serie_id}:
     get:
       parameters:

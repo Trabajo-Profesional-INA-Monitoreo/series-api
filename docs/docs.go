@@ -269,12 +269,12 @@ const docTemplate = `{
                 }
             }
         },
-        "/series": {
+        "/series/comportamiento": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Endpoint para obtener las series configuradas de una configuracion",
+                "summary": "Endpoint para obtener las metricas de comportamiento",
                 "parameters": [
                     {
                         "type": "string",
@@ -292,42 +292,6 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Filtro por ID de la serie",
-                        "name": "streamId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Filtro por ID de la estacion",
-                        "name": "stationId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Filtro por ID de procedimiento",
-                        "name": "procId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Filtro por ID de variable",
-                        "name": "varId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Numero de pagina, por defecto 0",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Cantidad de series por pagina, por defecto 15",
-                        "name": "pageSize",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
                         "description": "ID de la configuracion",
                         "name": "configurationId",
                         "in": "query",
@@ -338,7 +302,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dtos.StreamCardsResponse"
+                            "$ref": "#/definitions/dtos.BehaviourStreamsResponse"
                         }
                     },
                     "400": {
@@ -587,6 +551,23 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.BehaviourStreamsResponse": {
+            "type": "object",
+            "properties": {
+                "countAlertLevel": {
+                    "type": "integer"
+                },
+                "countEvacuationLevel": {
+                    "type": "integer"
+                },
+                "countLowWaterLevel": {
+                    "type": "integer"
+                },
+                "totalValuesCount": {
+                    "type": "integer"
+                }
+            }
+        },
         "dtos.CalibratedStreamsData": {
             "type": "object",
             "properties": {
@@ -708,72 +689,6 @@ const docTemplate = `{
                 },
                 "value": {
                     "type": "number"
-                }
-            }
-        },
-        "dtos.Pageable": {
-            "type": "object",
-            "properties": {
-                "page": {
-                    "type": "integer"
-                },
-                "pageSize": {
-                    "type": "integer"
-                },
-                "pages": {
-                    "type": "integer"
-                },
-                "totalElements": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dtos.StreamCard": {
-            "type": "object",
-            "properties": {
-                "checkErrors": {
-                    "type": "boolean"
-                },
-                "configuredStreamId": {
-                    "type": "integer"
-                },
-                "procId": {
-                    "type": "integer"
-                },
-                "procedureName": {
-                    "type": "string"
-                },
-                "stationId": {
-                    "type": "integer"
-                },
-                "stationName": {
-                    "type": "string"
-                },
-                "streamId": {
-                    "type": "integer"
-                },
-                "totalErrors": {
-                    "type": "integer"
-                },
-                "varId": {
-                    "type": "string"
-                },
-                "variableName": {
-                    "type": "string"
-                }
-            }
-        },
-        "dtos.StreamCardsResponse": {
-            "type": "object",
-            "properties": {
-                "content": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dtos.StreamCard"
-                    }
-                },
-                "pageable": {
-                    "$ref": "#/definitions/dtos.Pageable"
                 }
             }
         },
