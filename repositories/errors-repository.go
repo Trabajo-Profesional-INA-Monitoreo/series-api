@@ -14,6 +14,7 @@ type ErrorsRepository interface {
 	Create(detectedError entities.DetectedError)
 	Update(detectedError entities.DetectedError)
 	GetErrorsPerDay(timeStart time.Time, timeEnd time.Time) []*dtos.ErrorsCountPerDayAndType
+	GetErrorIndicators(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorIndicator
 }
 
 type errorsRepository struct {
@@ -73,6 +74,30 @@ func (e errorsRepository) GetErrorsPerDay(timeStart time.Time, timeEnd time.Time
 	).Find(&results)
 	if err.Error != nil {
 		log.Errorf("Error executing GetErrorsPerDay query: %v", err)
+	}
+	return results
+}
+
+func (e errorsRepository) GetErrorIndicators(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorIndicator {
+	var results []*dtos.ErrorIndicator
+	err := e.connection.Model(
+		&entities.DetectedError{},
+	).Select(
+		"detected_errors.error_type as error_type",
+		"COUNT(detected_errors.error_id) as count",
+	).Joins(
+		"JOIN configured_streams_errors ON configured_streams_errors.detected_error_error_id=detected_errors.error_id",
+	).Joins(
+		"JOIN configured_streams ON configured_streams.configured_stream_id=configured_streams_errors.configured_stream_configured_stream_id",
+	).Where(
+		"configured_streams.configuration_id = ?", configId,
+	).Where(
+		"detected_date >= ? AND detected_date <= ?", timeStart, timeEnd,
+	).Group(
+		"detected_errors.error_type",
+	).Find(&results)
+	if err.Error != nil {
+		log.Errorf("Error executing GetErrorIndicators query: %v", err)
 	}
 	return results
 }

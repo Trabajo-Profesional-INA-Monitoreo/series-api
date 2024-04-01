@@ -94,7 +94,7 @@ const docTemplate = `{
                 "summary": "Endpoint para obtener una configuracion por id",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "ID de la configuracion",
                         "name": "id",
                         "in": "path",
@@ -123,7 +123,7 @@ const docTemplate = `{
                 "summary": "Endpoint para eliminar una configuracion por id",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "ID de la configuracion",
                         "name": "id",
                         "in": "path",
@@ -133,6 +133,55 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/errores/indicadores": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Endpoint para obtener las indicadores de errores",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: hoy",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "uint",
+                        "description": "Id de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.ErrorIndicator"
+                            }
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -215,6 +264,93 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.InputsGeneralMetrics"
+                        }
+                    }
+                }
+            }
+        },
+        "/series": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Endpoint para obtener las series configuradas de una configuracion",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtro por ID de la serie",
+                        "name": "streamId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtro por ID de la estacion",
+                        "name": "stationId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtro por ID de procedimiento",
+                        "name": "procId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtro por ID de variable",
+                        "name": "varId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Numero de pagina, por defecto 0",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Cantidad de series por pagina, por defecto 15",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StreamCardsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
                         }
                     }
                 }
@@ -422,6 +558,18 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dtos.ErrorResponse"
                         }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -502,6 +650,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.ErrorIndicator": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "errorType": {
+                    "type": "string"
+                }
+            }
+        },
         "dtos.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -552,6 +711,72 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.Pageable": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "pages": {
+                    "type": "integer"
+                },
+                "totalElements": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.StreamCard": {
+            "type": "object",
+            "properties": {
+                "checkErrors": {
+                    "type": "boolean"
+                },
+                "configuredStreamId": {
+                    "type": "integer"
+                },
+                "procId": {
+                    "type": "integer"
+                },
+                "procedureName": {
+                    "type": "string"
+                },
+                "stationId": {
+                    "type": "integer"
+                },
+                "stationName": {
+                    "type": "string"
+                },
+                "streamId": {
+                    "type": "integer"
+                },
+                "totalErrors": {
+                    "type": "integer"
+                },
+                "varId": {
+                    "type": "string"
+                },
+                "variableName": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.StreamCardsResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.StreamCard"
+                    }
+                },
+                "pageable": {
+                    "$ref": "#/definitions/dtos.Pageable"
+                }
+            }
+        },
         "dtos.StreamData": {
             "type": "object",
             "properties": {
@@ -561,7 +786,7 @@ const docTemplate = `{
                 "evacuationLevel": {
                     "type": "number"
                 },
-                "lowLevel": {
+                "lowWaterLevel": {
                     "type": "number"
                 },
                 "metrics": {
@@ -570,8 +795,11 @@ const docTemplate = `{
                         "$ref": "#/definitions/dtos.MetricCard"
                     }
                 },
-                "network": {
+                "owner": {
                     "type": "string"
+                },
+                "procId": {
+                    "type": "integer"
                 },
                 "procedure": {
                     "type": "string"
@@ -582,14 +810,17 @@ const docTemplate = `{
                 "streamType": {
                     "type": "integer"
                 },
-                "totalCount": {
-                    "type": "string"
-                },
                 "unit": {
                     "type": "string"
                 },
+                "unitId": {
+                    "type": "integer"
+                },
                 "updateFrequency": {
                     "type": "number"
+                },
+                "varId": {
+                    "type": "integer"
                 },
                 "varName": {
                     "type": "string"

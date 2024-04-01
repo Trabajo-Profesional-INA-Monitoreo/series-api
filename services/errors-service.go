@@ -8,6 +8,7 @@ import (
 
 type ErrorsService interface {
 	GetErrorsPerDay(timeStart time.Time, timeEnd time.Time) []*dtos.ErrorsCountPerDayAndType
+	GetErrorIndicators(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorIndicator
 }
 
 type errorsService struct {
@@ -20,6 +21,14 @@ func NewErrorsService(repository repositories.ErrorsRepository) ErrorsService {
 
 func (e errorsService) GetErrorsPerDay(timeStart time.Time, timeEnd time.Time) []*dtos.ErrorsCountPerDayAndType {
 	errors := e.repository.GetErrorsPerDay(timeStart, timeEnd)
+	for _, count := range errors {
+		count.ConvertToResponse()
+	}
+	return errors
+}
+
+func (e errorsService) GetErrorIndicators(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorIndicator {
+	errors := e.repository.GetErrorIndicators(timeStart, timeEnd, configId)
 	for _, count := range errors {
 		count.ConvertToResponse()
 	}
