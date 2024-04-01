@@ -18,6 +18,7 @@ type StreamService interface {
 	GetPredictedSerieById(id string) dtos.CalibratedStreamsDataResponse
 	GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error)
 	GetStreamCards(parameters *dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error)
+	GetOutputBehaviourMetrics(configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.BehaviourStreamsResponse, error)
 }
 
 type streamService struct {
@@ -71,7 +72,7 @@ func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, co
 	if len(neededMetrics) == 0 {
 		return nil
 	}
-	waterLevelCalculator := NewCalculateWaterLevels(*stream.Station, stream.VariableId)
+	waterLevelCalculator := NewCalculatorOfWaterLevelsDependingOnVariable(*stream.Station, stream.VariableId)
 	if stream.IsForecasted() {
 		values, err := s.inaApiClient.GetLastForecast(configured.CalibrationId)
 		if err != nil {
@@ -126,4 +127,13 @@ func (s streamService) GetStreamCards(parameters *dtos.StreamCardsParameters) (*
 		}
 	}
 	return result, nil
+}
+
+func (s streamService) GetOutputBehaviourMetrics(configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.BehaviourStreamsResponse, error) {
+	behaviourStreams, err := s.repository.GetStreamsForOutputMetrics(configId)
+	if err != nil {
+		return nil, err
+	}
+
+	return getLevelsCountForAllStreams(behaviourStreams, timeStart, timeEnd, s.inaApiClient), nil
 }

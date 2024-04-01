@@ -23,6 +23,7 @@ type SeriesController interface {
 	GetPredictedSerieById(ctx *gin.Context)
 	GetStreamDataById(ctx *gin.Context)
 	GetStreamCards(ctx *gin.Context)
+	GetOutputMetrics(ctx *gin.Context)
 }
 
 type seriesController struct {
@@ -269,5 +270,48 @@ func (s seriesController) GetStreamCards(ctx *gin.Context) {
 		return
 	}
 
+	ctx.JSON(http.StatusOK, res)
+}
+
+// GetOutputMetrics godoc
+//
+//	@Summary		Endpoint para obtener las metricas de comportamiento
+//	@Produce		json
+//	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
+//	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: mañana"  Format(2006-01-02)
+//	@Param          configurationId     query      int     true  "ID de la configuracion"
+//	@Success		200	{object} dtos.BehaviourStreamsResponse
+//	@Failure        400  {object}  dtos.ErrorResponse
+//	@Failure        500  {object}  dtos.ErrorResponse
+//	@Router			/series/comportamiento [get]
+func (s seriesController) GetOutputMetrics(ctx *gin.Context) {
+	timeStartQuery := ctx.DefaultQuery("timeStart", time.Now().Add(-DaysPerWeek*HoursPerDay*time.Hour).Format(time.DateOnly))
+	timeEndQuery := ctx.DefaultQuery("timeEnd", time.Now().Add(DaysDefaultObservated*HoursPerDay*time.Hour).Format(time.DateOnly))
+	timeStart, err := time.Parse(time.DateOnly, timeStartQuery)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
+		return
+	}
+	timeEnd, err := time.Parse(time.DateOnly, timeEndQuery)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
+		return
+	}
+	configIdQuery, found := ctx.GetQuery("configurationId")
+	if !found {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("configurationId missing")))
+		return
+	}
+	configId, err := strconv.ParseUint(configIdQuery, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("configurationId is not an int")))
+		return
+	}
+
+	res, err := s.seriesService.GetOutputBehaviourMetrics(configId, timeStart, timeEnd)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, dtos.NewErrorResponse(err))
+		return
+	}
 	ctx.JSON(http.StatusOK, res)
 }
