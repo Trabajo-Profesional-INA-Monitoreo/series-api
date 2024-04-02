@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 const DaysDefaultCured = 5
@@ -72,17 +71,8 @@ func (s seriesController) GetCuredSerieById(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("Id was not send")))
 		return
 	}
-
-	timeStartQuery := ctx.DefaultQuery("timeStart", time.Now().Add(-DaysPerWeek*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeEndQuery := ctx.DefaultQuery("timeEnd", time.Now().Add(DaysDefaultCured*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeStart, err := time.Parse(time.DateOnly, timeStartQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
-		return
-	}
-	timeEnd, err := time.Parse(time.DateOnly, timeEndQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
 		return
 	}
 
@@ -107,16 +97,8 @@ func (s seriesController) GetObservatedSerieById(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("serie_id was not send")))
 		return
 	}
-	timeStartQuery := ctx.DefaultQuery("timeStart", time.Now().Add(-DaysPerWeek*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeEndQuery := ctx.DefaultQuery("timeEnd", time.Now().Add(DaysDefaultObservated*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeStart, err := time.Parse(time.DateOnly, timeStartQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
-		return
-	}
-	timeEnd, err := time.Parse(time.DateOnly, timeEndQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
 		return
 	}
 
@@ -163,34 +145,20 @@ func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("serie_id was not sent")))
 		return
 	}
-	configIdParam, userSentConfigId := ctx.GetQuery("configuredStreamId")
-	if !userSentConfigId {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("configuredStreamId was not sent")))
-		return
-	}
 	streamId, err := strconv.ParseUint(streamIdParam, 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("serie_id should be a number")))
 		return
 	}
-	configId, err := strconv.ParseUint(configIdParam, 10, 64)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("configuredStreamId should be a number")))
+	configurationId, done := getConfigurationId(ctx)
+	if done {
 		return
 	}
-	timeStartQuery := ctx.DefaultQuery("timeStart", time.Now().Add(-DaysPerWeek*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeEndQuery := ctx.DefaultQuery("timeEnd", time.Now().Add(DaysDefaultObservated*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeStart, err := time.Parse(time.DateOnly, timeStartQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
 		return
 	}
-	timeEnd, err := time.Parse(time.DateOnly, timeEndQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
-		return
-	}
-	streamData, err := s.seriesService.GetStreamData(streamId, configId, timeStart, timeEnd)
+	streamData, err := s.seriesService.GetStreamData(streamId, configurationId, timeStart, timeEnd)
 	if errors.Is(err, &exceptions.NotFound{}) {
 		ctx.JSON(http.StatusNotFound, dtos.NewErrorResponse(err))
 		return
@@ -220,28 +188,19 @@ func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 //	@Failure        500  {object}  dtos.ErrorResponse
 //	@Router			/series [get]
 func (s seriesController) GetStreamCards(ctx *gin.Context) {
-	timeStartQuery := ctx.DefaultQuery("timeStart", time.Now().Add(-DaysPerWeek*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeEndQuery := ctx.DefaultQuery("timeEnd", time.Now().Add(DaysDefaultObservated*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeStart, err := time.Parse(time.DateOnly, timeStartQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
 		return
 	}
-	timeEnd, err := time.Parse(time.DateOnly, timeEndQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
-		return
-	}
-	configId, found := ctx.GetQuery("configurationId")
-	if !found {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("configurationId missing")))
+	configurationId, done := getConfigurationId(ctx)
+	if done {
 		return
 	}
 
 	parameters := dtos.NewStreamCardsParameters()
 	parameters.AddParam("timeStart", timeStart)
 	parameters.AddParam("timeEnd", timeEnd)
-	parameters.AddParam("configurationId", configId)
+	parameters.AddParam("configurationId", configurationId)
 
 	query, found := ctx.GetQuery("streamId")
 	parameters.AddParamIfFound("streamId", query, found)
@@ -285,30 +244,16 @@ func (s seriesController) GetStreamCards(ctx *gin.Context) {
 //	@Failure        500  {object}  dtos.ErrorResponse
 //	@Router			/series/comportamiento [get]
 func (s seriesController) GetOutputMetrics(ctx *gin.Context) {
-	timeStartQuery := ctx.DefaultQuery("timeStart", time.Now().Add(-DaysPerWeek*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeEndQuery := ctx.DefaultQuery("timeEnd", time.Now().Add(DaysDefaultObservated*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeStart, err := time.Parse(time.DateOnly, timeStartQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
 		return
 	}
-	timeEnd, err := time.Parse(time.DateOnly, timeEndQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
-		return
-	}
-	configIdQuery, found := ctx.GetQuery("configurationId")
-	if !found {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("configurationId missing")))
-		return
-	}
-	configId, err := strconv.ParseUint(configIdQuery, 10, 64)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("configurationId is not an int")))
+	configurationId, done := getConfigurationId(ctx)
+	if done {
 		return
 	}
 
-	res, err := s.seriesService.GetOutputBehaviourMetrics(configId, timeStart, timeEnd)
+	res, err := s.seriesService.GetOutputBehaviourMetrics(configurationId, timeStart, timeEnd)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, dtos.NewErrorResponse(err))
 		return
