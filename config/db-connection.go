@@ -14,6 +14,7 @@ type Repositories struct {
 	ConfigurationRepository    repositories.ConfigurationRepository
 	ConfiguredStreamRepository repositories.ConfiguredStreamsRepository
 	ErrorsRepository           repositories.ErrorsRepository
+	FilterRepository           repositories.FilterRepository
 }
 
 func CreateRepositories(connectionData string) *Repositories {
@@ -49,6 +50,7 @@ func CreateRepositories(connectionData string) *Repositories {
 		ConfigurationRepository:    repositories.NewConfigurationRepository(connection),
 		ConfiguredStreamRepository: repositories.NewConfiguredStreamsRepository(connection),
 		ErrorsRepository:           repositories.NewErrorsRepository(connection),
+		FilterRepository:           repositories.NewFilterRepository(connection),
 	}
 	log.Infof("Done creating repositories")
 	return &repos
