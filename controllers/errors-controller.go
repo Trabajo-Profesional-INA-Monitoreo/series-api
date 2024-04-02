@@ -33,7 +33,11 @@ func (e errorsController) GetErrorsPerDay(ctx *gin.Context) {
 	if done {
 		return
 	}
-	response := e.errorsService.GetErrorsPerDay(timeStart, timeEnd)
+	configurationId, done := getConfigurationId(ctx)
+	if done {
+		return
+	}
+	response := e.errorsService.GetErrorsPerDay(timeStart, timeEnd, configurationId)
 	ctx.JSON(http.StatusOK, response)
 }
 

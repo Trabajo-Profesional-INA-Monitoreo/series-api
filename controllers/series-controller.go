@@ -150,7 +150,7 @@ func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("serie_id should be a number")))
 		return
 	}
-	configurationId, done := getConfigurationId(ctx)
+	configId, done := getConfiguredStreamId(ctx, err)
 	if done {
 		return
 	}
@@ -158,7 +158,7 @@ func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 	if done {
 		return
 	}
-	streamData, err := s.seriesService.GetStreamData(streamId, configurationId, timeStart, timeEnd)
+	streamData, err := s.seriesService.GetStreamData(streamId, configId, timeStart, timeEnd)
 	if errors.Is(err, &exceptions.NotFound{}) {
 		ctx.JSON(http.StatusNotFound, dtos.NewErrorResponse(err))
 		return

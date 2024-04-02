@@ -38,3 +38,17 @@ func getConfigurationId(ctx *gin.Context) (uint64, bool) {
 	}
 	return configurationId, false
 }
+
+func getConfiguredStreamId(ctx *gin.Context, err error) (uint64, bool) {
+	configIdParam, userSentConfigId := ctx.GetQuery("configuredStreamId")
+	if !userSentConfigId {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("configuredStreamId was not sent")))
+		return 0, true
+	}
+	configId, err := strconv.ParseUint(configIdParam, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("configuredStreamId should be a number")))
+		return 0, true
+	}
+	return configId, false
+}
