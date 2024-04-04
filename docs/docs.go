@@ -240,6 +240,90 @@ const docTemplate = `{
                 }
             }
         },
+        "/filtro/estaciones": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Filtros"
+                ],
+                "summary": "Endpoint para obtener las estaciones",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.StationFilter"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/filtro/procedimientos": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Filtros"
+                ],
+                "summary": "Endpoint para obtener los procedimientos",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.ProcedureFilter"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/filtro/variables": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Filtros"
+                ],
+                "summary": "Endpoint para obtener las variables",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.VariableFilter"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/healthcheck": {
             "get": {
                 "description": "get the status of the server.",
@@ -465,6 +549,29 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Endpoint para obtener el resumen de las series agrupado por estacion",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: 5 dias despues",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -803,6 +910,28 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.ProcedureFilter": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.StationFilter": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "dtos.StreamCard": {
             "type": "object",
             "properties": {
@@ -952,6 +1081,9 @@ const docTemplate = `{
         "dtos.StreamsPerStation": {
             "type": "object",
             "properties": {
+                "errorCount": {
+                    "type": "integer"
+                },
                 "stationId": {
                     "type": "string"
                 },
@@ -971,6 +1103,17 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/dtos.StreamsPerStation"
                     }
+                }
+            }
+        },
+        "dtos.VariableFilter": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         }
