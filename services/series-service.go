@@ -12,7 +12,7 @@ import (
 
 type StreamService interface {
 	GetNetworks() dtos.StreamsPerNetworkResponse
-	GetStations() dtos.StreamsPerStationResponse
+	GetStations(time.Time, time.Time, uint64) dtos.StreamsPerStationResponse
 	GetCuredSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse
 	GetObservatedSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse
 	GetPredictedSerieById(id string) dtos.CalibratedStreamsDataResponse
@@ -36,9 +36,19 @@ func (s streamService) GetNetworks() dtos.StreamsPerNetworkResponse {
 	return dtos.StreamsPerNetworkResponse{Networks: networks}
 }
 
-func (s streamService) GetStations() dtos.StreamsPerStationResponse {
-	stations := s.repository.GetStations()
-	return dtos.StreamsPerStationResponse{Stations: stations}
+func (s streamService) GetStations(timeStart time.Time, timeEnd time.Time, configId uint64) dtos.StreamsPerStationResponse {
+	stations := s.repository.GetStations(configId)
+	errorsPerStation := s.repository.GetErrorsOfStations(configId, timeStart, timeEnd)
+
+	for _, errors := range errorsPerStation {
+		for _, station := range *stations {
+			if station.StationId == errors.StationId {
+				station.ErrorCount = errors.ErrorCount
+				break
+			}
+		}
+	}
+	return dtos.StreamsPerStationResponse{Stations: *stations}
 }
 
 func (s streamService) GetCuredSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse {

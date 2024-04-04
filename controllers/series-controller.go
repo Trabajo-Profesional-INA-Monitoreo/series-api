@@ -48,10 +48,21 @@ func (s seriesController) GetNetworks(ctx *gin.Context) {
 //
 //	@Summary		Endpoint para obtener el resumen de las series agrupado por estacion
 //	@Produce		json
+//	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
+//	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: 5 dias despues"  Format(2006-01-02)
+//	@Param          configurationId     query      int     true  "ID de la configuracion"
 //	@Success		200	{object} dtos.StreamsPerStationResponse
 //	@Router			/series/estaciones [get]
 func (s seriesController) GetStations(ctx *gin.Context) {
-	res := s.seriesService.GetStations()
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
+		return
+	}
+	configId, done := getConfigurationId(ctx)
+	if done {
+		return
+	}
+	res := s.seriesService.GetStations(timeStart, timeEnd, configId)
 	ctx.JSON(http.StatusOK, res)
 }
 
