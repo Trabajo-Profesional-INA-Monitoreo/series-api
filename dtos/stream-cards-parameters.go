@@ -1,10 +1,5 @@
 package dtos
 
-import (
-	log "github.com/sirupsen/logrus"
-	"strconv"
-)
-
 type StreamCardsParameters struct {
 	params map[string]interface{}
 	//streamId        *uint64
@@ -50,11 +45,6 @@ func (s *StreamCardsParameters) GetAsInt(key string) *int {
 	if value == nil {
 		return nil
 	}
-	converted, err := strconv.ParseInt(value.(string), 10, 64)
-	if err != nil {
-		log.Errorf("Error converting %v to int", value)
-		return nil
-	}
-	aux := int(converted)
+	aux := int(value.(uint64))
 	return &aux
 }

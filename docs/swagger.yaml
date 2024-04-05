@@ -6,6 +6,17 @@ definitions:
       name:
         type: string
     type: object
+  dtos.BehaviourStreamsResponse:
+    properties:
+      countAlertLevel:
+        type: integer
+      countEvacuationLevel:
+        type: integer
+      countLowWaterLevel:
+        type: integer
+      totalValuesCount:
+        type: integer
+    type: object
   dtos.CalibratedStreamsData:
     properties:
       qualifier:
@@ -97,13 +108,27 @@ definitions:
       totalElements:
         type: integer
     type: object
+  dtos.ProcedureFilter:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  dtos.StationFilter:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   dtos.StreamCard:
     properties:
       checkErrors:
         type: boolean
       configuredStreamId:
         type: integer
-      procId:
+      procedureId:
         type: integer
       procedureName:
         type: string
@@ -115,8 +140,8 @@ definitions:
         type: integer
       totalErrors:
         type: integer
-      varId:
-        type: string
+      variableId:
+        type: integer
       variableName:
         type: string
     type: object
@@ -194,6 +219,8 @@ definitions:
     type: object
   dtos.StreamsPerStation:
     properties:
+      errorCount:
+        type: integer
       stationId:
         type: string
       stationName:
@@ -207,6 +234,13 @@ definitions:
         items:
           $ref: '#/definitions/dtos.StreamsPerStation'
         type: array
+    type: object
+  dtos.VariableFilter:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
     type: object
 info:
   contact: {}
@@ -343,6 +377,11 @@ paths:
         in: query
         name: timeEnd
         type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -357,6 +396,60 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener las errores detectados por dia
+  /filtro/estaciones:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.StationFilter'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las estaciones
+      tags:
+      - Filtros
+  /filtro/procedimientos:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.ProcedureFilter'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los procedimientos
+      tags:
+      - Filtros
+  /filtro/variables:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.VariableFilter'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las variables
+      tags:
+      - Filtros
   /healthcheck:
     get:
       consumes:
@@ -409,7 +502,7 @@ paths:
         in: query
         name: varId
         type: integer
-      - description: Numero de pagina, por defecto 0
+      - description: Numero de pagina, por defecto 1
         in: query
         name: page
         type: integer
@@ -482,6 +575,40 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los datos de una serie dado un id y su configuracion
+  /series/comportamiento:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.BehaviourStreamsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las metricas de comportamiento
   /series/curadas/{serie_id}:
     get:
       parameters:
@@ -514,6 +641,22 @@ paths:
       summary: Endpoint para obtener los valores de una serie curada por id
   /series/estaciones:
     get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: 5 dias despues'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
