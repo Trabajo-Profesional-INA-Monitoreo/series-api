@@ -191,7 +191,7 @@ func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 //	@Param          stationId    query      int     false  "Filtro por ID de la estacion"
 //	@Param          procId    	 query      int     false  "Filtro por ID de procedimiento"
 //	@Param          varId    	 query      int     false  "Filtro por ID de variable"
-//	@Param          page    	 query      int     false  "Numero de pagina, por defecto 0"
+//	@Param          page    	 query      int     false  "Numero de pagina, por defecto 1"
 //	@Param          pageSize     query      int     false  "Cantidad de series por pagina, por defecto 15"
 //	@Param          configurationId     query      int     true  "ID de la configuracion"
 //	@Success		200	{object} dtos.StreamCardsResponse
@@ -228,7 +228,7 @@ func (s seriesController) GetStreamCards(ctx *gin.Context) {
 	query, found = ctx.GetQuery("varId")
 	parameters.AddParamIfFound("varId", query, found)
 
-	query = ctx.DefaultQuery("page", "0")
+	query = ctx.DefaultQuery("page", "1")
 	parameters.AddParam("page", query)
 
 	query = ctx.DefaultQuery("pageSize", "15")

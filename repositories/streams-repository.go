@@ -219,7 +219,7 @@ func (db *streamsRepository) GetStreamCards(parameters dtos.StreamCardsParameter
 		tx.Where("streams.stream_type = ?", streamType)
 		countTx.Where("streams.stream_type = ?", streamType)
 	}
-	tx.Limit(pageSize).Offset(page * pageSize).Find(&streamCards)
+	tx.Limit(pageSize).Offset((page - 1) * pageSize).Find(&streamCards)
 
 	if tx.Error != nil {
 		log.Errorf("Error executing GetStreamCards query: %v", tx.Error)

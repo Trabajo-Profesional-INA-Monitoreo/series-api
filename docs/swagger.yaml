@@ -502,7 +502,7 @@ paths:
         in: query
         name: varId
         type: integer
-      - description: Numero de pagina, por defecto 0
+      - description: Numero de pagina, por defecto 1
         in: query
         name: page
         type: integer

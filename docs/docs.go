@@ -407,7 +407,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Numero de pagina, por defecto 0",
+                        "description": "Numero de pagina, por defecto 1",
                         "name": "page",
                         "in": "query"
                     },
