@@ -51,7 +51,7 @@ func (c configurationRepository) GetAllConfigurations() []dtos.AllConfigurations
 	c.connection.Model(
 		&entities.Configuration{},
 	).Select(
-		"configurations.name as name, configurations.id as id",
+		"configurations.name as name, configurations.configuration_id as id",
 	).Scan(&configurations)
 
 	log.Debugf("Get configurations query result: %v", configurations)

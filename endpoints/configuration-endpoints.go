@@ -1,15 +1,16 @@
 package endpoints
 
 import (
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/config"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/controllers"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
 
-func setConfigurationEndpoints(apiGroup *gin.RouterGroup, configurationRepository repositories.ConfigurationRepository) {
-	controller := controllers.NewConfigurationController(services.NewConfigurationService(configurationRepository))
+func setConfigurationEndpoints(apiGroup *gin.RouterGroup, repositories *config.Repositories, inaClient clients.InaAPiClient) {
+	controller := controllers.NewConfigurationController(services.NewConfigurationService(repositories, inaClient))
 	testApi := apiGroup.Group("/configuracion")
 	{
 		testApi.GET("", controller.GetAllConfigurations)

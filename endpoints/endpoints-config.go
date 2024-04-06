@@ -19,7 +19,7 @@ func SetUpEndpoints(server *gin.Engine, repositories *config.Repositories, apiCo
 	}
 	setSeriesEndpoints(api, repositories, clients.NewInaApiClientImpl(apiConfig))
 	setInputsEndpoints(api, repositories.StreamsRepository)
-	setConfigurationEndpoints(api, repositories.ConfigurationRepository)
+	setConfigurationEndpoints(api, repositories, clients.NewInaApiClientImpl(apiConfig))
 	setErrorEndpoints(api, repositories.ErrorsRepository)
 	setUpHealthCheck(api)
 }

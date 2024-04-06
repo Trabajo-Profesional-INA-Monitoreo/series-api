@@ -23,6 +23,7 @@ type errorsController struct {
 // GetErrorsPerDay godoc
 //
 //	@Summary		Endpoint para obtener las errores detectados por dia
+//	@Tags           Errores
 //	@Produce		json
 //	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
 //	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: hoy"  Format(2006-01-02)

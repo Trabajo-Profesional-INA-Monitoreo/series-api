@@ -35,6 +35,7 @@ func NewSeriesController(seriesService services.StreamService) SeriesController 
 // GetNetworks godoc
 //
 //	@Summary		Endpoint para obtener el resumen de las series agrupado por red
+//	@Tags           Series
 //	@Produce		json
 //	@Success		200	{object} dtos.StreamsPerNetworkResponse
 //	@Router			/series/redes [get]
@@ -46,6 +47,7 @@ func (s seriesController) GetNetworks(ctx *gin.Context) {
 // GetStations godoc
 //
 //	@Summary		Endpoint para obtener el resumen de las series agrupado por estacion
+//	@Tags           Series
 //	@Produce		json
 //	@Success		200	{object} dtos.StreamsPerStationResponse
 //	@Router			/series/estaciones [get]
@@ -57,10 +59,11 @@ func (s seriesController) GetStations(ctx *gin.Context) {
 // GetCuredSerieById godoc
 //
 //	@Summary		Endpoint para obtener los valores de una serie curada por id
+//	@Tags           Series
 //	@Produce		json
 //	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
 //	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: 5 dias despues"  Format(2006-01-02)
-//	@Param          serie_id     path      int     true  "ID de la serie"
+//	@Param          serie_id     path      int     true  "Id de la serie"
 //	@Success		200	{object} dtos.StreamsDataResponse
 //	@Failure        400  {object}  dtos.ErrorResponse
 //	@Router			/series/curadas/{serie_id} [get]
@@ -92,10 +95,11 @@ func (s seriesController) GetCuredSerieById(ctx *gin.Context) {
 // GetObservatedSerieById godoc
 //
 //	@Summary		Endpoint para obtener los valores de una serie observada por id
+//	@Tags           Series
 //	@Produce		json
 //	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
 //	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: mañana"  Format(2006-01-02)
-//	@Param          serie_id     path      int     true  "ID de la serie"
+//	@Param          serie_id     path      int     true  "Id de la serie"
 //	@Success		200	{object} dtos.StreamsDataResponse
 //	@Failure        400  {object}  dtos.ErrorResponse
 //	@Router			/series/observadas/{serie_id} [get]
@@ -126,8 +130,9 @@ func (s seriesController) GetObservatedSerieById(ctx *gin.Context) {
 // GetPredictedSerieById godoc
 //
 //	@Summary		Endpoint para obtener los valores de una serie pronosticadas por id
+//	@Tags           Series
 //	@Produce		json
-//	@Param          calibrado_id     path      int     true  "ID del calibrado"
+//	@Param          calibrado_id     path      int     true  "Id del calibrado"
 //	@Success		200	{object} dtos.CalibratedStreamsDataResponse
 //	@Failure        400  {object}  dtos.ErrorResponse
 //	@Router			/series/pronosticadas/{calibrado_id} [get]
@@ -145,11 +150,12 @@ func (s seriesController) GetPredictedSerieById(ctx *gin.Context) {
 // GetStreamDataById godoc
 //
 //		@Summary		Endpoint para obtener los datos de una serie dado un id y su configuracion
+//		@Tags           Series
 //		@Produce		json
 //		@Param          configuredStreamId      query     string  true  "Id de la configuracion de la serie"  Format(string)
 //		@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
 //		@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: mañana"  Format(2006-01-02)
-//	    @Param          serie_id     path      int     true  "ID de la serie"
+//	    @Param          serie_id     path      int     true  "Id de la serie"
 //		@Success		200	{object} dtos.StreamData
 //		@Failure        400  {object}  dtos.ErrorResponse
 //		@Router			/series/{serie_id} [get]

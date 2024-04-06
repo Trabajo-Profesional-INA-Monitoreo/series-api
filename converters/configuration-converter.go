@@ -6,5 +6,5 @@ import (
 )
 
 func ConvertDtoToConfiguration(dto dtos.Configuration) *entities.Configuration {
-	return &entities.Configuration{Name: dto.Name, Id: dto.Id}
+	return &entities.Configuration{Name: dto.Name, ConfigurationId: dto.Id}
 }

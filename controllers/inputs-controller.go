@@ -21,6 +21,7 @@ func NewInputsController(inputsService services.InputsService) InputsController 
 // GetGeneralMetrics godoc
 //
 //	@Summary		Endpoint para obtener las metricas generales de inputs
+//	@Tags           Inputs
 //	@Produce		json
 //	@Success		200	{object} dtos.InputsGeneralMetrics
 //	@Router			/inputs/metricas-generales [get]

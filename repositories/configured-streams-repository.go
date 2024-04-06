@@ -12,6 +12,7 @@ import (
 type ConfiguredStreamsRepository interface {
 	FindConfiguredStreamsWithCheckErrorsForStream(stream entities.Stream) []entities.ConfiguredStream
 	FindConfiguredStreamById(configStreamId uint64) (entities.ConfiguredStream, error)
+	Create(e *entities.ConfiguredStream) error
 }
 
 type configuredStreamsRepository struct {
@@ -48,4 +49,9 @@ func (db configuredStreamsRepository) FindConfiguredStreamById(configStreamId ui
 	}
 
 	return configured, nil
+}
+
+func (db configuredStreamsRepository) Create(configuredStream *entities.ConfiguredStream) error {
+	result := db.connection.Create(&configuredStream)
+	return result.Error
 }
