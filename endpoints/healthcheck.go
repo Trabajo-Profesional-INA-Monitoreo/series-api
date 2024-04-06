@@ -14,6 +14,7 @@ func setUpHealthCheck(r *gin.RouterGroup) {
 // healthcheck godoc
 //
 //	@Summary		Show the status of the server.
+//	@Tags			Health
 //	@Description	get the status of the server.
 //	@Accept			*/*
 //	@Produce		json

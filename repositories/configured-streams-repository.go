@@ -3,17 +3,21 @@ package repositories
 import (
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	exceptions "github.com/Trabajo-Profesional-INA-Monitoreo/series-api/errors"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"time"
 )
 
 type ConfiguredStreamsRepository interface {
 	FindConfiguredStreamsWithCheckErrorsForStream(stream entities.Stream) []entities.ConfiguredStream
 	FindConfiguredStreamById(configStreamId uint64) (entities.ConfiguredStream, error)
+	Create(e *entities.ConfiguredStream) error
+	FindConfiguredStreamsByNodeId(nodeId uint64, configurationId string) *[]dtos.ConfiguredStream
+	Update(e *entities.ConfiguredStream) error
 	CountErrorOfConfigurations(ids []uint64, parameters *dtos.StreamCardsParameters) ([]dtos.ErrorsPerConfigStream, error)
 }
 
@@ -51,6 +55,39 @@ func (db configuredStreamsRepository) FindConfiguredStreamById(configStreamId ui
 	}
 
 	return configured, nil
+}
+
+func (db configuredStreamsRepository) Create(configuredStream *entities.ConfiguredStream) error {
+	result := db.connection.Create(&configuredStream)
+	return result.Error
+}
+
+func (db configuredStreamsRepository) FindConfiguredStreamsByNodeId(nodeId uint64, configurationId string) *[]dtos.ConfiguredStream {
+	var configuredStream []dtos.ConfiguredStream
+
+	result := db.connection.Model(
+		&entities.ConfiguredStream{},
+	).Select(
+		"configured_streams.stream_id ",
+		"streams.stream_type ",
+		"configured_streams.update_frequency",
+		"configured_streams.check_errors",
+		"configured_streams.normal_upper_threshold",
+		"configured_streams.normal_lower_threshold",
+		"configured_streams.calibration_id",
+	).Where("node_id = ? AND configuration_id = ?", nodeId, configurationId).Joins("JOIN streams ON streams.stream_id = configured_streams.stream_id ").Scan(&configuredStream)
+
+	if result.RowsAffected == 0 {
+		return nil
+	}
+
+	log.Debugf("Get configurations query result: %v", configuredStream)
+	return &configuredStream
+}
+
+func (db configuredStreamsRepository) Update(configuredStream *entities.ConfiguredStream) error {
+	result := db.connection.Save(&configuredStream)
+	return result.Error
 }
 
 func (db configuredStreamsRepository) CountErrorOfConfigurations(ids []uint64, parameters *dtos.StreamCardsParameters) ([]dtos.ErrorsPerConfigStream, error) {

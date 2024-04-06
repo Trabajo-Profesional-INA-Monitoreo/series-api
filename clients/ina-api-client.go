@@ -14,6 +14,7 @@ import (
 type InaAPiClient interface {
 	GetLastForecast(calibrationId uint64) (*responses.LastForecast, error)
 	GetObservedData(streamId uint64, timeStart time.Time, timeEnd time.Time) ([]responses.ObservedDataResponse, error)
+	GetStream(streamId uint64) (*responses.InaStreamResponse, error)
 }
 
 type inaApiClientImpl struct {
@@ -84,4 +85,32 @@ func (i inaApiClientImpl) GetObservedData(streamId uint64, timeStart time.Time, 
 		return nil, err
 	}
 	return decodedBody, nil
+}
+
+func (i inaApiClientImpl) GetStream(streamId uint64) (*responses.InaStreamResponse, error) {
+	url := fmt.Sprintf("%v/obs/puntual/series/%v", i.baseUrl, streamId)
+
+	log.Debugf("Performing stream request: %v", url)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		log.Errorf("Error creating request: %v", err)
+		return nil, err
+	}
+	req.Header.Add("Authorization", i.authHeader)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Errorf("Error making request: %v", err)
+		return nil, err
+	}
+	defer closeReaderAndPrintError(res.Body)
+	if res.StatusCode != 200 {
+		return nil, fmt.Errorf("Stream response error: got %v", res.StatusCode)
+	}
+	var decodedBody responses.InaStreamResponse
+	err = json.NewDecoder(res.Body).Decode(&decodedBody)
+	if err != nil {
+		log.Errorf("Error decoding response: %v", err)
+		return nil, err
+	}
+	return &decodedBody, nil
 }
