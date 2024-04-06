@@ -58,7 +58,7 @@ func (s seriesController) GetStations(ctx *gin.Context) {
 	if done {
 		return
 	}
-	configId, done := getConfigurationId(ctx)
+	configId, done := getUintQueryParam(ctx, "configurationId")
 	if done {
 		return
 	}
@@ -161,7 +161,7 @@ func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("serie_id should be a number")))
 		return
 	}
-	configId, done := getConfiguredStreamId(ctx, err)
+	configId, done := getUintQueryParam(ctx, "configuredStreamId")
 	if done {
 		return
 	}
@@ -203,7 +203,7 @@ func (s seriesController) GetStreamCards(ctx *gin.Context) {
 	if done {
 		return
 	}
-	configurationId, done := getConfigurationId(ctx)
+	configurationId, done := getUintQueryParam(ctx, "configurationId")
 	if done {
 		return
 	}
@@ -259,7 +259,7 @@ func (s seriesController) GetOutputMetrics(ctx *gin.Context) {
 	if done {
 		return
 	}
-	configurationId, done := getConfigurationId(ctx)
+	configurationId, done := getUintQueryParam(ctx, "configurationId")
 	if done {
 		return
 	}

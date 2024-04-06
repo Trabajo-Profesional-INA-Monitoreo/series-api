@@ -33,7 +33,7 @@ func (e errorsController) GetErrorsPerDay(ctx *gin.Context) {
 	if done {
 		return
 	}
-	configurationId, done := getConfigurationId(ctx)
+	configurationId, done := getUintQueryParam(ctx, "configurationId")
 	if done {
 		return
 	}
@@ -56,7 +56,31 @@ func (e errorsController) GetErrorIndicators(ctx *gin.Context) {
 	if done {
 		return
 	}
-	configurationId, done := getConfigurationId(ctx)
+	configurationId, done := getUintQueryParam(ctx, "configurationId")
+	if done {
+		return
+	}
+	result := e.errorsService.GetErrorIndicators(timeStart, timeEnd, configurationId)
+	ctx.JSON(http.StatusOK, result)
+}
+
+// GetStreamsWithRelatedError godoc
+//
+//	@Summary		Endpoint para obtener las indicadores de errores
+//	@Produce		json
+//	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
+//	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: hoy"  Format(2006-01-02)
+//	@Param          configurationId      query     string  true  "Id de la configuracion"  Format(uint)
+//	@Param          errorId      query     string  true  "Id del tipo de error"  Format(uint)
+//	@Success		200	 {array}   dtos.ErrorIndicator
+//	@Failure        400  {object}  dtos.ErrorResponse
+//	@Router			/errores/indicadores [get]
+func (e errorsController) GetStreamsWithRelatedError(ctx *gin.Context) {
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
+		return
+	}
+	configurationId, done := getUintQueryParam(ctx, "configurationId")
 	if done {
 		return
 	}
