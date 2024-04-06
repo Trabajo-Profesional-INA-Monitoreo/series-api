@@ -13,10 +13,28 @@ type ConfigurationRepository interface {
 	GetConfigurationById(id string) *dtos.Configuration
 	Delete(id string)
 	Update(configuration *entities.Configuration) error
+	GetNodesById(id string) []*dtos.Node
 }
 
 type configurationRepository struct {
 	connection *gorm.DB
+}
+
+func (c configurationRepository) GetNodesById(id string) []*dtos.Node {
+	var nodes []*dtos.Node
+
+	result := c.connection.Model(
+		&entities.Node{},
+	).Select(
+		"nodes.name as name, nodes.node_id as node_id",
+	).Where("configuration_id = ?", id).Scan(&nodes)
+
+	if result.RowsAffected == 0 {
+		return nil
+	}
+
+	log.Debugf("Get node query result: %v", nodes)
+	return nodes
 }
 
 func (c configurationRepository) Update(configuration *entities.Configuration) error {
@@ -34,8 +52,8 @@ func (c configurationRepository) GetConfigurationById(id string) *dtos.Configura
 	result := c.connection.Model(
 		&entities.Configuration{},
 	).Select(
-		"configurations.name as name, configurations.id as id",
-	).Where("id = ?", id).Scan(&configuration)
+		"configurations.name as name, configurations.configuration_id as configuration_id",
+	).Where("configuration_id = ?", id).Scan(&configuration)
 
 	if result.RowsAffected == 0 {
 		return nil
@@ -51,7 +69,7 @@ func (c configurationRepository) GetAllConfigurations() []dtos.AllConfigurations
 	c.connection.Model(
 		&entities.Configuration{},
 	).Select(
-		"configurations.name as name, configurations.configuration_id as id",
+		"configurations.name as name, configurations.configuration_id as configuration_id",
 	).Scan(&configurations)
 
 	log.Debugf("Get configurations query result: %v", configurations)

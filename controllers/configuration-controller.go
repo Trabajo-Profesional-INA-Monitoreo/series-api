@@ -70,7 +70,7 @@ func (c configurationController) GetConfigurationById(ctx *gin.Context) {
 //			@Router			/configuracion [post]
 func (c configurationController) CreateConfiguration(ctx *gin.Context) {
 
-	var configuration dtos.Configuration
+	var configuration dtos.CreateConfiguration
 
 	if err := ctx.ShouldBindJSON(&configuration); err != nil {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(err))

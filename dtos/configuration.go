@@ -1,14 +1,14 @@
 package dtos
 
 type Configuration struct {
-	Name  string `binding:"required" ,gorm:"column:name"`
-	Id    uint64 `gorm:"column:id"`
-	Nodes *[]Node
+	Name  string  `binding:"required" ,gorm:"column:name"`
+	Id    uint64  `gorm:"column:configuration_id"`
+	Nodes []*Node `gorm:"-"`
 }
 
 type AllConfigurations struct {
 	Name string `gorm:"column:name"`
-	Id   uint64 `gorm:"column:id"`
+	Id   uint64 `gorm:"column:configuration_id"`
 }
 
 type CreateConfiguration struct {

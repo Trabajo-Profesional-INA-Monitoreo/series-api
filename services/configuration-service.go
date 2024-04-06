@@ -12,7 +12,7 @@ type (
 	ConfigurationService interface {
 		GetAllConfigurations() []dtos.AllConfigurations
 		GetConfigurationById(id string) *dtos.Configuration
-		CreateConfiguration(configuration dtos.Configuration) error
+		CreateConfiguration(configuration dtos.CreateConfiguration) error
 		DeleteConfiguration(id string)
 		ModifyConfiguration(configuration dtos.Configuration) error
 	}
@@ -34,8 +34,8 @@ func (c configurationService) DeleteConfiguration(id string) {
 	c.configurationRepository.Delete(id)
 }
 
-func (c configurationService) CreateConfiguration(configuration dtos.Configuration) error {
-	newConfiguration := converters.ConvertDtoToConfiguration(configuration)
+func (c configurationService) CreateConfiguration(configuration dtos.CreateConfiguration) error {
+	newConfiguration := converters.ConvertDtoToCreateConfiguration(configuration)
 	err := c.configurationRepository.Create(newConfiguration)
 	if err != nil {
 		return err
@@ -74,7 +74,18 @@ func (c configurationService) GetAllConfigurations() []dtos.AllConfigurations {
 }
 
 func (c configurationService) GetConfigurationById(id string) *dtos.Configuration {
-	return c.configurationRepository.GetConfigurationById(id)
+	var configuration *dtos.Configuration
+	var nodes []*dtos.Node
+
+	configuration = c.configurationRepository.GetConfigurationById(id)
+	nodes = c.configurationRepository.GetNodesById(id)
+	configuration.Nodes = nodes
+
+	for _, node := range nodes {
+		node.ConfiguredStreams = c.configuratedStreamRepository.FindConfiguredStreamsByNodeId(node.Id, id)
+	}
+
+	return configuration
 }
 
 func NewConfigurationService(repositories *config.Repositories, client clients.InaAPiClient) ConfigurationService {
