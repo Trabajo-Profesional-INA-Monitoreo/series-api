@@ -78,7 +78,13 @@ func (c configurationService) GetConfigurationById(id string) *dtos.Configuratio
 	var nodes []*dtos.Node
 
 	configuration = c.configurationRepository.GetConfigurationById(id)
+	if configuration == nil {
+		return nil
+	}
 	nodes = c.configurationRepository.GetNodesById(id)
+	if nodes == nil {
+		return nil
+	}
 	configuration.Nodes = nodes
 
 	for _, node := range nodes {
