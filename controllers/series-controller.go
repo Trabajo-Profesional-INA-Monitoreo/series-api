@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 const DaysDefaultCured = 5
@@ -22,6 +21,8 @@ type SeriesController interface {
 	GetObservatedSerieById(ctx *gin.Context)
 	GetPredictedSerieById(ctx *gin.Context)
 	GetStreamDataById(ctx *gin.Context)
+	GetStreamCards(ctx *gin.Context)
+	GetOutputMetrics(ctx *gin.Context)
 }
 
 type seriesController struct {
@@ -49,10 +50,21 @@ func (s seriesController) GetNetworks(ctx *gin.Context) {
 //	@Summary		Endpoint para obtener el resumen de las series agrupado por estacion
 //	@Tags           Series
 //	@Produce		json
+//	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
+//	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: 5 dias despues"  Format(2006-01-02)
+//	@Param          configurationId     query      int     true  "ID de la configuracion"
 //	@Success		200	{object} dtos.StreamsPerStationResponse
 //	@Router			/series/estaciones [get]
 func (s seriesController) GetStations(ctx *gin.Context) {
-	res := s.seriesService.GetStations()
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
+		return
+	}
+	configId, done := getConfigurationId(ctx)
+	if done {
+		return
+	}
+	res := s.seriesService.GetStations(timeStart, timeEnd, configId)
 	ctx.JSON(http.StatusOK, res)
 }
 
@@ -73,17 +85,8 @@ func (s seriesController) GetCuredSerieById(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("Id was not send")))
 		return
 	}
-
-	timeStartQuery := ctx.DefaultQuery("timeStart", time.Now().Add(-DaysPerWeek*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeEndQuery := ctx.DefaultQuery("timeEnd", time.Now().Add(DaysDefaultCured*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeStart, err := time.Parse(time.DateOnly, timeStartQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
-		return
-	}
-	timeEnd, err := time.Parse(time.DateOnly, timeEndQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
 		return
 	}
 
@@ -109,16 +112,8 @@ func (s seriesController) GetObservatedSerieById(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("serie_id was not send")))
 		return
 	}
-	timeStartQuery := ctx.DefaultQuery("timeStart", time.Now().Add(-DaysPerWeek*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeEndQuery := ctx.DefaultQuery("timeEnd", time.Now().Add(DaysDefaultObservated*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeStart, err := time.Parse(time.DateOnly, timeStartQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
-		return
-	}
-	timeEnd, err := time.Parse(time.DateOnly, timeEndQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
 		return
 	}
 
@@ -158,6 +153,8 @@ func (s seriesController) GetPredictedSerieById(ctx *gin.Context) {
 //	    @Param          serie_id     path      int     true  "Id de la serie"
 //		@Success		200	{object} dtos.StreamData
 //		@Failure        400  {object}  dtos.ErrorResponse
+//		@Failure        404  {object}  dtos.ErrorResponse
+//		@Failure        500  {object}  dtos.ErrorResponse
 //		@Router			/series/{serie_id} [get]
 func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 	streamIdParam, userSentId := ctx.Params.Get("serie_id")
@@ -165,31 +162,17 @@ func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("serie_id was not sent")))
 		return
 	}
-	configIdParam, userSentConfigId := ctx.GetQuery("configuredStreamId")
-	if !userSentConfigId {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("configuredStreamId was not sent")))
-		return
-	}
 	streamId, err := strconv.ParseUint(streamIdParam, 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("serie_id should be a number")))
 		return
 	}
-	configId, err := strconv.ParseUint(configIdParam, 10, 64)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("configuredStreamId should be a number")))
+	configId, done := getConfiguredStreamId(ctx, err)
+	if done {
 		return
 	}
-	timeStartQuery := ctx.DefaultQuery("timeStart", time.Now().Add(-DaysPerWeek*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeEndQuery := ctx.DefaultQuery("timeEnd", time.Now().Add(DaysDefaultObservated*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeStart, err := time.Parse(time.DateOnly, timeStartQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
-		return
-	}
-	timeEnd, err := time.Parse(time.DateOnly, timeEndQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
 		return
 	}
 	streamData, err := s.seriesService.GetStreamData(streamId, configId, timeStart, timeEnd)
@@ -202,4 +185,95 @@ func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, streamData)
+}
+
+// GetStreamCards godoc
+//
+//	@Summary		Endpoint para obtener las series configuradas de una configuracion
+//	@Produce		json
+//	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
+//	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: mañana"  Format(2006-01-02)
+//	@Param          streamId     query      int     false  "Filtro por ID de la serie"
+//	@Param          stationId    query      int     false  "Filtro por ID de la estacion"
+//	@Param          procId    	 query      int     false  "Filtro por ID de procedimiento"
+//	@Param          varId    	 query      int     false  "Filtro por ID de variable"
+//	@Param          page    	 query      int     false  "Numero de pagina, por defecto 1"
+//	@Param          pageSize     query      int     false  "Cantidad de series por pagina, por defecto 15"
+//	@Param          configurationId     query      int     true  "ID de la configuracion"
+//	@Success		200	{object} dtos.StreamCardsResponse
+//	@Failure        400  {object}  dtos.ErrorResponse
+//	@Failure        500  {object}  dtos.ErrorResponse
+//	@Router			/series [get]
+func (s seriesController) GetStreamCards(ctx *gin.Context) {
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
+		return
+	}
+	configurationId, done := getConfigurationId(ctx)
+	if done {
+		return
+	}
+
+	parameters := dtos.NewStreamCardsParameters()
+	parameters.AddParam("timeStart", timeStart)
+	parameters.AddParam("timeEnd", timeEnd)
+	parameters.AddParam("configurationId", configurationId)
+
+	query, found := ctx.GetQuery("streamId")
+	parameters.AddParamIfFound("streamId", query, found)
+
+	query, found = ctx.GetQuery("stationId")
+	parameters.AddParamIfFound("stationId", query, found)
+
+	query, found = ctx.GetQuery("stationId")
+	parameters.AddParamIfFound("stationId", query, found)
+
+	query, found = ctx.GetQuery("procId")
+	parameters.AddParamIfFound("procId", query, found)
+
+	query, found = ctx.GetQuery("varId")
+	parameters.AddParamIfFound("varId", query, found)
+
+	query = ctx.DefaultQuery("page", "1")
+	parameters.AddParam("page", query)
+
+	query = ctx.DefaultQuery("pageSize", "15")
+	parameters.AddParam("pageSize", query)
+
+	res, err := s.seriesService.GetStreamCards(parameters)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, dtos.NewErrorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, res)
+}
+
+// GetOutputMetrics godoc
+//
+//	@Summary		Endpoint para obtener las metricas de comportamiento
+//	@Produce		json
+//	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
+//	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: mañana"  Format(2006-01-02)
+//	@Param          configurationId     query      int     true  "ID de la configuracion"
+//	@Success		200	{object} dtos.BehaviourStreamsResponse
+//	@Failure        400  {object}  dtos.ErrorResponse
+//	@Failure        500  {object}  dtos.ErrorResponse
+//	@Router			/series/comportamiento [get]
+func (s seriesController) GetOutputMetrics(ctx *gin.Context) {
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
+		return
+	}
+	configurationId, done := getConfigurationId(ctx)
+	if done {
+		return
+	}
+
+	res, err := s.seriesService.GetOutputBehaviourMetrics(configurationId, timeStart, timeEnd)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, dtos.NewErrorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, res)
 }

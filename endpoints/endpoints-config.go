@@ -21,5 +21,6 @@ func SetUpEndpoints(server *gin.Engine, repositories *config.Repositories, apiCo
 	setInputsEndpoints(api, repositories.StreamsRepository)
 	setConfigurationEndpoints(api, repositories, clients.NewInaApiClientImpl(apiConfig))
 	setErrorEndpoints(api, repositories.ErrorsRepository)
+	setFiltersEndpoints(api, repositories.FilterRepository)
 	setUpHealthCheck(api)
 }

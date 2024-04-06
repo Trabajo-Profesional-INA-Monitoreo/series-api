@@ -1,12 +1,9 @@
 package controllers
 
 import (
-	"fmt"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"time"
 )
 
 const HoursPerDay = 24
@@ -14,6 +11,7 @@ const DaysPerWeek = 7
 
 type ErrorsController interface {
 	GetErrorsPerDay(ctx *gin.Context)
+	GetErrorIndicators(context *gin.Context)
 }
 
 type errorsController struct {
@@ -27,24 +25,44 @@ type errorsController struct {
 //	@Produce		json
 //	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
 //	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: hoy"  Format(2006-01-02)
+//	@Param          configurationId     query      int     true  "ID de la configuracion"
 //	@Success		200	 {array}   dtos.ErrorsCountPerDayAndType
 //	@Failure        400  {object}  dtos.ErrorResponse
 //	@Router			/errores/por-dia [get]
 func (e errorsController) GetErrorsPerDay(ctx *gin.Context) {
-	timeStartQuery := ctx.DefaultQuery("timeStart", time.Now().Add(-DaysPerWeek*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeEndQuery := ctx.DefaultQuery("timeEnd", time.Now().Add(HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeStart, err := time.Parse(time.DateOnly, timeStartQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
 		return
 	}
-	timeEnd, err := time.Parse(time.DateOnly, timeEndQuery)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
+	configurationId, done := getConfigurationId(ctx)
+	if done {
 		return
 	}
-	response := e.errorsService.GetErrorsPerDay(timeStart, timeEnd)
+	response := e.errorsService.GetErrorsPerDay(timeStart, timeEnd, configurationId)
 	ctx.JSON(http.StatusOK, response)
+}
+
+// GetErrorIndicators godoc
+//
+//	@Summary		Endpoint para obtener las indicadores de errores
+//	@Produce		json
+//	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
+//	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: hoy"  Format(2006-01-02)
+//	@Param          configurationId      query     string  true  "Id de la configuracion"  Format(uint)
+//	@Success		200	 {array}   dtos.ErrorIndicator
+//	@Failure        400  {object}  dtos.ErrorResponse
+//	@Router			/errores/indicadores [get]
+func (e errorsController) GetErrorIndicators(ctx *gin.Context) {
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
+		return
+	}
+	configurationId, done := getConfigurationId(ctx)
+	if done {
+		return
+	}
+	result := e.errorsService.GetErrorIndicators(timeStart, timeEnd, configurationId)
+	ctx.JSON(http.StatusOK, result)
 }
 
 func NewErrorsController(errorsService services.ErrorsService) ErrorsController {
