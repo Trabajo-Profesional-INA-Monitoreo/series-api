@@ -26,8 +26,40 @@ type configurationService struct {
 }
 
 func (c configurationService) ModifyConfiguration(configuration dtos.Configuration) error {
+
 	newConfiguration := converters.ConvertDtoToConfiguration(configuration)
-	return c.configurationRepository.Update(newConfiguration)
+	err := c.configurationRepository.Update(newConfiguration)
+	if err != nil {
+		return err
+	}
+	newNodes := converters.ConvertDtoToNodeModify(*newConfiguration, configuration.Nodes)
+	for _, newNode := range newNodes {
+		err := c.nodeRepository.Update(&newNode)
+		if err != nil {
+			return err
+		}
+	}
+
+	nodes := configuration.Nodes
+	for _, node := range nodes {
+
+		for _, configuratedStream := range *node.ConfiguredStreams {
+
+			newConfiguratedStreams := converters.ConvertDtoToConfiguratedStreamModify(*node, &configuratedStream, *newConfiguration)
+
+			err := c.streamService.CreateStream(newConfiguratedStreams.StreamId, configuratedStream.StreamType)
+			if err != nil {
+				return err
+			}
+
+			err = c.configuratedStreamRepository.Update(&newConfiguratedStreams)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return err
+
 }
 
 func (c configurationService) DeleteConfiguration(id string) {
@@ -81,7 +113,7 @@ func (c configurationService) GetConfigurationById(id string) *dtos.Configuratio
 	if configuration == nil {
 		return nil
 	}
-	nodes = c.configurationRepository.GetNodesById(id)
+	nodes = c.nodeRepository.GetNodesById(id)
 	if nodes == nil {
 		return nil
 	}

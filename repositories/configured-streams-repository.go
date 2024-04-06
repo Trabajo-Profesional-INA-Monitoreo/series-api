@@ -15,6 +15,7 @@ type ConfiguredStreamsRepository interface {
 	FindConfiguredStreamById(configStreamId uint64) (entities.ConfiguredStream, error)
 	Create(e *entities.ConfiguredStream) error
 	FindConfiguredStreamsByNodeId(nodeId uint64, configurationId string) *[]dtos.ConfiguredStream
+	Update(e *entities.ConfiguredStream) error
 }
 
 type configuredStreamsRepository struct {
@@ -79,4 +80,9 @@ func (db configuredStreamsRepository) FindConfiguredStreamsByNodeId(nodeId uint6
 
 	log.Debugf("Get configurations query result: %v", configuredStream)
 	return &configuredStream
+}
+
+func (db configuredStreamsRepository) Update(configuredStream *entities.ConfiguredStream) error {
+	result := db.connection.Save(&configuredStream)
+	return result.Error
 }

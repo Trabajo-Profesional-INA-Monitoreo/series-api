@@ -13,28 +13,10 @@ type ConfigurationRepository interface {
 	GetConfigurationById(id string) *dtos.Configuration
 	Delete(id string)
 	Update(configuration *entities.Configuration) error
-	GetNodesById(id string) []*dtos.Node
 }
 
 type configurationRepository struct {
 	connection *gorm.DB
-}
-
-func (c configurationRepository) GetNodesById(id string) []*dtos.Node {
-	var nodes []*dtos.Node
-
-	result := c.connection.Model(
-		&entities.Node{},
-	).Select(
-		"nodes.name as name, nodes.node_id as node_id",
-	).Where("configuration_id = ?", id).Scan(&nodes)
-
-	if result.RowsAffected == 0 {
-		return nil
-	}
-
-	log.Debugf("Get node query result: %v", nodes)
-	return nodes
 }
 
 func (c configurationRepository) Update(configuration *entities.Configuration) error {
