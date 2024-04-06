@@ -2,8 +2,6 @@ package entities
 
 type ConfiguredStream struct {
 	ConfiguredStreamId     uint64 `gorm:"primary_key;auto_increment"`
-	ConfigurationId        uint64
-	Configuration          *Configuration `gorm:"references:Id"`
 	StreamId               uint64
 	Stream                 *Stream `gorm:"references:StreamId"`
 	UpdateFrequency        float64
