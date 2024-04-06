@@ -15,6 +15,7 @@ type ErrorsRepository interface {
 	Update(detectedError entities.DetectedError)
 	GetErrorsPerDay(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorsCountPerDayAndType
 	GetErrorIndicators(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorIndicator
+	GetRelatedStreamsToError(parameters *dtos.QueryParameters) ([]dtos.ErrorRelatedStream, error)
 }
 
 type errorsRepository struct {
@@ -106,4 +107,38 @@ func (e errorsRepository) GetErrorIndicators(timeStart time.Time, timeEnd time.T
 		log.Errorf("Error executing GetErrorIndicators query: %v", err)
 	}
 	return results
+}
+
+func (e errorsRepository) GetRelatedStreamsToError(parameters *dtos.QueryParameters) ([]dtos.ErrorRelatedStream, error) {
+	timeStart := parameters.Get("timeStart").(time.Time)
+	timeEnd := parameters.Get("timeEnd").(time.Time)
+	configurationId := parameters.Get("configurationId").(uint64)
+	errorId := parameters.Get("errorType").(uint64)
+	var results []dtos.ErrorRelatedStream
+	tx := e.connection.Model(
+		&entities.DetectedError{},
+	).Select(
+		"streams.stream_id as stream_id",
+		"streams.station_id as station_id",
+		"stations.name as station_name",
+	).Joins(
+		"JOIN configured_streams_errors ON configured_streams_errors.detected_error_error_id=detected_errors.error_id",
+	).Joins(
+		"JOIN configured_streams ON configured_streams.configured_stream_id = configured_streams_errors.configured_stream_configured_stream_id",
+	).Joins(
+		"JOIN streams ON streams.stream_id = configured_streams.stream_id",
+	).Joins(
+		"JOIN stations ON stations.station_id = streams.station_id",
+	).Where(
+		"configured_streams.configuration_id = ?", configurationId,
+	).Where(
+		"detected_errors.error_type = ?", errorId,
+	).Where(
+		"detected_errors.detected_date >= ? AND detected_errors.detected_date <= ?", timeStart, timeEnd,
+	).Find(&results)
+	if tx.Error != nil {
+		log.Errorf("Error executing GetRelatedStreamsToError query: %v", tx.Error)
+		return nil, tx.Error
+	}
+	return results, nil
 }

@@ -208,7 +208,7 @@ func (s seriesController) GetStreamCards(ctx *gin.Context) {
 		return
 	}
 
-	parameters := dtos.NewStreamCardsParameters()
+	parameters := dtos.NewQueryParameters()
 	parameters.AddParam("timeStart", timeStart)
 	parameters.AddParam("timeEnd", timeEnd)
 	parameters.AddParam("configurationId", configurationId)

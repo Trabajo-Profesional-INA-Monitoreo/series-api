@@ -1,6 +1,6 @@
 package dtos
 
-type StreamCardsParameters struct {
+type QueryParameters struct {
 	params map[string]interface{}
 	//streamId        *uint64
 	//configurationId uint64
@@ -14,21 +14,21 @@ type StreamCardsParameters struct {
 	//pageSize        int
 }
 
-func NewStreamCardsParameters() *StreamCardsParameters {
-	return &StreamCardsParameters{params: make(map[string]interface{})}
+func NewQueryParameters() *QueryParameters {
+	return &QueryParameters{params: make(map[string]interface{})}
 }
 
-func (s *StreamCardsParameters) AddParam(key string, value interface{}) {
+func (s *QueryParameters) AddParam(key string, value interface{}) {
 	s.params[key] = value
 }
 
-func (s *StreamCardsParameters) AddParamIfFound(key string, value string, found bool) {
+func (s *QueryParameters) AddParamIfFound(key string, value string, found bool) {
 	if found {
 		s.params[key] = value
 	}
 }
 
-func (s *StreamCardsParameters) AddParamOrDefault(key string, value string, found bool, defaultValue interface{}) {
+func (s *QueryParameters) AddParamOrDefault(key string, value string, found bool, defaultValue interface{}) {
 	if found {
 		s.params[key] = value
 	} else {
@@ -36,11 +36,11 @@ func (s *StreamCardsParameters) AddParamOrDefault(key string, value string, foun
 	}
 }
 
-func (s *StreamCardsParameters) Get(key string) interface{} {
+func (s *QueryParameters) Get(key string) interface{} {
 	return s.params[key]
 }
 
-func (s *StreamCardsParameters) GetAsInt(key string) *int {
+func (s *QueryParameters) GetAsInt(key string) *int {
 	value := s.params[key]
 	if value == nil {
 		return nil

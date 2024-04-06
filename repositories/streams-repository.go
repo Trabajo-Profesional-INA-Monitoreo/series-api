@@ -23,7 +23,7 @@ type StreamRepository interface {
 	GetTotalStations() int
 	GetStreams() []entities.Stream
 	GetStreamWithAssociatedData(streamId uint64) (entities.Stream, error)
-	GetStreamCards(parameters dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error)
+	GetStreamCards(parameters dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
 	GetStreamsForOutputMetrics(configId uint64) ([]dtos.BehaviourStream, error)
 }
 
@@ -155,7 +155,7 @@ func (db *streamsRepository) GetStreamWithAssociatedData(streamId uint64) (entit
 	return stream, nil
 }
 
-func (db *streamsRepository) GetStreamCards(parameters dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error) {
+func (db *streamsRepository) GetStreamCards(parameters dtos.QueryParameters) (*dtos.StreamCardsResponse, error) {
 	var streamCards []*dtos.StreamCard
 	configId := parameters.GetAsInt("configurationId")
 	streamId := parameters.GetAsInt("streamId")

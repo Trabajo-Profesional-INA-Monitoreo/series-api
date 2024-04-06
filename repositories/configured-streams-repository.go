@@ -14,7 +14,7 @@ import (
 type ConfiguredStreamsRepository interface {
 	FindConfiguredStreamsWithCheckErrorsForStream(stream entities.Stream) []entities.ConfiguredStream
 	FindConfiguredStreamById(configStreamId uint64) (entities.ConfiguredStream, error)
-	CountErrorOfConfigurations(ids []uint64, parameters *dtos.StreamCardsParameters) ([]dtos.ErrorsPerConfigStream, error)
+	CountErrorOfConfigurations(ids []uint64, parameters *dtos.QueryParameters) ([]dtos.ErrorsPerConfigStream, error)
 }
 
 type configuredStreamsRepository struct {
@@ -53,7 +53,7 @@ func (db configuredStreamsRepository) FindConfiguredStreamById(configStreamId ui
 	return configured, nil
 }
 
-func (db configuredStreamsRepository) CountErrorOfConfigurations(ids []uint64, parameters *dtos.StreamCardsParameters) ([]dtos.ErrorsPerConfigStream, error) {
+func (db configuredStreamsRepository) CountErrorOfConfigurations(ids []uint64, parameters *dtos.QueryParameters) ([]dtos.ErrorsPerConfigStream, error) {
 	timeStart := parameters.Get("timeStart").(time.Time)
 	timeEnd := parameters.Get("timeEnd").(time.Time)
 	var results []dtos.ErrorsPerConfigStream
