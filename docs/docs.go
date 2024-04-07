@@ -20,6 +20,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Configuracion"
+                ],
                 "summary": "Endpoint para obtener las configuraciones",
                 "responses": {
                     "200": {
@@ -43,7 +46,21 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Configuracion"
+                ],
                 "summary": "Endpoint para modificar una configuracion",
+                "parameters": [
+                    {
+                        "description": "Modify configuration",
+                        "name": "configuration",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.Configuration"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -66,7 +83,21 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Configuracion"
+                ],
                 "summary": "Endpoint para crear una configuracion",
+                "parameters": [
+                    {
+                        "description": "Add configuration",
+                        "name": "configuration",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.CreateConfiguration"
+                        }
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created"
@@ -91,11 +122,14 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Configuracion"
+                ],
                 "summary": "Endpoint para obtener una configuracion por id",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID de la configuracion",
+                        "description": "Id de la configuracion",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -120,11 +154,14 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Configuracion"
+                ],
                 "summary": "Endpoint para eliminar una configuracion por id",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID de la configuracion",
+                        "description": "Id de la configuracion",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -196,6 +233,9 @@ const docTemplate = `{
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Errores"
                 ],
                 "summary": "Endpoint para obtener las errores detectados por dia",
                 "parameters": [
@@ -390,6 +430,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Health"
+                ],
                 "summary": "Show the status of the server.",
                 "responses": {
                     "200": {
@@ -405,6 +448,9 @@ const docTemplate = `{
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Inputs"
                 ],
                 "summary": "Endpoint para obtener las metricas generales de inputs",
                 "responses": {
@@ -560,6 +606,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Series"
+                ],
                 "summary": "Endpoint para obtener los valores de una serie curada por id",
                 "parameters": [
                     {
@@ -578,7 +627,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "ID de la serie",
+                        "description": "Id de la serie",
                         "name": "serie_id",
                         "in": "path",
                         "required": true
@@ -604,6 +653,9 @@ const docTemplate = `{
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Series"
                 ],
                 "summary": "Endpoint para obtener el resumen de las series agrupado por estacion",
                 "parameters": [
@@ -644,6 +696,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Series"
+                ],
                 "summary": "Endpoint para obtener los valores de una serie observada por id",
                 "parameters": [
                     {
@@ -662,7 +717,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "ID de la serie",
+                        "description": "Id de la serie",
                         "name": "serie_id",
                         "in": "path",
                         "required": true
@@ -689,11 +744,14 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Series"
+                ],
                 "summary": "Endpoint para obtener los valores de una serie pronosticadas por id",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID del calibrado",
+                        "description": "Id del calibrado",
                         "name": "calibrado_id",
                         "in": "path",
                         "required": true
@@ -720,6 +778,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Series"
+                ],
                 "summary": "Endpoint para obtener el resumen de las series agrupado por red",
                 "responses": {
                     "200": {
@@ -735,6 +796,9 @@ const docTemplate = `{
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Series"
                 ],
                 "summary": "Endpoint para obtener los datos de una serie dado un id y su configuracion",
                 "parameters": [
@@ -762,7 +826,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "ID de la serie",
+                        "description": "Id de la serie",
                         "name": "serie_id",
                         "in": "path",
                         "required": true
@@ -886,6 +950,70 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.Node"
+                    }
+                }
+            }
+        },
+        "dtos.ConfiguredStream": {
+            "type": "object",
+            "properties": {
+                "calibrationId": {
+                    "type": "integer"
+                },
+                "checkErrors": {
+                    "type": "boolean"
+                },
+                "configuredStreamId": {
+                    "type": "integer"
+                },
+                "lowerThreshold": {
+                    "type": "integer"
+                },
+                "metrics": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.Metric"
+                    }
+                },
+                "redundanciesIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "streamId": {
+                    "type": "integer"
+                },
+                "streamType": {
+                    "type": "integer"
+                },
+                "updateFrequency": {
+                    "type": "number"
+                },
+                "upperThreshold": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.CreateConfiguration": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.Node"
+                    }
                 }
             }
         },
@@ -950,6 +1078,23 @@ const docTemplate = `{
                 },
                 "value": {
                     "type": "number"
+                }
+            }
+        },
+        "dtos.Node": {
+            "type": "object",
+            "properties": {
+                "configuredStreams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.ConfiguredStream"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -1190,6 +1335,38 @@ const docTemplate = `{
                 "Missing4DaysHorizon",
                 "OutsideOfErrorBands",
                 "ForecastMissing"
+            ]
+        },
+        "entities.Metric": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+            ],
+            "x-enum-comments": {
+                "Maximo": "Configurable",
+                "Media": "Configurable",
+                "Mediana": "Configurable",
+                "Minimo": "Configurable",
+                "Nulos": "Configurable"
+            },
+            "x-enum-varnames": [
+                "Mediana",
+                "Media",
+                "Maximo",
+                "Minimo",
+                "Nulos",
+                "Observaciones",
+                "AguasAlerta",
+                "AguasEvacuacion",
+                "AguasBajas"
             ]
         }
     }

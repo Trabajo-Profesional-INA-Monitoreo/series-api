@@ -2,8 +2,6 @@ package entities
 
 type ConfiguredStream struct {
 	ConfiguredStreamId     uint64 `gorm:"primary_key;auto_increment"`
-	ConfigurationId        uint64
-	Configuration          *Configuration `gorm:"references:Id"`
 	StreamId               uint64
 	Stream                 *Stream `gorm:"references:StreamId"`
 	UpdateFrequency        float64
@@ -15,6 +13,10 @@ type ConfiguredStream struct {
 	UnusualLowerThreshold  uint64
 	CalibrationId          uint64
 	Metrics                []ConfiguredMetric
+	NodeId                 uint64
+	Node                   *Node `gorm:"references:NodeId"`
+	ConfigurationId        uint64
+	Configuration          *Configuration `gorm:"references:ConfigurationId"`
 }
 
 func NewConfiguredStream(

@@ -55,6 +55,48 @@ definitions:
         type: integer
       name:
         type: string
+      nodes:
+        items:
+          $ref: '#/definitions/dtos.Node'
+        type: array
+    required:
+    - name
+    type: object
+  dtos.ConfiguredStream:
+    properties:
+      calibrationId:
+        type: integer
+      checkErrors:
+        type: boolean
+      configuredStreamId:
+        type: integer
+      lowerThreshold:
+        type: integer
+      metrics:
+        items:
+          $ref: '#/definitions/entities.Metric'
+        type: array
+      redundanciesIds:
+        items:
+          type: integer
+        type: array
+      streamId:
+        type: integer
+      streamType:
+        type: integer
+      updateFrequency:
+        type: number
+      upperThreshold:
+        type: integer
+    type: object
+  dtos.CreateConfiguration:
+    properties:
+      name:
+        type: string
+      nodes:
+        items:
+          $ref: '#/definitions/dtos.Node'
+        type: array
     required:
     - name
     type: object
@@ -98,6 +140,17 @@ definitions:
         type: string
       value:
         type: number
+    type: object
+  dtos.Node:
+    properties:
+      configuredStreams:
+        items:
+          $ref: '#/definitions/dtos.ConfiguredStream'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
     type: object
   dtos.Pageable:
     properties:
@@ -256,6 +309,34 @@ definitions:
     - Missing4DaysHorizon
     - OutsideOfErrorBands
     - ForecastMissing
+  entities.Metric:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    type: integer
+    x-enum-comments:
+      Maximo: Configurable
+      Media: Configurable
+      Mediana: Configurable
+      Minimo: Configurable
+      Nulos: Configurable
+    x-enum-varnames:
+    - Mediana
+    - Media
+    - Maximo
+    - Minimo
+    - Nulos
+    - Observaciones
+    - AguasAlerta
+    - AguasEvacuacion
+    - AguasBajas
 info:
   contact: {}
   description: This API manages the inputs of the forecast model
@@ -278,7 +359,16 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener las configuraciones
+      tags:
+      - Configuracion
     post:
+      parameters:
+      - description: Add configuration
+        in: body
+        name: configuration
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateConfiguration'
       produces:
       - application/json
       responses:
@@ -293,7 +383,16 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para crear una configuracion
+      tags:
+      - Configuracion
     put:
+      parameters:
+      - description: Modify configuration
+        in: body
+        name: configuration
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.Configuration'
       produces:
       - application/json
       responses:
@@ -308,10 +407,12 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para modificar una configuracion
+      tags:
+      - Configuracion
   /configuracion/{id}:
     delete:
       parameters:
-      - description: ID de la configuracion
+      - description: Id de la configuracion
         in: path
         name: id
         required: true
@@ -326,9 +427,11 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para eliminar una configuracion por id
+      tags:
+      - Configuracion
     get:
       parameters:
-      - description: ID de la configuracion
+      - description: Id de la configuracion
         in: path
         name: id
         required: true
@@ -345,6 +448,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener una configuracion por id
+      tags:
+      - Configuracion
   /errores/indicadores:
     get:
       parameters:
@@ -410,6 +515,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener las errores detectados por dia
+      tags:
+      - Errores
   /errores/series-implicadas:
     get:
       parameters:
@@ -516,6 +623,8 @@ paths:
           schema:
             type: string
       summary: Show the status of the server.
+      tags:
+      - Health
   /inputs/metricas-generales:
     get:
       produces:
@@ -526,6 +635,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.InputsGeneralMetrics'
       summary: Endpoint para obtener las metricas generales de inputs
+      tags:
+      - Inputs
   /series:
     get:
       parameters:
@@ -603,7 +714,7 @@ paths:
         in: query
         name: timeEnd
         type: string
-      - description: ID de la serie
+      - description: Id de la serie
         in: path
         name: serie_id
         required: true
@@ -628,6 +739,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los datos de una serie dado un id y su configuracion
+      tags:
+      - Series
   /series/comportamiento:
     get:
       parameters:
@@ -675,7 +788,7 @@ paths:
         in: query
         name: timeEnd
         type: string
-      - description: ID de la serie
+      - description: Id de la serie
         in: path
         name: serie_id
         required: true
@@ -692,6 +805,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los valores de una serie curada por id
+      tags:
+      - Series
   /series/estaciones:
     get:
       parameters:
@@ -718,6 +833,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.StreamsPerStationResponse'
       summary: Endpoint para obtener el resumen de las series agrupado por estacion
+      tags:
+      - Series
   /series/observadas/{serie_id}:
     get:
       parameters:
@@ -731,7 +848,7 @@ paths:
         in: query
         name: timeEnd
         type: string
-      - description: ID de la serie
+      - description: Id de la serie
         in: path
         name: serie_id
         required: true
@@ -748,10 +865,12 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los valores de una serie observada por id
+      tags:
+      - Series
   /series/pronosticadas/{calibrado_id}:
     get:
       parameters:
-      - description: ID del calibrado
+      - description: Id del calibrado
         in: path
         name: calibrado_id
         required: true
@@ -768,6 +887,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los valores de una serie pronosticadas por id
+      tags:
+      - Series
   /series/redes:
     get:
       produces:
@@ -778,4 +899,6 @@ paths:
           schema:
             $ref: '#/definitions/dtos.StreamsPerNetworkResponse'
       summary: Endpoint para obtener el resumen de las series agrupado por red
+      tags:
+      - Series
 swagger: "2.0"

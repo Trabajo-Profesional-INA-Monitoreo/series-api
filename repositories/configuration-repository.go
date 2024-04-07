@@ -25,7 +25,7 @@ func (c configurationRepository) Update(configuration *entities.Configuration) e
 }
 
 func (c configurationRepository) Delete(id string) {
-	c.connection.Where("id = ?", id).Delete(&dtos.Configuration{})
+	c.connection.Model(&entities.Configuration{}).Where("configuration_id = ?", id).Update("deleted", true)
 }
 
 func (c configurationRepository) GetConfigurationById(id string) *dtos.Configuration {
@@ -34,8 +34,8 @@ func (c configurationRepository) GetConfigurationById(id string) *dtos.Configura
 	result := c.connection.Model(
 		&entities.Configuration{},
 	).Select(
-		"configurations.name as name, configurations.id as id",
-	).Where("id = ?", id).Scan(&configuration)
+		"configurations.name as name, configurations.configuration_id as configuration_id",
+	).Where("configuration_id = ? AND deleted = false", id).Scan(&configuration)
 
 	if result.RowsAffected == 0 {
 		return nil
@@ -51,8 +51,8 @@ func (c configurationRepository) GetAllConfigurations() []dtos.AllConfigurations
 	c.connection.Model(
 		&entities.Configuration{},
 	).Select(
-		"configurations.name as name, configurations.id as id",
-	).Scan(&configurations)
+		"configurations.name as name, configurations.configuration_id as configuration_id",
+	).Where("deleted = false").Scan(&configurations)
 
 	log.Debugf("Get configurations query result: %v", configurations)
 	return configurations

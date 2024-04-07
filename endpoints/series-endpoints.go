@@ -10,7 +10,7 @@ import (
 )
 
 func setSeriesEndpoints(apiGroup *gin.RouterGroup, repositories *config.Repositories, inaApiClient clients.InaAPiClient) {
-	controller := controllers.NewSeriesController(services.NewSeriesService(repositories.StreamsRepository, inaApiClient, repositories.ConfiguredStreamRepository))
+	controller := controllers.NewSeriesController(services.NewStreamService(repositories.StreamsRepository, inaApiClient, repositories.ConfiguredStreamRepository))
 	testApi := apiGroup.Group("/series")
 	{
 		testApi.GET("", controller.GetStreamCards)

@@ -14,6 +14,7 @@ type Repositories struct {
 	ConfigurationRepository    repositories.ConfigurationRepository
 	ConfiguredStreamRepository repositories.ConfiguredStreamsRepository
 	ErrorsRepository           repositories.ErrorsRepository
+	NodeRepository             repositories.NodeRepository
 	FilterRepository           repositories.FilterRepository
 }
 
@@ -38,6 +39,7 @@ func CreateRepositories(connectionData string) *Repositories {
 		&entities.Configuration{},
 		&entities.DetectedError{},
 		&entities.ConfiguredMetric{},
+		&entities.Node{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to auto migrate model to DB: %v", err)
@@ -50,6 +52,7 @@ func CreateRepositories(connectionData string) *Repositories {
 		ConfigurationRepository:    repositories.NewConfigurationRepository(connection),
 		ConfiguredStreamRepository: repositories.NewConfiguredStreamsRepository(connection),
 		ErrorsRepository:           repositories.NewErrorsRepository(connection),
+		NodeRepository:             repositories.NewNodeRepository(connection),
 		FilterRepository:           repositories.NewFilterRepository(connection),
 	}
 	log.Infof("Done creating repositories")

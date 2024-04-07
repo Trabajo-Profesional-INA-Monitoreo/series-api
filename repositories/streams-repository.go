@@ -3,12 +3,13 @@ package repositories
 import (
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	exceptions "github.com/Trabajo-Profesional-INA-Monitoreo/series-api/errors"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"time"
 )
 
 const directMeasurementProcedure = 1
@@ -23,7 +24,12 @@ type StreamRepository interface {
 	GetTotalStations() int
 	GetStreams() []entities.Stream
 	GetStreamWithAssociatedData(streamId uint64) (entities.Stream, error)
-	GetStreamCards(parameters dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
+	CreateUnit(entity entities.Unit) error
+	CreateStation(entity entities.Station) error
+	CreateProcedure(entity entities.Procedure) error
+	CreateVariable(entity entities.Variable) error
+	CreateStream(entity entities.Stream) error
+	GetStreamCards(parameters dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error)
 	GetStreamsForOutputMetrics(configId uint64) ([]dtos.BehaviourStream, error)
 }
 
@@ -139,7 +145,7 @@ func (db *streamsRepository) GetStreamWithAssociatedData(streamId uint64) (entit
 
 	result := db.connection.Model(
 		&entities.Stream{},
-	).Joins("Network").Joins("Station").Joins("Procedure").Joins("Unit").Joins("Variable").Where(
+	).Joins("Station").Joins("Procedure").Joins("Unit").Joins("Variable").Where(
 		"streams.stream_id = ?", streamId,
 	).Find(&stream)
 
@@ -155,7 +161,32 @@ func (db *streamsRepository) GetStreamWithAssociatedData(streamId uint64) (entit
 	return stream, nil
 }
 
-func (db *streamsRepository) GetStreamCards(parameters dtos.QueryParameters) (*dtos.StreamCardsResponse, error) {
+func (db *streamsRepository) CreateUnit(unit entities.Unit) error {
+	result := db.connection.Save(&unit)
+	return result.Error
+}
+
+func (db *streamsRepository) CreateStation(station entities.Station) error {
+	result := db.connection.Save(&station)
+	return result.Error
+}
+
+func (db *streamsRepository) CreateProcedure(procedure entities.Procedure) error {
+	result := db.connection.Save(&procedure)
+	return result.Error
+}
+
+func (db *streamsRepository) CreateVariable(variable entities.Variable) error {
+	result := db.connection.Save(&variable)
+	return result.Error
+}
+
+func (db *streamsRepository) CreateStream(stream entities.Stream) error {
+	result := db.connection.Save(&stream)
+	return result.Error
+}
+
+func (db *streamsRepository) GetStreamCards(parameters dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error) {
 	var streamCards []*dtos.StreamCard
 	configId := parameters.Get("configurationId").(uint64)
 	streamId := parameters.GetAsInt("streamId")

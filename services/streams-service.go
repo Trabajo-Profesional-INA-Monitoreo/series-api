@@ -1,13 +1,17 @@
 package services
 
 import (
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
-	log "github.com/sirupsen/logrus"
+	"errors"
 	"strconv"
 	"time"
+
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/converters"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
+	exceptions "github.com/Trabajo-Profesional-INA-Monitoreo/series-api/errors"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
+	log "github.com/sirupsen/logrus"
 )
 
 type StreamService interface {
@@ -17,7 +21,8 @@ type StreamService interface {
 	GetObservatedSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse
 	GetPredictedSerieById(id string) dtos.CalibratedStreamsDataResponse
 	GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error)
-	GetStreamCards(parameters *dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
+	CreateStream(streamId uint64, streamType uint64) error
+	GetStreamCards(parameters *dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error)
 	GetOutputBehaviourMetrics(configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.BehaviourStreamsResponse, error)
 }
 
@@ -27,7 +32,7 @@ type streamService struct {
 	configuredStreamsRepository repositories.ConfiguredStreamsRepository
 }
 
-func NewSeriesService(repository repositories.StreamRepository, inaApiClient clients.InaAPiClient, configuredStreamsRepository repositories.ConfiguredStreamsRepository) StreamService {
+func NewStreamService(repository repositories.StreamRepository, inaApiClient clients.InaAPiClient, configuredStreamsRepository repositories.ConfiguredStreamsRepository) StreamService {
 	return &streamService{repository, inaApiClient, configuredStreamsRepository}
 }
 
@@ -113,7 +118,44 @@ func (s streamService) GetStreamData(streamId uint64, configId uint64, timeStart
 	return streamData, nil
 }
 
-func (s streamService) GetStreamCards(parameters *dtos.QueryParameters) (*dtos.StreamCardsResponse, error) {
+func (s streamService) CreateStream(streamId uint64, streamType uint64) error {
+	_, err := s.repository.GetStreamWithAssociatedData(streamId)
+	if errors.Is(err, &exceptions.NotFound{}) {
+
+		inaStreamResponse, err := s.inaApiClient.GetStream(streamId)
+		if err != nil {
+			return err
+		}
+
+		err = s.repository.CreateUnit(converters.ConvertUnitResponseToEntity(inaStreamResponse.Unit))
+		if err != nil {
+			return err
+		}
+
+		err = s.repository.CreateStation(converters.ConvertStationResponseToEntity(inaStreamResponse.Station))
+		if err != nil {
+			return err
+		}
+
+		err = s.repository.CreateProcedure(converters.ConvertProcedureResponseToEntity(inaStreamResponse.Procedure))
+		if err != nil {
+			return err
+		}
+
+		err = s.repository.CreateVariable(converters.ConvertVariableResponseToEntity(inaStreamResponse.Variable))
+		if err != nil {
+			return err
+		}
+
+		err = s.repository.CreateStream(converters.ConvertStreamResponseToEntity(inaStreamResponse, streamType))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s streamService) GetStreamCards(parameters *dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error) {
 	result, err := s.repository.GetStreamCards(*parameters)
 	if err != nil {
 		return nil, err
