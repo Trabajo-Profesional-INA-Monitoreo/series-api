@@ -84,9 +84,6 @@ func (s streamService) GetPredictedSerieById(id string) dtos.CalibratedStreamsDa
 
 func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, configured entities.ConfiguredStream, timeStart time.Time, timeEnd time.Time) *[]dtos.MetricCard {
 	neededMetrics := configured.Metrics
-	if len(neededMetrics) == 0 {
-		return nil
-	}
 	waterLevelCalculator := NewCalculatorOfWaterLevelsDependingOnVariable(*stream.Station, stream.VariableId)
 	if stream.IsForecasted() {
 		values, err := s.inaApiClient.GetLastForecast(configured.CalibrationId)
