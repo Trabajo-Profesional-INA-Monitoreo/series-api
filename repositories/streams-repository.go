@@ -29,7 +29,7 @@ type StreamRepository interface {
 	CreateProcedure(entity entities.Procedure) error
 	CreateVariable(entity entities.Variable) error
 	CreateStream(entity entities.Stream) error
-	GetStreamCards(parameters dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error)
+	GetStreamCards(parameters dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
 	GetStreamsForOutputMetrics(configId uint64) ([]dtos.BehaviourStream, error)
 }
 
@@ -186,7 +186,7 @@ func (db *streamsRepository) CreateStream(stream entities.Stream) error {
 	return result.Error
 }
 
-func (db *streamsRepository) GetStreamCards(parameters dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error) {
+func (db *streamsRepository) GetStreamCards(parameters dtos.QueryParameters) (*dtos.StreamCardsResponse, error) {
 	var streamCards []*dtos.StreamCard
 	configId := parameters.Get("configurationId").(uint64)
 	streamId := parameters.GetAsInt("streamId")

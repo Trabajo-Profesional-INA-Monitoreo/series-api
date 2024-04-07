@@ -22,7 +22,7 @@ type StreamService interface {
 	GetPredictedSerieById(id string) dtos.CalibratedStreamsDataResponse
 	GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error)
 	CreateStream(streamId uint64, streamType uint64) error
-	GetStreamCards(parameters *dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error)
+	GetStreamCards(parameters *dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
 	GetOutputBehaviourMetrics(configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.BehaviourStreamsResponse, error)
 }
 
@@ -155,7 +155,7 @@ func (s streamService) CreateStream(streamId uint64, streamType uint64) error {
 	return nil
 }
 
-func (s streamService) GetStreamCards(parameters *dtos.StreamCardsParameters) (*dtos.StreamCardsResponse, error) {
+func (s streamService) GetStreamCards(parameters *dtos.QueryParameters) (*dtos.StreamCardsResponse, error) {
 	result, err := s.repository.GetStreamCards(*parameters)
 	if err != nil {
 		return nil, err
