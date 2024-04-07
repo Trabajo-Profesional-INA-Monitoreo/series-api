@@ -1,5 +1,10 @@
 package dtos
 
+import (
+	log "github.com/sirupsen/logrus"
+	"strconv"
+)
+
 type QueryParameters struct {
 	params map[string]interface{}
 	//streamId        *uint64
@@ -45,6 +50,11 @@ func (s *QueryParameters) GetAsInt(key string) *int {
 	if value == nil {
 		return nil
 	}
-	aux := int(value.(uint64))
+	converted, err := strconv.ParseInt(value.(string), 10, 64)
+	if err != nil {
+		log.Errorf("Error converting %v to int", value)
+		return nil
+	}
+	aux := int(converted)
 	return &aux
 }
