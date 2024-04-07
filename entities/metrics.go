@@ -26,19 +26,19 @@ func MapMetricToString(m Metric) string {
 	case Media:
 		return "Media"
 	case Maximo:
-		return "Maximo"
+		return "Máximo"
 	case Minimo:
-		return "Minimo"
+		return "Mínimo"
 	case Nulos:
-		return "Nulos"
+		return "Cantidad de Nulos"
 	case Observaciones:
 		return "Observaciones"
 	case AguasAlerta:
-		return "AguasAlerta"
+		return "Cantidad sobre nivel de Alerta"
 	case AguasEvacuacion:
-		return "AguasEvacuacion"
+		return "Cantidad sobre nivel de Evacuación"
 	case AguasBajas:
-		return "AguasBajas"
+		return "Cantidad bajo nivel de Aguas Bajas"
 	default:
 		return "Unknown"
 	}
