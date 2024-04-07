@@ -14,9 +14,9 @@ type WaterLevelsCalculator interface {
 }
 
 type calculateWaterLevels struct {
-	alertLevel           float64
-	evacuationLevel      float64
-	lowWaterLevel        float64
+	alertLevel           *float64
+	evacuationLevel      *float64
+	lowWaterLevel        *float64
 	countAlertLevel      float64
 	countEvacuationLevel float64
 	countLowWaterLevel   float64
@@ -41,7 +41,7 @@ func NewCalculatorOfWaterLevelsDependingOnVariable(station entities.Station, var
 	}
 }
 
-func NewCalculatorOfWaterLevels(alertLevel float64, evacuationLevel float64, lowWaterLevel float64) WaterLevelsCalculator {
+func NewCalculatorOfWaterLevels(alertLevel *float64, evacuationLevel *float64, lowWaterLevel *float64) WaterLevelsCalculator {
 	return &calculateWaterLevels{
 		alertLevel:           alertLevel,
 		evacuationLevel:      evacuationLevel,
@@ -53,19 +53,26 @@ func NewCalculatorOfWaterLevels(alertLevel float64, evacuationLevel float64, low
 }
 
 func (c *calculateWaterLevels) Compute(level float64) {
-	if level >= c.evacuationLevel {
+	if c.evacuationLevel != nil && level >= *c.evacuationLevel {
 		c.countEvacuationLevel++
-	} else if level >= c.alertLevel {
+	} else if c.alertLevel != nil && level >= *c.alertLevel {
 		c.countAlertLevel++
-	} else if level <= c.lowWaterLevel {
+	} else if c.lowWaterLevel != nil && level <= *c.lowWaterLevel {
 		c.countLowWaterLevel++
 	}
 }
 
 func (c *calculateWaterLevels) AddMetrics(metrics []dtos.MetricCard) []dtos.MetricCard {
-	metrics = append(metrics, dtos.NewMetricCard(entities.MapMetricToString(entities.AguasBajas), c.countLowWaterLevel))
-	metrics = append(metrics, dtos.NewMetricCard(entities.MapMetricToString(entities.AguasEvacuacion), c.countEvacuationLevel))
-	return append(metrics, dtos.NewMetricCard(entities.MapMetricToString(entities.AguasAlerta), c.countAlertLevel))
+	if c.lowWaterLevel != nil {
+		metrics = append(metrics, dtos.NewMetricCard(entities.MapMetricToString(entities.AguasBajas), c.countLowWaterLevel))
+	}
+	if c.alertLevel != nil {
+		metrics = append(metrics, dtos.NewMetricCard(entities.MapMetricToString(entities.AguasAlerta), c.countAlertLevel))
+	}
+	if c.evacuationLevel != nil {
+		metrics = append(metrics, dtos.NewMetricCard(entities.MapMetricToString(entities.AguasEvacuacion), c.countEvacuationLevel))
+	}
+	return metrics
 }
 
 func (n *calculateWaterLevels) GetAlertsCount() uint64 {

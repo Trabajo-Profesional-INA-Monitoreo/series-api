@@ -62,9 +62,9 @@ type Station struct {
 	Abreviatura     interface{} `json:"abreviatura"`
 	Locality        interface{} `json:"localidad"`
 	Real            bool        `json:"real"`
-	AlertLevel      int         `json:"nivel_alerta"`
-	EvacuationLevel float64     `json:"nivel_evacuacion"`
-	LowWaterLevel   float64     `json:"nivel_aguas_bajas"`
+	AlertLevel      *float64    `json:"nivel_alerta"`
+	EvacuationLevel *float64    `json:"nivel_evacuacion"`
+	LowWaterLevel   *float64    `json:"nivel_aguas_bajas"`
 	Altitude        interface{} `json:"altitud"`
 	Public          bool        `json:"public"`
 	CeroIgn         float64     `json:"cero_ign"`

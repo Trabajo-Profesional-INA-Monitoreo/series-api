@@ -2,9 +2,9 @@ package dtos
 
 type BehaviourStream struct {
 	StreamId        uint64
-	AlertLevel      float64
-	EvacuationLevel float64
-	LowWaterLevel   float64
+	AlertLevel      *float64
+	EvacuationLevel *float64
+	LowWaterLevel   *float64
 }
 
 type BehaviourStreamsResponse struct {
