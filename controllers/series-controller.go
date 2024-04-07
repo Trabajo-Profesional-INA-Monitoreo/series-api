@@ -190,6 +190,7 @@ func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 // GetStreamCards godoc
 //
 //	@Summary		Endpoint para obtener las series configuradas de una configuracion
+//	@Tags           Series
 //	@Produce		json
 //	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
 //	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: mañana"  Format(2006-01-02)
@@ -252,6 +253,7 @@ func (s seriesController) GetStreamCards(ctx *gin.Context) {
 // GetOutputMetrics godoc
 //
 //	@Summary		Endpoint para obtener las metricas de comportamiento
+//	@Tags           Series
 //	@Produce		json
 //	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
 //	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: mañana"  Format(2006-01-02)

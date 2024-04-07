@@ -185,6 +185,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Errores"
+                ],
                 "summary": "Endpoint para obtener las indicadores de errores",
                 "parameters": [
                     {
@@ -284,6 +287,9 @@ const docTemplate = `{
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Errores"
                 ],
                 "summary": "Endpoint para obtener las indicadores de errores",
                 "parameters": [
@@ -468,6 +474,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Series"
+                ],
                 "summary": "Endpoint para obtener las series configuradas de una configuracion",
                 "parameters": [
                     {
@@ -554,6 +563,9 @@ const docTemplate = `{
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Series"
                 ],
                 "summary": "Endpoint para obtener las metricas de comportamiento",
                 "parameters": [

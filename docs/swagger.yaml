@@ -483,6 +483,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener las indicadores de errores
+      tags:
+      - Errores
   /errores/por-dia:
     get:
       parameters:
@@ -556,6 +558,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener las indicadores de errores
+      tags:
+      - Errores
   /filtro/estaciones:
     get:
       produces:
@@ -695,6 +699,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener las series configuradas de una configuracion
+      tags:
+      - Series
   /series/{serie_id}:
     get:
       parameters:
@@ -775,6 +781,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener las metricas de comportamiento
+      tags:
+      - Series
   /series/curadas/{serie_id}:
     get:
       parameters:

@@ -177,6 +177,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Errores"
+                ],
                 "summary": "Endpoint para obtener las indicadores de errores",
                 "parameters": [
                     {
@@ -276,6 +279,9 @@
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Errores"
                 ],
                 "summary": "Endpoint para obtener las indicadores de errores",
                 "parameters": [
@@ -460,6 +466,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Series"
+                ],
                 "summary": "Endpoint para obtener las series configuradas de una configuracion",
                 "parameters": [
                     {
@@ -546,6 +555,9 @@
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Series"
                 ],
                 "summary": "Endpoint para obtener las metricas de comportamiento",
                 "parameters": [
