@@ -185,6 +185,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Errores"
+                ],
                 "summary": "Endpoint para obtener las indicadores de errores",
                 "parameters": [
                     {
@@ -268,6 +271,66 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/dtos.ErrorsCountPerDayAndType"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/errores/series-implicadas": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Errores"
+                ],
+                "summary": "Endpoint para obtener las indicadores de errores",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: hoy",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "uint",
+                        "description": "Id de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "uint",
+                        "description": "Id del tipo de error",
+                        "name": "errorType",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.ErrorIndicator"
                             }
                         }
                     },
@@ -411,6 +474,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Series"
+                ],
                 "summary": "Endpoint para obtener las series configuradas de una configuracion",
                 "parameters": [
                     {
@@ -497,6 +563,9 @@ const docTemplate = `{
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Series"
                 ],
                 "summary": "Endpoint para obtener las metricas de comportamiento",
                 "parameters": [
@@ -963,6 +1032,9 @@ const docTemplate = `{
         "dtos.ErrorIndicator": {
             "type": "object",
             "properties": {
+                "ErrorId": {
+                    "$ref": "#/definitions/entities.ErrorType"
+                },
                 "count": {
                     "type": "integer"
                 },
@@ -1261,6 +1333,21 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "entities.ErrorType": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "x-enum-varnames": [
+                "NullValue",
+                "Missing4DaysHorizon",
+                "OutsideOfErrorBands",
+                "ForecastMissing"
+            ]
         },
         "entities.Metric": {
             "type": "integer",

@@ -25,30 +25,16 @@ func getDates(ctx *gin.Context) (time.Time, time.Time, bool) {
 	return timeStart, timeEnd, false
 }
 
-func getConfigurationId(ctx *gin.Context) (uint64, bool) {
-	configurationIdQuery, sent := ctx.GetQuery("configurationId")
+func getUintQueryParam(ctx *gin.Context, queryParam string) (uint64, bool) {
+	configurationIdQuery, sent := ctx.GetQuery(queryParam)
 	if !sent {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("configurationId missing")))
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf(queryParam+" missing")))
 		return 0, true
 	}
 	configurationId, err := strconv.ParseUint(configurationIdQuery, 10, 64)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("wrong format for configurationId, should be uint")))
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("wrong format for "+queryParam+", should be uint")))
 		return 0, true
 	}
 	return configurationId, false
-}
-
-func getConfiguredStreamId(ctx *gin.Context, err error) (uint64, bool) {
-	configIdParam, userSentConfigId := ctx.GetQuery("configuredStreamId")
-	if !userSentConfigId {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("configuredStreamId was not sent")))
-		return 0, true
-	}
-	configId, err := strconv.ParseUint(configIdParam, 10, 64)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("configuredStreamId should be a number")))
-		return 0, true
-	}
-	return configId, false
 }

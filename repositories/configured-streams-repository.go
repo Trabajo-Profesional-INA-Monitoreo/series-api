@@ -18,7 +18,7 @@ type ConfiguredStreamsRepository interface {
 	Create(e *entities.ConfiguredStream) error
 	FindConfiguredStreamsByNodeId(nodeId uint64, configurationId string) *[]dtos.ConfiguredStream
 	Update(e *entities.ConfiguredStream) error
-	CountErrorOfConfigurations(ids []uint64, parameters *dtos.StreamCardsParameters) ([]dtos.ErrorsPerConfigStream, error)
+	CountErrorOfConfigurations(ids []uint64, parameters *dtos.QueryParameters) ([]dtos.ErrorsPerConfigStream, error)
 }
 
 type configuredStreamsRepository struct {
@@ -90,7 +90,7 @@ func (db configuredStreamsRepository) Update(configuredStream *entities.Configur
 	return result.Error
 }
 
-func (db configuredStreamsRepository) CountErrorOfConfigurations(ids []uint64, parameters *dtos.StreamCardsParameters) ([]dtos.ErrorsPerConfigStream, error) {
+func (db configuredStreamsRepository) CountErrorOfConfigurations(ids []uint64, parameters *dtos.QueryParameters) ([]dtos.ErrorsPerConfigStream, error) {
 	timeStart := parameters.Get("timeStart").(time.Time)
 	timeEnd := parameters.Get("timeEnd").(time.Time)
 	var results []dtos.ErrorsPerConfigStream

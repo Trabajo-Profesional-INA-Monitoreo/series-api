@@ -11,9 +11,7 @@ import (
 )
 
 func getMetricsForForecastedStream(data *responses.LastForecast, neededMetrics []entities.ConfiguredMetric, waterLevelCalculator WaterLevelsCalculator) *[]dtos.MetricCard {
-	if len(neededMetrics) == 0 {
-		return nil
-	}
+
 	var metrics []dtos.MetricCard
 	setUpFirstValues := false
 	var minValue float64
@@ -64,9 +62,7 @@ func getMetricsForForecastedStream(data *responses.LastForecast, neededMetrics [
 }
 
 func getMetricsForObservedOrCuratedStream(data []responses.ObservedDataResponse, neededMetrics []entities.ConfiguredMetric, waterLevelCalculator WaterLevelsCalculator) *[]dtos.MetricCard {
-	if len(neededMetrics) == 0 {
-		return nil
-	}
+
 	var metrics []dtos.MetricCard
 	setUpFirstValues := false
 	var minValue float64

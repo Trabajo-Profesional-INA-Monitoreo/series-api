@@ -102,6 +102,8 @@ definitions:
     type: object
   dtos.ErrorIndicator:
     properties:
+      ErrorId:
+        $ref: '#/definitions/entities.ErrorType'
       count:
         type: integer
       errorType:
@@ -295,6 +297,18 @@ definitions:
       name:
         type: string
     type: object
+  entities.ErrorType:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    type: integer
+    x-enum-varnames:
+    - NullValue
+    - Missing4DaysHorizon
+    - OutsideOfErrorBands
+    - ForecastMissing
   entities.Metric:
     enum:
     - 0
@@ -469,6 +483,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener las indicadores de errores
+      tags:
+      - Errores
   /errores/por-dia:
     get:
       parameters:
@@ -501,6 +517,47 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener las errores detectados por dia
+      tags:
+      - Errores
+  /errores/series-implicadas:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: hoy'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: Id de la configuracion
+        format: uint
+        in: query
+        name: configurationId
+        required: true
+        type: string
+      - description: Id del tipo de error
+        format: uint
+        in: query
+        name: errorType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.ErrorIndicator'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las indicadores de errores
       tags:
       - Errores
   /filtro/estaciones:
@@ -642,6 +699,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener las series configuradas de una configuracion
+      tags:
+      - Series
   /series/{serie_id}:
     get:
       parameters:
@@ -722,6 +781,8 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener las metricas de comportamiento
+      tags:
+      - Series
   /series/curadas/{serie_id}:
     get:
       parameters:

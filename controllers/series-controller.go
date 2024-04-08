@@ -60,7 +60,7 @@ func (s seriesController) GetStations(ctx *gin.Context) {
 	if done {
 		return
 	}
-	configId, done := getConfigurationId(ctx)
+	configId, done := getUintQueryParam(ctx, "configurationId")
 	if done {
 		return
 	}
@@ -167,7 +167,7 @@ func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("serie_id should be a number")))
 		return
 	}
-	configId, done := getConfiguredStreamId(ctx, err)
+	configId, done := getUintQueryParam(ctx, "configuredStreamId")
 	if done {
 		return
 	}
@@ -190,6 +190,7 @@ func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 // GetStreamCards godoc
 //
 //	@Summary		Endpoint para obtener las series configuradas de una configuracion
+//	@Tags           Series
 //	@Produce		json
 //	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
 //	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: mañana"  Format(2006-01-02)
@@ -209,12 +210,12 @@ func (s seriesController) GetStreamCards(ctx *gin.Context) {
 	if done {
 		return
 	}
-	configurationId, done := getConfigurationId(ctx)
+	configurationId, done := getUintQueryParam(ctx, "configurationId")
 	if done {
 		return
 	}
 
-	parameters := dtos.NewStreamCardsParameters()
+	parameters := dtos.NewQueryParameters()
 	parameters.AddParam("timeStart", timeStart)
 	parameters.AddParam("timeEnd", timeEnd)
 	parameters.AddParam("configurationId", configurationId)
@@ -252,6 +253,7 @@ func (s seriesController) GetStreamCards(ctx *gin.Context) {
 // GetOutputMetrics godoc
 //
 //	@Summary		Endpoint para obtener las metricas de comportamiento
+//	@Tags           Series
 //	@Produce		json
 //	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
 //	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: mañana"  Format(2006-01-02)
@@ -265,7 +267,7 @@ func (s seriesController) GetOutputMetrics(ctx *gin.Context) {
 	if done {
 		return
 	}
-	configurationId, done := getConfigurationId(ctx)
+	configurationId, done := getUintQueryParam(ctx, "configurationId")
 	if done {
 		return
 	}

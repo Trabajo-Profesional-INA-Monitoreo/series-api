@@ -3,10 +3,12 @@ package services
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
+	"time"
 )
 
 type InputsService interface {
-	GetGeneralMetrics() dtos.InputsGeneralMetrics
+	GetGeneralMetrics(configurationId uint64) dtos.InputsGeneralMetrics
+	GetTotalStreamsWithNullValues(configurationId uint64, timeStart time.Time, timeEnd time.Time) dtos.TotalStreamsWithNullValues
 }
 
 type inputsService struct {
@@ -17,17 +19,28 @@ func NewInputsService(repository repositories.StreamRepository) InputsService {
 	return &inputsService{repository}
 }
 
-func (s inputsService) GetGeneralMetrics() dtos.InputsGeneralMetrics {
+func (s inputsService) GetGeneralMetrics(configurationId uint64) dtos.InputsGeneralMetrics {
 	streamsResult := make(chan int, 1)
 	stationsResult := make(chan int, 1)
 	go func() {
-		streamsResult <- s.repository.GetTotalStreams()
+		streamsResult <- s.repository.GetTotalStreams(configurationId)
 	}()
 	go func() {
-		stationsResult <- s.repository.GetTotalStations()
+		stationsResult <- s.repository.GetTotalStations(configurationId)
 	}()
-	totalNetworks := s.repository.GetTotalNetworks()
+	//totalNetworks := s.repository.GetTotalNetworks()
 	totalStreams := <-streamsResult
 	totalStations := <-stationsResult
-	return dtos.InputsGeneralMetrics{TotalStreams: totalStreams, TotalStations: totalStations, TotalNetworks: totalNetworks}
+	return dtos.InputsGeneralMetrics{TotalStreams: totalStreams, TotalStations: totalStations, TotalNetworks: 0}
+}
+
+func (s inputsService) GetTotalStreamsWithNullValues(configurationId uint64, timeStart time.Time, timeEnd time.Time) dtos.TotalStreamsWithNullValues {
+	streamsResult := make(chan int, 1)
+	go func() {
+		streamsResult <- s.repository.GetTotalStreams(configurationId)
+	}()
+	streamsWithNull := s.repository.GetTotalStreamsWithNullValues(configurationId, timeStart, timeEnd)
+	totalStreams := <-streamsResult
+
+	return dtos.TotalStreamsWithNullValues{TotalStreams: totalStreams, TotalStreamsWithNull: streamsWithNull}
 }

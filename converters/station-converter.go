@@ -10,7 +10,7 @@ func ConvertStationResponseToEntity(station responses.Station) entities.Station 
 		StationId:       uint64(station.Id),
 		Name:            station.Name,
 		Owner:           station.Owner,
-		AlertLevel:      float64(station.AlertLevel),
+		AlertLevel:      station.AlertLevel,
 		EvacuationLevel: station.EvacuationLevel,
 		LowWaterLevel:   station.LowWaterLevel,
 	}

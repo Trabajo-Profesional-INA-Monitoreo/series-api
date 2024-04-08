@@ -1,5 +1,7 @@
 package dtos
 
+import "math"
+
 type Pageable struct {
 	Pages         int
 	TotalElements int
@@ -8,5 +10,5 @@ type Pageable struct {
 }
 
 func NewPageable(totalElements int, page int, pageSize int) Pageable {
-	return Pageable{Pages: totalElements / pageSize, TotalElements: totalElements, Page: page, PageSize: pageSize}
+	return Pageable{Pages: int(math.Ceil(float64(totalElements) / float64(pageSize))), TotalElements: totalElements, Page: page, PageSize: pageSize}
 }
