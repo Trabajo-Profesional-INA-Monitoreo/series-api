@@ -5,3 +5,8 @@ type InputsGeneralMetrics struct {
 	TotalStations int
 	TotalNetworks int
 }
+
+type TotalStreamsWithNullValues struct {
+	TotalStreams         int
+	TotalStreamsWithNull int
+}

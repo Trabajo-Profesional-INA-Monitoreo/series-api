@@ -19,9 +19,9 @@ type StreamRepository interface {
 	GetNetworks() []dtos.StreamsPerNetwork
 	GetStations(configId uint64) *[]*dtos.StreamsPerStation
 	GetErrorsOfStations(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfStations
-	GetTotalStreams() int
-	GetTotalNetworks() int
-	GetTotalStations() int
+	GetTotalStreams(configurationId uint64) int
+	//GetTotalNetworks(configurationId uint64) int
+	GetTotalStations(configurationId uint64) int
 	GetStreams() []entities.Stream
 	GetStreamWithAssociatedData(streamId uint64) (entities.Stream, error)
 	CreateUnit(entity entities.Unit) error
@@ -31,6 +31,7 @@ type StreamRepository interface {
 	CreateStream(entity entities.Stream) error
 	GetStreamCards(parameters dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
 	GetStreamsForOutputMetrics(configId uint64) ([]dtos.BehaviourStream, error)
+	GetTotalStreamsWithNullValues(configId uint64, timeStart time.Time, timeEnd time.Time) int
 }
 
 type streamsRepository struct {
@@ -106,19 +107,27 @@ func (db *streamsRepository) GetErrorsOfStations(configId uint64, timeStart time
 
 	return errorsPerStation
 }
-func (db *streamsRepository) GetTotalStreams() int {
+func (db *streamsRepository) GetTotalStreams(configurationId uint64) int {
 	var count int64
 	db.connection.Model(
 		&entities.Stream{},
-	).Count(&count)
+	).Select("COUNT(streams.stream_id)").Joins(
+		"JOIN configured_streams ON configured_streams.stream_id = streams.stream_id",
+	).Where(
+		"configured_streams.configuration_id = ?", configurationId,
+	).Find(&count)
 	return int(count)
 }
 
-func (db *streamsRepository) GetTotalStations() int {
+func (db *streamsRepository) GetTotalStations(configurationId uint64) int {
 	var count int64
 	db.connection.Model(
-		&entities.Station{},
-	).Count(&count)
+		&entities.Stream{},
+	).Select("COUNT(streams.station_id)").Joins(
+		"JOIN configured_streams ON configured_streams.stream_id = streams.stream_id",
+	).Where(
+		"configured_streams.configuration_id = ?", configurationId,
+	).Group("streams.station_id").Find(&count)
 	return int(count)
 }
 
@@ -138,6 +147,28 @@ func (db *streamsRepository) GetStreams() []entities.Stream {
 	).Find(&streams)
 
 	return streams
+}
+
+func (db *streamsRepository) GetTotalStreamsWithNullValues(configId uint64, timeStart time.Time, timeEnd time.Time) int {
+	var count int64
+	db.connection.Model(
+		&entities.ConfiguredStream{},
+	).Select("COUNT(detected_errors.error_id)").Joins(
+		"JOIN streams ON streams.stream_id = configured_streams.stream_id",
+	).Joins(
+		"JOIN configured_streams_errors ON configured_streams_errors.configured_stream_configured_stream_id=configured_streams.configured_stream_id",
+	).Joins(
+		"JOIN detected_errors ON detected_errors.error_id = configured_streams_errors.detected_error_error_id",
+	).Where(
+		"configured_streams.configuration_id = ?", configId,
+	).Where(
+		"detected_errors.error_type = ?", entities.NullValue,
+	).Where(
+		"detected_errors.detected_date >= ? AND detected_errors.detected_date <= ?", timeStart, timeEnd,
+	).Where(
+		"streams.stream_type = ?", entities.Observed,
+	).Find(&count)
+	return int(count)
 }
 
 func (db *streamsRepository) GetStreamWithAssociatedData(streamId uint64) (entities.Stream, error) {
