@@ -73,19 +73,23 @@ func (c configurationService) CreateConfiguration(configuration dtos.CreateConfi
 		return err
 	}
 	newNodes := converters.ConvertDtoToNode(*newConfiguration, configuration.Nodes)
+
+	var nodeIds []uint64
+
 	for _, newNode := range newNodes {
-		err := c.nodeRepository.Create(&newNode)
+		nodeId, err := c.nodeRepository.Create(&newNode)
+		nodeIds = append(nodeIds, nodeId)
 		if err != nil {
 			return err
 		}
 	}
 
 	nodes := *configuration.Nodes
-	for _, node := range nodes {
+	for index, node := range nodes {
 
 		for _, configuratedStream := range *node.ConfiguredStreams {
 
-			newConfiguratedStreams := converters.ConvertDtoToConfiguratedStream(node, &configuratedStream, *newConfiguration)
+			newConfiguratedStreams := converters.ConvertDtoToConfiguratedStream(nodeIds[index], &configuratedStream, *newConfiguration)
 
 			err := c.streamService.CreateStream(newConfiguratedStreams.StreamId, configuratedStream.StreamType)
 			if err != nil {

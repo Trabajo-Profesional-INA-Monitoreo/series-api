@@ -7,10 +7,10 @@ type ConfiguredStream struct {
 	UpdateFrequency        float64
 	RedundantStreams       []ConfiguredStream `gorm:"many2many:redundancies;"`
 	CheckErrors            bool
-	NormalUpperThreshold   uint64
-	NormalLowerThreshold   uint64
-	UnusualNormalThreshold uint64
-	UnusualLowerThreshold  uint64
+	NormalUpperThreshold   float64
+	NormalLowerThreshold   float64
+	UnusualNormalThreshold float64
+	UnusualLowerThreshold  float64
 	CalibrationId          uint64
 	Metrics                []ConfiguredMetric
 	NodeId                 uint64
@@ -22,7 +22,7 @@ type ConfiguredStream struct {
 func NewConfiguredStream(
 	stream *Stream, updateFrequency float64,
 	redundantStreams []ConfiguredStream, checkErrors bool,
-	normalUpperThreshold uint64, normalLowerThreshold uint64,
+	normalUpperThreshold float64, normalLowerThreshold float64,
 	calibrationId uint64, Metrics []ConfiguredMetric,
 ) *ConfiguredStream {
 	return &ConfiguredStream{

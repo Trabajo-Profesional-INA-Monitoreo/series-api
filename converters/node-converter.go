@@ -5,11 +5,11 @@ import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 )
 
-func ConvertDtoToNode(configuration entities.Configuration, nodes *[]dtos.Node) []entities.Node {
+func ConvertDtoToNode(configuration entities.Configuration, nodes *[]dtos.CreateNode) []entities.Node {
 	var newNodes []entities.Node
 
 	for _, node := range *nodes {
-		newNodes = append(newNodes, entities.Node{ConfigurationId: configuration.ConfigurationId, Name: node.Name, NodeId: node.Id})
+		newNodes = append(newNodes, entities.Node{ConfigurationId: configuration.ConfigurationId, Name: node.Name})
 	}
 
 	return newNodes

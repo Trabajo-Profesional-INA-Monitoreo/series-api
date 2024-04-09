@@ -13,5 +13,5 @@ type AllConfigurations struct {
 
 type CreateConfiguration struct {
 	Name  string `binding:"required" ,gorm:"column:name"`
-	Nodes *[]Node
+	Nodes *[]CreateNode
 }

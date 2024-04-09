@@ -8,7 +8,7 @@ import (
 )
 
 type NodeRepository interface {
-	Create(node *entities.Node) error
+	Create(node *entities.Node) (uint64, error)
 	Update(node *entities.Node) error
 	GetNodesById(id string) []*dtos.Node
 }
@@ -22,9 +22,9 @@ func (n nodeRepository) Update(node *entities.Node) error {
 	return result.Error
 }
 
-func (n nodeRepository) Create(node *entities.Node) error {
+func (n nodeRepository) Create(node *entities.Node) (uint64, error) {
 	result := n.connection.Create(&node)
-	return result.Error
+	return node.NodeId, result.Error
 }
 
 func (n nodeRepository) GetNodesById(id string) []*dtos.Node {
