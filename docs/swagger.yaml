@@ -71,7 +71,7 @@ definitions:
       configuredStreamId:
         type: integer
       lowerThreshold:
-        type: integer
+        type: number
       metrics:
         items:
           $ref: '#/definitions/entities.Metric'
@@ -87,7 +87,7 @@ definitions:
       updateFrequency:
         type: number
       upperThreshold:
-        type: integer
+        type: number
     type: object
   dtos.CreateConfiguration:
     properties:
@@ -95,10 +95,19 @@ definitions:
         type: string
       nodes:
         items:
-          $ref: '#/definitions/dtos.Node'
+          $ref: '#/definitions/dtos.CreateNode'
         type: array
     required:
     - name
+    type: object
+  dtos.CreateNode:
+    properties:
+      configuredStreams:
+        items:
+          $ref: '#/definitions/dtos.ConfiguredStream'
+        type: array
+      name:
+        type: string
     type: object
   dtos.ErrorIndicator:
     properties:
@@ -230,7 +239,7 @@ definitions:
       station:
         type: string
       streamType:
-        type: integer
+        $ref: '#/definitions/entities.StreamType'
       unit:
         type: string
       unitId:
@@ -290,6 +299,13 @@ definitions:
           $ref: '#/definitions/dtos.StreamsPerStation'
         type: array
     type: object
+  dtos.TotalStreamsWithNullValues:
+    properties:
+      totalStreams:
+        type: integer
+      totalStreamsWithNull:
+        type: integer
+    type: object
   dtos.VariableFilter:
     properties:
       id:
@@ -337,6 +353,16 @@ definitions:
     - AguasAlerta
     - AguasEvacuacion
     - AguasBajas
+  entities.StreamType:
+    enum:
+    - 0
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - Observed
+    - Forecasted
+    - Curated
 info:
   contact: {}
   description: This API manages the inputs of the forecast model
@@ -631,6 +657,12 @@ paths:
       - Health
   /inputs/metricas-generales:
     get:
+      parameters:
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -639,6 +671,34 @@ paths:
           schema:
             $ref: '#/definitions/dtos.InputsGeneralMetrics'
       summary: Endpoint para obtener las metricas generales de inputs
+      tags:
+      - Inputs
+  /inputs/series-con-nulos:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.TotalStreamsWithNullValues'
+      summary: Endpoint para obtener la cantidad de series con valores nulos
       tags:
       - Inputs
   /series:

@@ -459,11 +459,62 @@ const docTemplate = `{
                     "Inputs"
                 ],
                 "summary": "Endpoint para obtener las metricas generales de inputs",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.InputsGeneralMetrics"
+                        }
+                    }
+                }
+            }
+        },
+        "/inputs/series-con-nulos": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inputs"
+                ],
+                "summary": "Endpoint para obtener la cantidad de series con valores nulos",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.TotalStreamsWithNullValues"
                         }
                     }
                 }
@@ -984,7 +1035,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "lowerThreshold": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "metrics": {
                     "type": "array",
@@ -1008,7 +1059,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "upperThreshold": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },
@@ -1024,8 +1075,22 @@ const docTemplate = `{
                 "nodes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dtos.Node"
+                        "$ref": "#/definitions/dtos.CreateNode"
                     }
+                }
+            }
+        },
+        "dtos.CreateNode": {
+            "type": "object",
+            "properties": {
+                "configuredStreams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.ConfiguredStream"
+                    }
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -1229,7 +1294,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "streamType": {
-                    "type": "integer"
+                    "$ref": "#/definitions/entities.StreamType"
                 },
                 "unit": {
                     "type": "string"
@@ -1323,6 +1388,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.TotalStreamsWithNullValues": {
+            "type": "object",
+            "properties": {
+                "totalStreams": {
+                    "type": "integer"
+                },
+                "totalStreamsWithNull": {
+                    "type": "integer"
+                }
+            }
+        },
         "dtos.VariableFilter": {
             "type": "object",
             "properties": {
@@ -1379,6 +1455,19 @@ const docTemplate = `{
                 "AguasAlerta",
                 "AguasEvacuacion",
                 "AguasBajas"
+            ]
+        },
+        "entities.StreamType": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "Observed",
+                "Forecasted",
+                "Curated"
             ]
         }
     }
