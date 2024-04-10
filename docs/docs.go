@@ -1217,6 +1217,9 @@ const docTemplate = `{
         "dtos.StreamCard": {
             "type": "object",
             "properties": {
+                "calibrationId": {
+                    "type": "integer"
+                },
                 "checkErrors": {
                     "type": "boolean"
                 },
@@ -1271,6 +1274,9 @@ const docTemplate = `{
             "properties": {
                 "alertLevel": {
                     "type": "number"
+                },
+                "calibrationId": {
+                    "type": "integer"
                 },
                 "evacuationLevel": {
                     "type": "number"

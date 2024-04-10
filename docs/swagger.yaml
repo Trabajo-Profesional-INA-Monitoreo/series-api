@@ -188,6 +188,8 @@ definitions:
     type: object
   dtos.StreamCard:
     properties:
+      calibrationId:
+        type: integer
       checkErrors:
         type: boolean
       configuredStreamId:
@@ -224,6 +226,8 @@ definitions:
     properties:
       alertLevel:
         type: number
+      calibrationId:
+        type: integer
       evacuationLevel:
         type: number
       lowWaterLevel:

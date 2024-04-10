@@ -14,6 +14,7 @@ type StreamCard struct {
 	CheckErrors        bool   `gorm:"check_errors"`
 	TotalErrors        *uint64
 	StreamType         entities.StreamType
+	CalibrationId      uint64
 }
 
 type StreamCardsResponse struct {

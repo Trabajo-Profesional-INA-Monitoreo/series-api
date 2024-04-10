@@ -17,6 +17,7 @@ type StreamData struct {
 	ProcId          uint64
 	UpdateFrequency float64
 	StreamType      entities.StreamType
+	CalibrationId   uint64
 }
 
 func NewStreamData(stream entities.Stream, configured entities.ConfiguredStream) *StreamData {
@@ -34,5 +35,6 @@ func NewStreamData(stream entities.Stream, configured entities.ConfiguredStream)
 		ProcId:          stream.ProcedureId,
 		Owner:           stream.Station.Owner,
 		UpdateFrequency: configured.UpdateFrequency,
+		CalibrationId:   configured.CalibrationId,
 	}
 }

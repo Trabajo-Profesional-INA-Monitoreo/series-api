@@ -1209,6 +1209,9 @@
         "dtos.StreamCard": {
             "type": "object",
             "properties": {
+                "calibrationId": {
+                    "type": "integer"
+                },
                 "checkErrors": {
                     "type": "boolean"
                 },
@@ -1263,6 +1266,9 @@
             "properties": {
                 "alertLevel": {
                     "type": "number"
+                },
+                "calibrationId": {
+                    "type": "integer"
                 },
                 "evacuationLevel": {
                     "type": "number"
