@@ -1238,6 +1238,9 @@ const docTemplate = `{
                 "streamId": {
                     "type": "integer"
                 },
+                "streamType": {
+                    "$ref": "#/definitions/entities.StreamType"
+                },
                 "totalErrors": {
                     "type": "integer"
                 },
