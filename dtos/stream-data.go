@@ -16,7 +16,7 @@ type StreamData struct {
 	Procedure       string
 	ProcId          uint64
 	UpdateFrequency float64
-	StreamType      uint64
+	StreamType      entities.StreamType
 }
 
 func NewStreamData(stream entities.Stream, configured entities.ConfiguredStream) *StreamData {
@@ -24,7 +24,7 @@ func NewStreamData(stream entities.Stream, configured entities.ConfiguredStream)
 		Station:         stream.Station.Name,
 		VarId:           stream.VariableId,
 		VarName:         stream.Variable.Name,
-		StreamType:      stream.ProcedureId,
+		StreamType:      stream.StreamType,
 		AlertLevel:      stream.Station.AlertLevel,
 		EvacuationLevel: stream.Station.EvacuationLevel,
 		LowWaterLevel:   stream.Station.LowWaterLevel,

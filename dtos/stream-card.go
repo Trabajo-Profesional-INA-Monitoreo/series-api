@@ -1,5 +1,7 @@
 package dtos
 
+import "github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
+
 type StreamCard struct {
 	StreamId           uint64 `gorm:"stream_id"`
 	ConfiguredStreamId uint64 `gorm:"configured_stream_id"`
@@ -11,6 +13,7 @@ type StreamCard struct {
 	StationName        string `gorm:"station_name"`
 	CheckErrors        bool   `gorm:"check_errors"`
 	TotalErrors        *uint64
+	StreamType         entities.StreamType
 }
 
 type StreamCardsResponse struct {
