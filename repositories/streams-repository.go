@@ -144,7 +144,7 @@ func (db *streamsRepository) GetStreams() []entities.Stream {
 
 	db.connection.Model(
 		&entities.Stream{},
-	).Find(&streams)
+	).Where("streams.stream_type != ?", entities.Curated).Find(&streams)
 
 	return streams
 }
