@@ -70,7 +70,7 @@ func (f faultDetectorService) handleMissingForecast(stream entities.Stream, conf
 	}
 }
 
-func (f faultDetectorService) handleNullValues(data []responses.ObservedDataResponse, stream entities.Stream, configuredStreams []entities.ConfiguredStream) {
+func (f faultDetectorService) handleObservedValues(data []responses.ObservedDataResponse, stream entities.Stream, configuredStreams []entities.ConfiguredStream) {
 	for _, observed := range data {
 		isNull := observed.Value == nil || observed.DataId == ""
 		reqId := fmt.Sprintf("%v", observed.TimeStart)
@@ -86,6 +86,28 @@ func (f faultDetectorService) handleNullValues(data []responses.ObservedDataResp
 				ErrorType:        entities.NullValue,
 			}
 			f.errorsRepository.Create(detected)
+		}
+		if !isNull {
+			for _, configuredStream := range configuredStreams {
+				detectedError := f.errorsRepository.GetDetectedErrorForStreamWithIdAndType(stream.StreamId, reqId, entities.ObservedOutlier)
+				detected := detectedError.RequestId == reqId
+				isOutlier := configuredStream.NormalLowerThreshold > *observed.Value || configuredStream.NormalUpperThreshold < *observed.Value
+				if isOutlier && !detected {
+					log.Debugf("Detected outlier value in observed stream for: %v", stream.StreamId)
+					detected := entities.DetectedError{
+						StreamId:         stream.StreamId,
+						Stream:           &stream,
+						ConfiguredStream: []entities.ConfiguredStream{configuredStream},
+						DetectedDate:     time.Now(),
+						RequestId:        reqId,
+						ErrorType:        entities.ObservedOutlier,
+					}
+					f.errorsRepository.Create(detected)
+				} else if isOutlier {
+					detectedError.ConfiguredStream = append(detectedError.ConfiguredStream, configuredStream)
+					f.errorsRepository.Update(detectedError)
+				}
+			}
 		}
 	}
 }
@@ -105,7 +127,7 @@ func (f faultDetectorService) handleObservedStreams(stream entities.Stream) {
 		log.Errorf("Error detecting observed errors: %v", err)
 		return
 	}
-	f.handleNullValues(data, stream, configuredStreams)
+	f.handleObservedValues(data, stream, configuredStreams)
 }
 
 func (f faultDetectorService) handleForecastedStream(stream entities.Stream) {

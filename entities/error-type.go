@@ -7,6 +7,8 @@ const (
 	Missing4DaysHorizon
 	OutsideOfErrorBands
 	ForecastMissing
+	ObservedOutlier
+	ForecastOutOfBounds
 )
 
 func MapErrorTypeToString(e ErrorType) string {
