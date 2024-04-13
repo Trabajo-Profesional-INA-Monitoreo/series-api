@@ -22,6 +22,7 @@ type SeriesController interface {
 	GetStreamDataById(ctx *gin.Context)
 	GetStreamCards(ctx *gin.Context)
 	GetOutputMetrics(ctx *gin.Context)
+	GetNodes(ctx *gin.Context)
 }
 
 type seriesController struct {
@@ -30,6 +31,29 @@ type seriesController struct {
 
 func NewSeriesController(seriesService services.StreamService) SeriesController {
 	return &seriesController{seriesService}
+}
+
+// GetNodes godoc
+//
+//	@Summary		Endpoint para obtener el resumen de las series agrupado por nodo
+//	@Tags           Series
+//	@Produce		json
+//	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
+//	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: 5 dias despues"  Format(2006-01-02)
+//	@Param          configurationId     query      int     true  "ID de la configuracion"
+//	@Success		200	{object} dtos.StreamsPerNodeResponse
+//	@Router			/series/nodos [get]
+func (s seriesController) GetNodes(ctx *gin.Context) {
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
+		return
+	}
+	configId, done := getUintQueryParam(ctx, "configurationId")
+	if done {
+		return
+	}
+	res := s.seriesService.GetNodes(timeStart, timeEnd, configId)
+	ctx.JSON(http.StatusOK, res)
 }
 
 // GetStations godoc
