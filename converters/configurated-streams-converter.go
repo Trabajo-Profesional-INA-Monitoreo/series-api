@@ -19,9 +19,8 @@ func ConvertDtoToConfiguratedStreamModify(node dtos.Node, stream *dtos.Configure
 	}
 }
 
-func ConvertDtoToConfiguratedStream(nodeId uint64, stream *dtos.ConfiguredStream, configuration entities.Configuration) entities.ConfiguredStream {
+func ConvertDtoToConfiguratedStream(nodeId uint64, stream *dtos.ConfiguredStreamCreate, configuration entities.Configuration) entities.ConfiguredStream {
 	return entities.ConfiguredStream{
-		ConfiguredStreamId:   stream.ConfiguredStreamId,
 		ConfigurationId:      configuration.ConfigurationId,
 		NodeId:               nodeId,
 		StreamId:             stream.StreamId,

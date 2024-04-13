@@ -7,6 +7,6 @@ type Node struct {
 }
 
 type CreateNode struct {
-	Name              string              `gorm:"column:name"`
-	ConfiguredStreams *[]ConfiguredStream `gorm:"-"`
+	Name              string                    `gorm:"column:name"`
+	ConfiguredStreams *[]ConfiguredStreamCreate `gorm:"-"`
 }
