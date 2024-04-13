@@ -16,7 +16,7 @@ type ConfiguredStreamsRepository interface {
 	FindConfiguredStreamsWithCheckErrorsForStream(stream entities.Stream) []entities.ConfiguredStream
 	FindConfiguredStreamById(configStreamId uint64) (entities.ConfiguredStream, error)
 	Create(e *entities.ConfiguredStream) (uint64, error)
-	FindConfiguredStreamsByNodeId(nodeId uint64, configurationId string) *[]dtos.ConfiguredStream
+	FindConfiguredStreamsByNodeId(nodeId uint64, configurationId string) *[]*dtos.ConfiguredStream
 	Update(e *entities.ConfiguredStream) error
 	CountErrorOfConfigurations(ids []uint64, parameters *dtos.QueryParameters) ([]dtos.ErrorsPerConfigStream, error)
 }
@@ -62,12 +62,13 @@ func (db configuredStreamsRepository) Create(configuredStream *entities.Configur
 	return configuredStream.ConfiguredStreamId, result.Error
 }
 
-func (db configuredStreamsRepository) FindConfiguredStreamsByNodeId(nodeId uint64, configurationId string) *[]dtos.ConfiguredStream {
-	var configuredStream []dtos.ConfiguredStream
+func (db configuredStreamsRepository) FindConfiguredStreamsByNodeId(nodeId uint64, configurationId string) *[]*dtos.ConfiguredStream {
+	var configuredStream *[]*dtos.ConfiguredStream
 
 	result := db.connection.Model(
 		&entities.ConfiguredStream{},
 	).Select(
+		"configured_streams.configured_stream_id",
 		"configured_streams.stream_id ",
 		"streams.stream_type ",
 		"configured_streams.update_frequency",
@@ -82,7 +83,7 @@ func (db configuredStreamsRepository) FindConfiguredStreamsByNodeId(nodeId uint6
 	}
 
 	log.Debugf("Get configurations query result: %v", configuredStream)
-	return &configuredStream
+	return configuredStream
 }
 
 func (db configuredStreamsRepository) Update(configuredStream *entities.ConfiguredStream) error {

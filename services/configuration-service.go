@@ -48,7 +48,7 @@ func (c configurationService) ModifyConfiguration(configuration dtos.Configurati
 
 		for _, configuratedStream := range *node.ConfiguredStreams {
 
-			newConfiguratedStreams := converters.ConvertDtoToConfiguratedStreamModify(*node, &configuratedStream, *newConfiguration)
+			newConfiguratedStreams := converters.ConvertDtoToConfiguratedStreamModify(*node, configuratedStream, *newConfiguration)
 
 			err := c.streamService.CreateStream(newConfiguratedStreams.StreamId, configuratedStream.StreamType)
 			if err != nil {
@@ -143,6 +143,10 @@ func (c configurationService) GetConfigurationById(id string) *dtos.Configuratio
 
 	for _, node := range nodes {
 		node.ConfiguredStreams = c.configuratedStreamRepository.FindConfiguredStreamsByNodeId(node.Id, id)
+		for _, configuredStream := range *node.ConfiguredStreams {
+			configuredStream.Metrics = c.metricsRepository.GetByConfiguredStreamId(configuredStream.ConfiguredStreamId)
+			configuredStream.RedundanciesIds = c.redundancyRepository.GetByConfiguredStreamId(configuredStream.ConfiguredStreamId)
+		}
 	}
 
 	return configuration
