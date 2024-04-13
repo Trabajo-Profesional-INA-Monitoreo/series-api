@@ -7,9 +7,13 @@ import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
 	log "github.com/sirupsen/logrus"
+	"math"
 	"strconv"
 	"time"
 )
+
+const DayInHours = 24
+const MinForecastedDays = 4
 
 type FaultDetector interface {
 	DetectFaults()
@@ -156,8 +160,13 @@ func (f faultDetectorService) handleForecastedStream(stream entities.Stream) {
 
 		if forecast.MainForecast.Forecasts != nil {
 			consecutiveOutliers := 0
+			forecastedDays := 0
 			for _, hourlyForecast := range forecast.MainForecast.Forecasts {
-				timestamp := hourlyForecast[0]
+				timestamp, err := time.Parse("2006-01-02T15:04:05.999Z", hourlyForecast[0])
+				if err != nil {
+					log.Errorf("Error parsing timestamp %v for stream %v with cal id %v - err: %v", hourlyForecast[0], stream.StreamId, configuredStream.CalibrationId, err)
+					continue
+				}
 				value, err := strconv.ParseFloat(hourlyForecast[2], 64)
 				if err != nil {
 					log.Errorf("Error parsing forecast value %v for stream %v with cal id %v - err: %v", hourlyForecast[2], stream.StreamId, configuredStream.CalibrationId, err)
@@ -189,10 +198,37 @@ func (f faultDetectorService) handleForecastedStream(stream entities.Stream) {
 				if !isOutsideBoundaries {
 					consecutiveOutliers = 0
 				}
+
+				if timestamp.After(res.ForecastDate) {
+					diff := timestamp.Sub(res.ForecastDate)
+					if math.Floor(diff.Hours()/DayInHours) > float64(forecastedDays) {
+						forecastedDays++
+					}
+				}
+
+			}
+			if forecastedDays < MinForecastedDays {
+				reqErrorId := fmt.Sprintf("%v-%v-%v", res.RunId, res.CalibrationId, stream.StreamId)
+				detectedError := f.errorsRepository.GetDetectedErrorForStreamWithIdAndType(stream.StreamId, reqErrorId, entities.Missing4DaysHorizon)
+				detected := detectedError.RequestId == reqErrorId
+				if !detected {
+					log.Debugf("Detected missing 4 days horizon forecast for: %v", stream.StreamId)
+					detected := entities.DetectedError{
+						StreamId:         stream.StreamId,
+						Stream:           &stream,
+						ConfiguredStream: []entities.ConfiguredStream{configuredStream},
+						DetectedDate:     time.Now(),
+						RequestId:        reqErrorId,
+						ErrorType:        entities.Missing4DaysHorizon,
+					}
+					f.errorsRepository.Create(detected)
+				} else if !contains(detectedError.ConfiguredStream, configuredStream) {
+					detectedError.ConfiguredStream = append(detectedError.ConfiguredStream, configuredStream)
+					f.errorsRepository.Update(detectedError)
+				}
 			}
 		}
 
-		// TODO handle 4 days forecast horizon
 	}
 }
 
