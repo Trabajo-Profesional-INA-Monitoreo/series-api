@@ -33,7 +33,6 @@ func CreateRepositories(connectionData string) *Repositories {
 		&entities.Procedure{},
 		&entities.Variable{},
 		&entities.Station{},
-		&entities.Network{},
 		&entities.ConfiguredStream{},
 		&entities.Stream{},
 		&entities.Configuration{},

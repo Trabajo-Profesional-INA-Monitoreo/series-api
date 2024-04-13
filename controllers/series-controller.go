@@ -15,7 +15,6 @@ const DaysDefaultCured = 5
 const DaysDefaultObservated = 1
 
 type SeriesController interface {
-	GetNetworks(ctx *gin.Context)
 	GetStations(ctx *gin.Context)
 	GetCuredSerieById(ctx *gin.Context)
 	GetObservatedSerieById(ctx *gin.Context)
@@ -31,18 +30,6 @@ type seriesController struct {
 
 func NewSeriesController(seriesService services.StreamService) SeriesController {
 	return &seriesController{seriesService}
-}
-
-// GetNetworks godoc
-//
-//	@Summary		Endpoint para obtener el resumen de las series agrupado por red
-//	@Tags           Series
-//	@Produce		json
-//	@Success		200	{object} dtos.StreamsPerNetworkResponse
-//	@Router			/series/redes [get]
-func (s seriesController) GetNetworks(ctx *gin.Context) {
-	res := s.seriesService.GetNetworks()
-	ctx.JSON(http.StatusOK, res)
 }
 
 // GetStations godoc

@@ -16,11 +16,9 @@ const directMeasurementProcedure = 1
 const waterLevelVariable = 2
 
 type StreamRepository interface {
-	GetNetworks() []dtos.StreamsPerNetwork
 	GetStations(configId uint64) *[]*dtos.StreamsPerStation
 	GetErrorsOfStations(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfStations
 	GetTotalStreams(configurationId uint64) int
-	//GetTotalNetworks(configurationId uint64) int
 	GetTotalStations(configurationId uint64) int
 	GetStreams() []entities.Stream
 	GetStreamWithAssociatedData(streamId uint64) (entities.Stream, error)
@@ -40,20 +38,6 @@ type streamsRepository struct {
 
 func NewStreamRepository(connection *gorm.DB) StreamRepository {
 	return &streamsRepository{connection}
-}
-
-func (db *streamsRepository) GetNetworks() []dtos.StreamsPerNetwork {
-	var networks []dtos.StreamsPerNetwork
-
-	db.connection.Model(
-		&entities.Stream{},
-	).Select(
-		"networks.name as networkname",
-		"networks.network_id as networkid",
-		"count(streams.stream_id) as streamscount",
-	).Joins("JOIN networks ON streams.network_id = networks.network_id").Group("networks.name, networks.network_id").Scan(&networks)
-	log.Debugf("Get network query result: %v", networks)
-	return networks
 }
 
 func (db *streamsRepository) GetStations(configId uint64) *[]*dtos.StreamsPerStation {
@@ -128,14 +112,6 @@ func (db *streamsRepository) GetTotalStations(configurationId uint64) int {
 	).Where(
 		"configured_streams.configuration_id = ?", configurationId,
 	).Group("streams.station_id").Find(&count)
-	return int(count)
-}
-
-func (db *streamsRepository) GetTotalNetworks() int {
-	var count int64
-	db.connection.Model(
-		&entities.Network{},
-	).Count(&count)
 	return int(count)
 }
 
