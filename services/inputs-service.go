@@ -28,10 +28,9 @@ func (s inputsService) GetGeneralMetrics(configurationId uint64) dtos.InputsGene
 	go func() {
 		stationsResult <- s.repository.GetTotalStations(configurationId)
 	}()
-	//totalNetworks := s.repository.GetTotalNetworks()
 	totalStreams := <-streamsResult
 	totalStations := <-stationsResult
-	return dtos.InputsGeneralMetrics{TotalStreams: totalStreams, TotalStations: totalStations, TotalNetworks: 0}
+	return dtos.InputsGeneralMetrics{TotalStreams: totalStreams, TotalStations: totalStations}
 }
 
 func (s inputsService) GetTotalStreamsWithNullValues(configurationId uint64, timeStart time.Time, timeEnd time.Time) dtos.TotalStreamsWithNullValues {

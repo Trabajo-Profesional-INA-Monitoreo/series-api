@@ -15,7 +15,6 @@ func setSeriesEndpoints(apiGroup *gin.RouterGroup, repositories *config.Reposito
 	{
 		testApi.GET("", controller.GetStreamCards)
 		testApi.GET("/comportamiento", controller.GetOutputMetrics)
-		testApi.GET("/redes", controller.GetNetworks)
 		testApi.GET("/estaciones", controller.GetStations)
 		testApi.GET("/:serie_id", controller.GetStreamDataById)
 		testApi.GET("/curadas/:serie_id", controller.GetCuredSerieById)

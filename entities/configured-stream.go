@@ -5,7 +5,7 @@ type ConfiguredStream struct {
 	StreamId             uint64
 	Stream               *Stream `gorm:"references:StreamId"`
 	UpdateFrequency      float64
-	RedundantStreams     []ConfiguredStream `gorm:"many2many:redundancies;"`
+	RedundantStreams     []Redundancy
 	CheckErrors          bool
 	NormalUpperThreshold float64
 	NormalLowerThreshold float64

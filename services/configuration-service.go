@@ -5,6 +5,7 @@ import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/config"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/converters"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
 )
 
@@ -23,6 +24,8 @@ type configurationService struct {
 	nodeRepository               repositories.NodeRepository
 	configuratedStreamRepository repositories.ConfiguredStreamsRepository
 	streamService                StreamService
+	metricsRepository            repositories.MetricsRepository
+	redundancyRepository         repositories.RedundancyRepository
 }
 
 func (c configurationService) ModifyConfiguration(configuration dtos.Configuration) error {
@@ -45,7 +48,7 @@ func (c configurationService) ModifyConfiguration(configuration dtos.Configurati
 
 		for _, configuratedStream := range *node.ConfiguredStreams {
 
-			newConfiguratedStreams := converters.ConvertDtoToConfiguratedStreamModify(*node, &configuratedStream, *newConfiguration)
+			newConfiguratedStreams := converters.ConvertDtoToConfiguratedStreamModify(*node, configuratedStream, *newConfiguration)
 
 			err := c.streamService.CreateStream(newConfiguratedStreams.StreamId, configuratedStream.StreamType)
 			if err != nil {
@@ -96,9 +99,24 @@ func (c configurationService) CreateConfiguration(configuration dtos.CreateConfi
 				return err
 			}
 
-			err = c.configuratedStreamRepository.Create(&newConfiguratedStreams)
+			var configuredStreamId uint64
+			configuredStreamId, err = c.configuratedStreamRepository.Create(&newConfiguratedStreams)
 			if err != nil {
 				return err
+			}
+
+			for _, metric := range configuratedStream.Metrics {
+				err = c.metricsRepository.Create(entities.ConfiguredMetric{MetricId: metric, ConfiguredStreamId: configuredStreamId})
+				if err != nil {
+					return err
+				}
+			}
+
+			for _, redundancyId := range configuratedStream.RedundanciesIds {
+				err = c.redundancyRepository.Create(entities.Redundancy{RedundancyId: redundancyId, ConfiguredStreamId: configuredStreamId})
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -125,11 +143,21 @@ func (c configurationService) GetConfigurationById(id string) *dtos.Configuratio
 
 	for _, node := range nodes {
 		node.ConfiguredStreams = c.configuratedStreamRepository.FindConfiguredStreamsByNodeId(node.Id, id)
+		for _, configuredStream := range *node.ConfiguredStreams {
+			configuredStream.Metrics = c.metricsRepository.GetByConfiguredStreamId(configuredStream.ConfiguredStreamId)
+			configuredStream.RedundanciesIds = c.redundancyRepository.GetByConfiguredStreamId(configuredStream.ConfiguredStreamId)
+		}
 	}
 
 	return configuration
 }
 
 func NewConfigurationService(repositories *config.Repositories, client clients.InaAPiClient) ConfigurationService {
-	return &configurationService{configurationRepository: repositories.ConfigurationRepository, nodeRepository: repositories.NodeRepository, configuratedStreamRepository: repositories.ConfiguredStreamRepository, streamService: NewStreamService(repositories.StreamsRepository, client, repositories.ConfiguredStreamRepository)}
+	return &configurationService{configurationRepository: repositories.ConfigurationRepository,
+		nodeRepository:               repositories.NodeRepository,
+		configuratedStreamRepository: repositories.ConfiguredStreamRepository,
+		streamService:                NewStreamService(repositories.StreamsRepository, client, repositories.ConfiguredStreamRepository),
+		metricsRepository:            repositories.MetricsRepository,
+		redundancyRepository:         repositories.RedundancyRepository,
+	}
 }

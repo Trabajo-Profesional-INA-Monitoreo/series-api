@@ -15,7 +15,6 @@ import (
 )
 
 type StreamService interface {
-	GetNetworks() dtos.StreamsPerNetworkResponse
 	GetStations(time.Time, time.Time, uint64) dtos.StreamsPerStationResponse
 	GetCuredSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse
 	GetObservatedSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse
@@ -34,11 +33,6 @@ type streamService struct {
 
 func NewStreamService(repository repositories.StreamRepository, inaApiClient clients.InaAPiClient, configuredStreamsRepository repositories.ConfiguredStreamsRepository) StreamService {
 	return &streamService{repository, inaApiClient, configuredStreamsRepository}
-}
-
-func (s streamService) GetNetworks() dtos.StreamsPerNetworkResponse {
-	networks := s.repository.GetNetworks()
-	return dtos.StreamsPerNetworkResponse{Networks: networks}
 }
 
 func (s streamService) GetStations(timeStart time.Time, timeEnd time.Time, configId uint64) dtos.StreamsPerStationResponse {
