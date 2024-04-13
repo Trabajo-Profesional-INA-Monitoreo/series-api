@@ -23,16 +23,33 @@ type StreamService interface {
 	CreateStream(streamId uint64, streamType uint64) error
 	GetStreamCards(parameters *dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
 	GetOutputBehaviourMetrics(configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.BehaviourStreamsResponse, error)
+	GetNodes(start time.Time, end time.Time, id uint64) dtos.StreamsPerNodeResponse
 }
 
 type streamService struct {
 	repository                  repositories.StreamRepository
 	inaApiClient                clients.InaAPiClient
 	configuredStreamsRepository repositories.ConfiguredStreamsRepository
+	nodesRepository             repositories.NodeRepository
 }
 
-func NewStreamService(repository repositories.StreamRepository, inaApiClient clients.InaAPiClient, configuredStreamsRepository repositories.ConfiguredStreamsRepository) StreamService {
-	return &streamService{repository, inaApiClient, configuredStreamsRepository}
+func NewStreamService(repository repositories.StreamRepository, inaApiClient clients.InaAPiClient, configuredStreamsRepository repositories.ConfiguredStreamsRepository, nodeRepository repositories.NodeRepository) StreamService {
+	return &streamService{repository, inaApiClient, configuredStreamsRepository, nodeRepository}
+}
+
+func (s streamService) GetNodes(timeStart time.Time, timeEnd time.Time, configId uint64) dtos.StreamsPerNodeResponse {
+	nodes := s.nodesRepository.GetStreamsPerNodeById(strconv.FormatUint(configId, 10))
+	errorsPerNode := s.repository.GetErrorsOfNodes(configId, timeStart, timeEnd)
+
+	for _, errors := range errorsPerNode {
+		for _, node := range nodes {
+			if node.NodeId == errors.NodeId {
+				node.ErrorCount = errors.ErrorCount
+				break
+			}
+		}
+	}
+	return dtos.StreamsPerNodeResponse{Nodes: nodes}
 }
 
 func (s streamService) GetStations(timeStart time.Time, timeEnd time.Time, configId uint64) dtos.StreamsPerStationResponse {

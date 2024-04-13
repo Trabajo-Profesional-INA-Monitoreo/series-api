@@ -30,6 +30,7 @@ type StreamRepository interface {
 	GetStreamCards(parameters dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
 	GetStreamsForOutputMetrics(configId uint64) ([]dtos.BehaviourStream, error)
 	GetTotalStreamsWithNullValues(configId uint64, timeStart time.Time, timeEnd time.Time) int
+	GetErrorsOfNodes(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfNodes
 }
 
 type streamsRepository struct {
@@ -91,6 +92,32 @@ func (db *streamsRepository) GetErrorsOfStations(configId uint64, timeStart time
 
 	return errorsPerStation
 }
+
+func (db *streamsRepository) GetErrorsOfNodes(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfNodes {
+	var errorsPerNode []dtos.ErrorsOfNodes
+
+	tx := db.connection.Model(
+		&entities.ConfiguredStream{},
+	).Select(
+		"configured_streams.node_id as node_id",
+		"count(detected_errors.error_id) as error_count",
+	).Joins(
+		"JOIN configured_streams_errors ON configured_streams.configured_stream_id = configured_streams_errors.configured_stream_configured_stream_id",
+	).Joins(
+		"JOIN detected_errors ON detected_errors.error_id = configured_streams_errors.detected_error_error_id ",
+	).Where(
+		"configured_streams.configuration_id = ?", configId,
+	).Where(
+		"detected_errors.detected_date >= ? AND detected_errors.detected_date <= ?", timeStart, timeEnd,
+	).Group("configured_streams.node_id").Scan(&errorsPerNode)
+
+	if tx.Error != nil {
+		log.Errorf("Error executing GetErrorsOfStations query: %v", tx.Error)
+	}
+
+	return errorsPerNode
+}
+
 func (db *streamsRepository) GetTotalStreams(configurationId uint64) int {
 	var count int64
 	db.connection.Model(

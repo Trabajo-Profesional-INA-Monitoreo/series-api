@@ -10,7 +10,7 @@ import (
 )
 
 func setSeriesEndpoints(apiGroup *gin.RouterGroup, repositories *config.Repositories, inaApiClient clients.InaAPiClient) {
-	controller := controllers.NewSeriesController(services.NewStreamService(repositories.StreamsRepository, inaApiClient, repositories.ConfiguredStreamRepository))
+	controller := controllers.NewSeriesController(services.NewStreamService(repositories.StreamsRepository, inaApiClient, repositories.ConfiguredStreamRepository, repositories.NodeRepository))
 	testApi := apiGroup.Group("/series")
 	{
 		testApi.GET("", controller.GetStreamCards)
@@ -20,6 +20,7 @@ func setSeriesEndpoints(apiGroup *gin.RouterGroup, repositories *config.Reposito
 		testApi.GET("/curadas/:serie_id", controller.GetCuredSerieById)
 		testApi.GET("/observadas/:serie_id", controller.GetObservatedSerieById)
 		testApi.GET("/pronosticadas/:calibrado_id", controller.GetPredictedSerieById)
+		testApi.GET("/nodos", controller.GetNodes)
 	}
 	log.Infof("Configured stream endpoints")
 }
