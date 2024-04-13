@@ -7,8 +7,13 @@ import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
 	log "github.com/sirupsen/logrus"
+	"math"
+	"strconv"
 	"time"
 )
+
+const DayInHours = 24
+const MinForecastedDays = 4
 
 type FaultDetector interface {
 	DetectFaults()
@@ -49,7 +54,7 @@ func (f faultDetectorService) handleMissingForecast(stream entities.Stream, conf
 	reqErrorId := fmt.Sprintf("%v", res.RunId)
 	detectedError := f.errorsRepository.GetDetectedErrorForStreamWithIdAndType(stream.StreamId, reqErrorId, entities.ForecastMissing)
 	detected := detectedError.RequestId == reqErrorId
-	if diff.Hours() > configuredStream.UpdateFrequency && !detected {
+	if diff.Minutes() > configuredStream.UpdateFrequency && !detected {
 		// There should be a new forecast already
 		// We save the detected error
 		log.Debugf("Detected missing forecast for: %v", stream.StreamId)
@@ -62,7 +67,7 @@ func (f faultDetectorService) handleMissingForecast(stream entities.Stream, conf
 			ErrorType:        entities.ForecastMissing,
 		}
 		f.errorsRepository.Create(detected)
-	} else if detected && contains(detectedError.ConfiguredStream, configuredStream) {
+	} else if detected && !contains(detectedError.ConfiguredStream, configuredStream) {
 		// We already detected the error, we need to save the relationship to the current ConfiguredStream
 		detectedError := f.errorsRepository.GetDetectedErrorForStreamWithIdAndType(stream.StreamId, reqErrorId, entities.ForecastMissing)
 		detectedError.ConfiguredStream = append(detectedError.ConfiguredStream, configuredStream)
@@ -70,7 +75,7 @@ func (f faultDetectorService) handleMissingForecast(stream entities.Stream, conf
 	}
 }
 
-func (f faultDetectorService) handleNullValues(data []responses.ObservedDataResponse, stream entities.Stream, configuredStreams []entities.ConfiguredStream) {
+func (f faultDetectorService) handleObservedValues(data []responses.ObservedDataResponse, stream entities.Stream, configuredStreams []entities.ConfiguredStream) {
 	for _, observed := range data {
 		isNull := observed.Value == nil || observed.DataId == ""
 		reqId := fmt.Sprintf("%v", observed.TimeStart)
@@ -88,6 +93,38 @@ func (f faultDetectorService) handleNullValues(data []responses.ObservedDataResp
 			f.errorsRepository.Create(detected)
 		}
 	}
+
+	for _, configuredStream := range configuredStreams {
+		consecutiveOutliers := 0
+		for _, observed := range data {
+			isOutlier := configuredStream.NormalLowerThreshold > *observed.Value || configuredStream.NormalUpperThreshold < *observed.Value
+			if isOutlier && consecutiveOutliers == 0 {
+				reqId := fmt.Sprintf("%v", observed.TimeStart)
+				detectedError := f.errorsRepository.GetDetectedErrorForStreamWithIdAndType(stream.StreamId, reqId, entities.ObservedOutlier)
+				detected := detectedError.RequestId == reqId
+				if !detected {
+					log.Debugf("Detected outlier value in observed stream for: %v", stream.StreamId)
+					detected := entities.DetectedError{
+						StreamId:         stream.StreamId,
+						Stream:           &stream,
+						ConfiguredStream: []entities.ConfiguredStream{configuredStream},
+						DetectedDate:     time.Now(),
+						RequestId:        reqId,
+						ErrorType:        entities.ObservedOutlier,
+					}
+					f.errorsRepository.Create(detected)
+				} else if !contains(detectedError.ConfiguredStream, configuredStream) {
+					detectedError.ConfiguredStream = append(detectedError.ConfiguredStream, configuredStream)
+					f.errorsRepository.Update(detectedError)
+				}
+				consecutiveOutliers++
+			}
+			if !isOutlier {
+				consecutiveOutliers = 0
+			}
+		}
+	}
+
 }
 
 func (f faultDetectorService) getObservedDataFromStream(streamId uint64) ([]responses.ObservedDataResponse, error) {
@@ -105,11 +142,12 @@ func (f faultDetectorService) handleObservedStreams(stream entities.Stream) {
 		log.Errorf("Error detecting observed errors: %v", err)
 		return
 	}
-	f.handleNullValues(data, stream, configuredStreams)
+	f.handleObservedValues(data, stream, configuredStreams)
 }
 
 func (f faultDetectorService) handleForecastedStream(stream entities.Stream) {
 	configuredStreams := f.configuredStreamsRepository.FindConfiguredStreamsWithCheckErrorsForStream(stream)
+	// Una misma serie puede tener multiples calibrados, estos calibrados pertenecen a la configuracion
 	for _, configuredStream := range configuredStreams {
 		res, err := f.inaApiClient.GetLastForecast(configuredStream.CalibrationId)
 		if err != nil {
@@ -118,7 +156,79 @@ func (f faultDetectorService) handleForecastedStream(stream entities.Stream) {
 		}
 		f.handleMissingForecast(stream, configuredStream, res)
 
-		// TODO handle 4 days forecast horizon
+		forecast := res.GetForecastOfStream(stream.StreamId)
+
+		if forecast.MainForecast.Forecasts != nil {
+			consecutiveOutliers := 0
+			forecastedDays := 0
+			for _, hourlyForecast := range forecast.MainForecast.Forecasts {
+				timestamp, err := time.Parse("2006-01-02T15:04:05.999Z", hourlyForecast[0])
+				if err != nil {
+					log.Errorf("Error parsing timestamp %v for stream %v with cal id %v - err: %v", hourlyForecast[0], stream.StreamId, configuredStream.CalibrationId, err)
+					continue
+				}
+				value, err := strconv.ParseFloat(hourlyForecast[2], 64)
+				if err != nil {
+					log.Errorf("Error parsing forecast value %v for stream %v with cal id %v - err: %v", hourlyForecast[2], stream.StreamId, configuredStream.CalibrationId, err)
+					continue
+				}
+				isOutsideBoundaries := configuredStream.NormalLowerThreshold > value || configuredStream.NormalUpperThreshold < value
+				if isOutsideBoundaries && consecutiveOutliers == 0 {
+					reqErrorId := fmt.Sprintf("%v-%v-%v-%v", res.RunId, res.CalibrationId, stream.StreamId, timestamp)
+					detectedError := f.errorsRepository.GetDetectedErrorForStreamWithIdAndType(stream.StreamId, reqErrorId, entities.ForecastOutOfBounds)
+					detected := detectedError.RequestId == reqErrorId
+					if !detected {
+						// We detected an outlier in the forecast
+						log.Debugf("Detected outlier in forecast for: %v", stream.StreamId)
+						detected := entities.DetectedError{
+							StreamId:         stream.StreamId,
+							Stream:           &stream,
+							ConfiguredStream: []entities.ConfiguredStream{configuredStream},
+							DetectedDate:     time.Now(),
+							RequestId:        reqErrorId,
+							ErrorType:        entities.ForecastOutOfBounds,
+						}
+						f.errorsRepository.Create(detected)
+					} else if !contains(detectedError.ConfiguredStream, configuredStream) {
+						detectedError.ConfiguredStream = append(detectedError.ConfiguredStream, configuredStream)
+						f.errorsRepository.Update(detectedError)
+					}
+					consecutiveOutliers++
+				}
+				if !isOutsideBoundaries {
+					consecutiveOutliers = 0
+				}
+
+				if timestamp.After(res.ForecastDate) {
+					diff := timestamp.Sub(res.ForecastDate)
+					if math.Floor(diff.Hours()/DayInHours) > float64(forecastedDays) {
+						forecastedDays++
+					}
+				}
+
+			}
+			if forecastedDays < MinForecastedDays {
+				reqErrorId := fmt.Sprintf("%v-%v-%v", res.RunId, res.CalibrationId, stream.StreamId)
+				detectedError := f.errorsRepository.GetDetectedErrorForStreamWithIdAndType(stream.StreamId, reqErrorId, entities.Missing4DaysHorizon)
+				detected := detectedError.RequestId == reqErrorId
+				if !detected {
+					log.Debugf("Detected missing 4 days horizon forecast for: %v", stream.StreamId)
+					detected := entities.DetectedError{
+						StreamId:         stream.StreamId,
+						Stream:           &stream,
+						ConfiguredStream: []entities.ConfiguredStream{configuredStream},
+						DetectedDate:     time.Now(),
+						RequestId:        reqErrorId,
+						ErrorType:        entities.Missing4DaysHorizon,
+					}
+					f.errorsRepository.Create(detected)
+				} else if !contains(detectedError.ConfiguredStream, configuredStream) {
+					detectedError.ConfiguredStream = append(detectedError.ConfiguredStream, configuredStream)
+					f.errorsRepository.Update(detectedError)
+				}
+			}
+		}
+
 	}
 }
 

@@ -51,10 +51,7 @@ func (e errorsRepository) Update(detectedError entities.DetectedError) {
 
 func (e errorsRepository) GetDetectedErrorForStreamWithIdAndType(streamId uint64, requestId string, errorType entities.ErrorType) entities.DetectedError {
 	var detectedError entities.DetectedError
-	err := e.connection.Model(&entities.DetectedError{}).Where("stream_id = ? AND request_id = ? AND error_type = ?", streamId, requestId, errorType).First(&detectedError)
-	if err.Error != nil {
-		log.Errorf("Error executing GetDetectedErrorForStreamWithIdAndType query: %v", err)
-	}
+	e.connection.Model(&entities.DetectedError{}).Where("stream_id = ? AND request_id = ? AND error_type = ?", streamId, requestId, errorType).First(&detectedError)
 	return detectedError
 }
 
