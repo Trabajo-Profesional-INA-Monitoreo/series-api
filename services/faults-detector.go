@@ -49,7 +49,7 @@ func (f faultDetectorService) handleMissingForecast(stream entities.Stream, conf
 	reqErrorId := fmt.Sprintf("%v", res.RunId)
 	detectedError := f.errorsRepository.GetDetectedErrorForStreamWithIdAndType(stream.StreamId, reqErrorId, entities.ForecastMissing)
 	detected := detectedError.RequestId == reqErrorId
-	if diff.Hours() > configuredStream.UpdateFrequency && !detected {
+	if diff.Minutes() > configuredStream.UpdateFrequency && !detected {
 		// There should be a new forecast already
 		// We save the detected error
 		log.Debugf("Detected missing forecast for: %v", stream.StreamId)
