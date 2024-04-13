@@ -7,16 +7,38 @@ import (
 )
 
 type LastForecast struct {
-	RunId         uint64             `json:"cor_id"`
-	CalibrationId uint64             `json:"cal_id"`
-	ForecastDate  time.Time          `json:"forecast_date"`
-	Streams       []ForecastedStream `json:"series"`
+	RunId         uint64              `json:"cor_id"`
+	CalibrationId uint64              `json:"cal_id"`
+	ForecastDate  time.Time           `json:"forecast_date"`
+	Streams       []*ForecastedStream `json:"series"`
 }
 
 type ForecastedStream struct {
 	StreamId  uint64     `json:"series_id"`
 	Qualifier string     `json:"qualifier"`
 	Forecasts [][]string `json:"pronosticos"`
+}
+
+type Forecast struct {
+	MainForecast *ForecastedStream
+	P05Forecast  *ForecastedStream
+	P95Forecast  *ForecastedStream
+}
+
+func (f LastForecast) GetForecastOfStream(streamId uint64) *Forecast {
+	forecast := &Forecast{}
+	for _, stream := range f.Streams {
+		if stream.StreamId == streamId {
+			if stream.Qualifier == "main" {
+				forecast.MainForecast = stream
+			} else if stream.Qualifier == "p05" {
+				forecast.P05Forecast = stream
+			} else if stream.Qualifier == "p95" {
+				forecast.P95Forecast = stream
+			}
+		}
+	}
+	return forecast
 }
 
 func (f LastForecast) GetMainForecast() []float64 {
