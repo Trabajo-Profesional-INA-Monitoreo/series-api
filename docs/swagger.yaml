@@ -89,6 +89,31 @@ definitions:
       upperThreshold:
         type: number
     type: object
+  dtos.ConfiguredStreamCreate:
+    properties:
+      calibrationId:
+        type: integer
+      checkErrors:
+        type: boolean
+      lowerThreshold:
+        type: number
+      metrics:
+        items:
+          $ref: '#/definitions/entities.Metric'
+        type: array
+      redundanciesIds:
+        items:
+          type: integer
+        type: array
+      streamId:
+        type: integer
+      streamType:
+        type: integer
+      updateFrequency:
+        type: number
+      upperThreshold:
+        type: number
+    type: object
   dtos.CreateConfiguration:
     properties:
       name:
@@ -104,9 +129,31 @@ definitions:
     properties:
       configuredStreams:
         items:
-          $ref: '#/definitions/dtos.ConfiguredStream'
+          $ref: '#/definitions/dtos.ConfiguredStreamCreate'
         type: array
       name:
+        type: string
+    type: object
+  dtos.DetectedErrorsOfStream:
+    properties:
+      content:
+        items:
+          $ref: '#/definitions/dtos.ErrorDto'
+        type: array
+      pageable:
+        $ref: '#/definitions/dtos.Pageable'
+    type: object
+  dtos.ErrorDto:
+    properties:
+      detectedDate:
+        type: string
+      errorId:
+        type: integer
+      errorTypeId:
+        $ref: '#/definitions/entities.ErrorType'
+      errorTypeName:
+        type: string
+      extraInfo:
         type: string
     type: object
   dtos.ErrorIndicator:
@@ -136,8 +183,6 @@ definitions:
     type: object
   dtos.InputsGeneralMetrics:
     properties:
-      totalNetworks:
-        type: integer
       totalStations:
         type: integer
       totalStreams:
@@ -271,20 +316,22 @@ definitions:
           $ref: '#/definitions/dtos.StreamsData'
         type: array
     type: object
-  dtos.StreamsPerNetwork:
+  dtos.StreamsPerNode:
     properties:
-      networkId:
+      errorCount:
+        type: integer
+      nodeId:
         type: string
-      networkName:
+      nodeName:
         type: string
       streamsCount:
         type: integer
     type: object
-  dtos.StreamsPerNetworkResponse:
+  dtos.StreamsPerNodeResponse:
     properties:
-      networks:
+      nodes:
         items:
-          $ref: '#/definitions/dtos.StreamsPerNetwork'
+          $ref: '#/definitions/dtos.StreamsPerNode'
         type: array
     type: object
   dtos.StreamsPerStation:
@@ -325,12 +372,16 @@ definitions:
     - 1
     - 2
     - 3
+    - 4
+    - 5
     type: integer
     x-enum-varnames:
     - NullValue
     - Missing4DaysHorizon
     - OutsideOfErrorBands
     - ForecastMissing
+    - ObservedOutlier
+    - ForecastOutOfBounds
   entities.Metric:
     enum:
     - 0
@@ -482,6 +533,51 @@ paths:
       summary: Endpoint para obtener una configuracion por id
       tags:
       - Configuracion
+  /errores/{configuredStreamId}:
+    get:
+      parameters:
+      - description: Id de la configuracion de la serie
+        format: int
+        in: path
+        name: configuredStreamId
+        required: true
+        type: integer
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: Numero de pagina, por defecto 1
+        in: query
+        name: page
+        type: integer
+      - description: Cantidad de series por pagina, por defecto 15
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.DetectedErrorsOfStream'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los errores de una serie dado un id
+      tags:
+      - Errores
   /errores/indicadores:
     get:
       parameters:
@@ -909,6 +1005,34 @@ paths:
       summary: Endpoint para obtener el resumen de las series agrupado por estacion
       tags:
       - Series
+  /series/nodos:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: 5 dias despues'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StreamsPerNodeResponse'
+      summary: Endpoint para obtener el resumen de las series agrupado por nodo
+      tags:
+      - Series
   /series/observadas/{serie_id}:
     get:
       parameters:
@@ -961,18 +1085,6 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los valores de una serie pronosticadas por id
-      tags:
-      - Series
-  /series/redes:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dtos.StreamsPerNetworkResponse'
-      summary: Endpoint para obtener el resumen de las series agrupado por red
       tags:
       - Series
 swagger: "2.0"

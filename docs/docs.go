@@ -343,6 +343,73 @@ const docTemplate = `{
                 }
             }
         },
+        "/errores/{configuredStreamId}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Errores"
+                ],
+                "summary": "Endpoint para obtener los errores de una serie dado un id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "Id de la configuracion de la serie",
+                        "name": "configuredStreamId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Numero de pagina, por defecto 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Cantidad de series por pagina, por defecto 15",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.DetectedErrorsOfStream"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/filtro/estaciones": {
             "get": {
                 "produces": [
@@ -754,6 +821,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/series/nodos": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Series"
+                ],
+                "summary": "Endpoint para obtener el resumen de las series agrupado por nodo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: 5 dias despues",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StreamsPerNodeResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/series/observadas/{serie_id}": {
             "get": {
                 "produces": [
@@ -831,25 +940,6 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/dtos.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/series/redes": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Series"
-                ],
-                "summary": "Endpoint para obtener el resumen de las series agrupado por red",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.StreamsPerNetworkResponse"
                         }
                     }
                 }
@@ -1063,6 +1153,44 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.ConfiguredStreamCreate": {
+            "type": "object",
+            "properties": {
+                "calibrationId": {
+                    "type": "integer"
+                },
+                "checkErrors": {
+                    "type": "boolean"
+                },
+                "lowerThreshold": {
+                    "type": "number"
+                },
+                "metrics": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.Metric"
+                    }
+                },
+                "redundanciesIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "streamId": {
+                    "type": "integer"
+                },
+                "streamType": {
+                    "type": "integer"
+                },
+                "updateFrequency": {
+                    "type": "number"
+                },
+                "upperThreshold": {
+                    "type": "number"
+                }
+            }
+        },
         "dtos.CreateConfiguration": {
             "type": "object",
             "required": [
@@ -1086,10 +1214,44 @@ const docTemplate = `{
                 "configuredStreams": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dtos.ConfiguredStream"
+                        "$ref": "#/definitions/dtos.ConfiguredStreamCreate"
                     }
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.DetectedErrorsOfStream": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.ErrorDto"
+                    }
+                },
+                "pageable": {
+                    "$ref": "#/definitions/dtos.Pageable"
+                }
+            }
+        },
+        "dtos.ErrorDto": {
+            "type": "object",
+            "properties": {
+                "detectedDate": {
+                    "type": "string"
+                },
+                "errorId": {
+                    "type": "integer"
+                },
+                "errorTypeId": {
+                    "$ref": "#/definitions/entities.ErrorType"
+                },
+                "errorTypeName": {
+                    "type": "string"
+                },
+                "extraInfo": {
                     "type": "string"
                 }
             }
@@ -1136,9 +1298,6 @@ const docTemplate = `{
         "dtos.InputsGeneralMetrics": {
             "type": "object",
             "properties": {
-                "totalNetworks": {
-                    "type": "integer"
-                },
                 "totalStations": {
                     "type": "integer"
                 },
@@ -1344,13 +1503,16 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.StreamsPerNetwork": {
+        "dtos.StreamsPerNode": {
             "type": "object",
             "properties": {
-                "networkId": {
+                "errorCount": {
+                    "type": "integer"
+                },
+                "nodeId": {
                     "type": "string"
                 },
-                "networkName": {
+                "nodeName": {
                     "type": "string"
                 },
                 "streamsCount": {
@@ -1358,13 +1520,13 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.StreamsPerNetworkResponse": {
+        "dtos.StreamsPerNodeResponse": {
             "type": "object",
             "properties": {
-                "networks": {
+                "nodes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dtos.StreamsPerNetwork"
+                        "$ref": "#/definitions/dtos.StreamsPerNode"
                     }
                 }
             }
@@ -1425,13 +1587,17 @@ const docTemplate = `{
                 0,
                 1,
                 2,
-                3
+                3,
+                4,
+                5
             ],
             "x-enum-varnames": [
                 "NullValue",
                 "Missing4DaysHorizon",
                 "OutsideOfErrorBands",
-                "ForecastMissing"
+                "ForecastMissing",
+                "ObservedOutlier",
+                "ForecastOutOfBounds"
             ]
         },
         "entities.Metric": {
