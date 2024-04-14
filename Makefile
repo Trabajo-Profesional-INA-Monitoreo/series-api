@@ -10,6 +10,7 @@ build:
 .PHONY: build
 
 run:
+	swag init
 	go run .
 .PHONY: run
 
