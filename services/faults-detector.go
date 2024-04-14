@@ -65,6 +65,7 @@ func (f faultDetectorService) handleMissingForecast(stream entities.Stream, conf
 			DetectedDate:     time.Now(),
 			RequestId:        reqErrorId,
 			ErrorType:        entities.ForecastMissing,
+			ExtraInfo:        fmt.Sprintf("Fecha ultimo pronostico %v - Tiempo transcurrido %v", res.ForecastDate, diff.String()),
 		}
 		f.errorsRepository.Create(detected)
 	} else if detected && !contains(detectedError.ConfiguredStream, configuredStream) {
@@ -89,6 +90,7 @@ func (f faultDetectorService) handleObservedValues(data []responses.ObservedData
 				DetectedDate:     time.Now(),
 				RequestId:        reqId,
 				ErrorType:        entities.NullValue,
+				ExtraInfo:        fmt.Sprintf("Timestamp del dato nulo %v", observed.TimeStart),
 			}
 			f.errorsRepository.Create(detected)
 		}
@@ -111,6 +113,7 @@ func (f faultDetectorService) handleObservedValues(data []responses.ObservedData
 						DetectedDate:     time.Now(),
 						RequestId:        reqId,
 						ErrorType:        entities.ObservedOutlier,
+						ExtraInfo:        fmt.Sprintf("Valor %v - Timestamp %v", observed.Value, observed.TimeStart),
 					}
 					f.errorsRepository.Create(detected)
 				} else if !contains(detectedError.ConfiguredStream, configuredStream) {
@@ -187,6 +190,7 @@ func (f faultDetectorService) handleForecastedStream(stream entities.Stream) {
 							DetectedDate:     time.Now(),
 							RequestId:        reqErrorId,
 							ErrorType:        entities.ForecastOutOfBounds,
+							ExtraInfo:        fmt.Sprintf("Valor %v - Timestamp %v - Corrida %v - Fecha pronostico %v", value, timestamp, res.RunId, res.ForecastDate),
 						}
 						f.errorsRepository.Create(detected)
 					} else if !contains(detectedError.ConfiguredStream, configuredStream) {
@@ -220,6 +224,7 @@ func (f faultDetectorService) handleForecastedStream(stream entities.Stream) {
 						DetectedDate:     time.Now(),
 						RequestId:        reqErrorId,
 						ErrorType:        entities.Missing4DaysHorizon,
+						ExtraInfo:        fmt.Sprintf("Corrida %v - Fecha pronostico %v", res.RunId, res.ForecastDate),
 					}
 					f.errorsRepository.Create(detected)
 				} else if !contains(detectedError.ConfiguredStream, configuredStream) {

@@ -10,4 +10,5 @@ type DetectedError struct {
 	DetectedDate     time.Time
 	RequestId        string `gorm:"type:varchar(254)"` // A unique identifier that we can get from the requests to INA
 	ErrorType        ErrorType
+	ExtraInfo        string
 }
