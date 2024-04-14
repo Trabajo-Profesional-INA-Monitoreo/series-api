@@ -16,6 +16,7 @@ type ErrorsRepository interface {
 	GetErrorsPerDay(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorsCountPerDayAndType
 	GetErrorIndicators(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorIndicator
 	GetRelatedStreamsToError(parameters *dtos.QueryParameters) ([]dtos.ErrorRelatedStream, error)
+	GetErrorsOfConfiguredStream(parameters *dtos.QueryParameters) (*dtos.DetectedErrorsOfStream, error)
 }
 
 type errorsRepository struct {
@@ -138,4 +139,53 @@ func (e errorsRepository) GetRelatedStreamsToError(parameters *dtos.QueryParamet
 		return nil, tx.Error
 	}
 	return results, nil
+}
+
+func (e errorsRepository) GetErrorsOfConfiguredStream(parameters *dtos.QueryParameters) (*dtos.DetectedErrorsOfStream, error) {
+	timeStart := parameters.Get("timeStart").(time.Time)
+	timeEnd := parameters.Get("timeEnd").(time.Time)
+	configStreamId := parameters.Get("configStreamId").(uint64)
+	pageSize := *parameters.GetAsInt("pageSize")
+	page := *parameters.GetAsInt("page")
+
+	var errors []*dtos.ErrorDto
+	tx := e.connection.Model(
+		&entities.DetectedError{},
+	).Select(
+		"detected_errors.error_id as error_id",
+		"detected_errors.detected_date as detected_date",
+		"detected_errors.error_type as error_type_id",
+		"detected_errors.extra_info as extra_info",
+	).Joins(
+		"JOIN configured_streams_errors ON configured_streams_errors.detected_error_error_id=detected_errors.error_id",
+	).Where(
+		"configured_streams_errors.configured_stream_configured_stream_id = ?", configStreamId,
+	).Where(
+		"detected_errors.detected_date >= ? AND detected_errors.detected_date <= ?", timeStart, timeEnd,
+	).Limit(pageSize).Offset((page - 1) * pageSize).Order("detected_errors.detected_date desc").Find(&errors)
+
+	if tx.Error != nil {
+		log.Errorf("Error executing GetErrorsOfConfiguredStream Count query: %v", tx.Error)
+		return nil, tx.Error
+	}
+
+	var totalElements int
+	countTx := e.connection.Model(
+		&entities.DetectedError{},
+	).Select(
+		"count(detected_errors.error_id)",
+	).Joins(
+		"JOIN configured_streams_errors ON configured_streams_errors.detected_error_error_id=detected_errors.error_id",
+	).Where(
+		"configured_streams_errors.configured_stream_configured_stream_id = ?", configStreamId,
+	).Where(
+		"detected_errors.detected_date >= ? AND detected_errors.detected_date <= ?", timeStart, timeEnd,
+	).Find(&totalElements)
+
+	if countTx.Error != nil {
+		log.Errorf("Error executing GetErrorsOfConfiguredStream Count query: %v", countTx.Error)
+		return nil, countTx.Error
+	}
+
+	return dtos.NewDetectedErrorsOfStream(errors, dtos.NewPageable(totalElements, page, pageSize)), nil
 }

@@ -21,6 +21,10 @@ func MapErrorTypeToString(e ErrorType) string {
 		return "OutsideOfErrorBands"
 	case ForecastMissing:
 		return "ForecastMissing"
+	case ObservedOutlier:
+		return "ObservedOutlier"
+	case ForecastOutOfBounds:
+		return "ForecastOutOfBounds"
 	default:
 		return "UnknownError"
 	}

@@ -38,3 +38,17 @@ func getUintQueryParam(ctx *gin.Context, queryParam string) (uint64, bool) {
 	}
 	return configurationId, false
 }
+
+func getUintPathParam(ctx *gin.Context, pathParam string) (uint64, bool) {
+	param, sentParam := ctx.Params.Get(pathParam)
+	if !sentParam {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("%v was not sent", pathParam)))
+		return 0, true
+	}
+	convertedParam, err := strconv.ParseUint(param, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("%v should be a number", pathParam)))
+		return 0, true
+	}
+	return convertedParam, false
+}

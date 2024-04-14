@@ -8,7 +8,6 @@ import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strconv"
 )
 
 const DaysDefaultCured = 5
@@ -168,14 +167,8 @@ func (s seriesController) GetPredictedSerieById(ctx *gin.Context) {
 //		@Failure        500  {object}  dtos.ErrorResponse
 //		@Router			/series/{serie_id} [get]
 func (s seriesController) GetStreamDataById(ctx *gin.Context) {
-	streamIdParam, userSentId := ctx.Params.Get("serie_id")
-	if !userSentId {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("serie_id was not sent")))
-		return
-	}
-	streamId, err := strconv.ParseUint(streamIdParam, 10, 64)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("serie_id should be a number")))
+	streamId, done := getUintPathParam(ctx, "serie_id")
+	if done {
 		return
 	}
 	configId, done := getUintQueryParam(ctx, "configuredStreamId")

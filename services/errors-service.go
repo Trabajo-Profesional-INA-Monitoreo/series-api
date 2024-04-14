@@ -10,6 +10,7 @@ type ErrorsService interface {
 	GetErrorsPerDay(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorsCountPerDayAndType
 	GetErrorIndicators(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorIndicator
 	GetRelatedStreams(parameters *dtos.QueryParameters) ([]dtos.ErrorRelatedStream, error)
+	GetErrorsOfConfiguredStream(parameters *dtos.QueryParameters) (*dtos.DetectedErrorsOfStream, error)
 }
 
 type errorsService struct {
@@ -37,9 +38,14 @@ func (e errorsService) GetErrorIndicators(timeStart time.Time, timeEnd time.Time
 }
 
 func (e errorsService) GetRelatedStreams(parameters *dtos.QueryParameters) ([]dtos.ErrorRelatedStream, error) {
-	related, err := e.repository.GetRelatedStreamsToError(parameters)
+	return e.repository.GetRelatedStreamsToError(parameters)
+}
+
+func (e errorsService) GetErrorsOfConfiguredStream(parameters *dtos.QueryParameters) (*dtos.DetectedErrorsOfStream, error) {
+	res, err := e.repository.GetErrorsOfConfiguredStream(parameters)
 	if err != nil {
 		return nil, err
 	}
-	return related, nil
+	res.ConvertToResponse()
+	return res, nil
 }
