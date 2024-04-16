@@ -927,6 +927,14 @@ const docTemplate = `{
                         "name": "calibrado_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "format": "string",
+                        "description": "Id de la serie",
+                        "name": "serieId",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {

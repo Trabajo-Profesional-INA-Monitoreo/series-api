@@ -18,7 +18,7 @@ type StreamService interface {
 	GetStations(time.Time, time.Time, uint64) dtos.StreamsPerStationResponse
 	GetCuredSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse
 	GetObservatedSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse
-	GetPredictedSerieById(id string) dtos.CalibratedStreamsDataResponse
+	GetPredictedSerieById(id string, streamId uint64) dtos.CalibratedStreamsDataResponse
 	GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error)
 	CreateStream(streamId uint64, streamType uint64) error
 	GetStreamCards(parameters *dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
@@ -87,10 +87,10 @@ func (s streamService) GetObservatedSerieById(id string, start time.Time, end ti
 	return dtos.StreamsDataResponse{Streams: streamsData}
 }
 
-func (s streamService) GetPredictedSerieById(id string) dtos.CalibratedStreamsDataResponse {
+func (s streamService) GetPredictedSerieById(id string, streamId uint64) dtos.CalibratedStreamsDataResponse {
 	num, _ := strconv.ParseUint(id, 10, 64)
 	streams, _ := s.inaApiClient.GetLastForecast(num)
-	return streams.ConvertToCalibratedStreamsDataResponse()
+	return streams.ConvertToCalibratedStreamsDataResponse(streamId)
 }
 
 func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, configured entities.ConfiguredStream, timeStart time.Time, timeEnd time.Time) *[]dtos.MetricCard {

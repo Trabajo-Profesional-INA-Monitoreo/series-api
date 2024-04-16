@@ -1073,6 +1073,12 @@ paths:
         name: calibrado_id
         required: true
         type: integer
+      - description: Id de la serie
+        format: string
+        in: query
+        name: serieId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:

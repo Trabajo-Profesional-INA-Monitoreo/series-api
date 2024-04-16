@@ -55,12 +55,12 @@ func (f LastForecast) GetMainForecast() []float64 {
 	return []float64{}
 }
 
-func (f LastForecast) ConvertToCalibratedStreamsDataResponse() dtos.CalibratedStreamsDataResponse {
-	var P05Streams = convertToCalibratedStreamsData(f, "p05")
-	var MainStreams = convertToCalibratedStreamsData(f, "main")
-	var P75Streams = convertToCalibratedStreamsData(f, "p75")
-	var P95Streams = convertToCalibratedStreamsData(f, "p95")
-	var P25Streams = convertToCalibratedStreamsData(f, "p25")
+func (f LastForecast) ConvertToCalibratedStreamsDataResponse(streamId uint64) dtos.CalibratedStreamsDataResponse {
+	var P05Streams = convertToCalibratedStreamsData(f, "p05", streamId)
+	var MainStreams = convertToCalibratedStreamsData(f, "main", streamId)
+	var P75Streams = convertToCalibratedStreamsData(f, "p75", streamId)
+	var P95Streams = convertToCalibratedStreamsData(f, "p95", streamId)
+	var P25Streams = convertToCalibratedStreamsData(f, "p25", streamId)
 
 	return dtos.CalibratedStreamsDataResponse{
 		P05Streams,
@@ -71,11 +71,11 @@ func (f LastForecast) ConvertToCalibratedStreamsDataResponse() dtos.CalibratedSt
 	}
 }
 
-func convertToCalibratedStreamsData(f LastForecast, qualifier string) []dtos.CalibratedStreamsData {
+func convertToCalibratedStreamsData(f LastForecast, qualifier string, streamId uint64) []dtos.CalibratedStreamsData {
 	var calibratedStreams []dtos.CalibratedStreamsData
 
 	for _, stream := range f.Streams {
-		if stream.Qualifier == qualifier {
+		if stream.StreamId == streamId && stream.Qualifier == qualifier {
 			for _, forecast := range stream.Forecasts {
 				value, _ := strconv.ParseFloat(forecast[2], 64)
 				date, _ := time.Parse("2006-01-02T15:04:05Z07:00", forecast[0])

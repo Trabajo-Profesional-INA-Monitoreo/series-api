@@ -138,6 +138,7 @@ func (s seriesController) GetObservatedSerieById(ctx *gin.Context) {
 //	@Tags           Series
 //	@Produce		json
 //	@Param          calibrado_id     path      int     true  "Id del calibrado"
+//	@Param          serieId      query     int  true  "Id de la serie"  Format(string)
 //	@Success		200	{object} dtos.CalibratedStreamsDataResponse
 //	@Failure        400  {object}  dtos.ErrorResponse
 //	@Router			/series/pronosticadas/{calibrado_id} [get]
@@ -147,7 +148,11 @@ func (s seriesController) GetPredictedSerieById(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("calibrado_id was not sent")))
 		return
 	}
-	res := s.seriesService.GetPredictedSerieById(id)
+	streamId, done := getUintQueryParam(ctx, "serieId")
+	if done {
+		return
+	}
+	res := s.seriesService.GetPredictedSerieById(id, streamId)
 
 	ctx.JSON(http.StatusOK, res)
 }
