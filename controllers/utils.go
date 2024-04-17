@@ -11,7 +11,7 @@ import (
 
 func getDates(ctx *gin.Context) (time.Time, time.Time, bool) {
 	timeStartQuery := ctx.DefaultQuery("timeStart", time.Now().Add(-DaysPerWeek*HoursPerDay*time.Hour).Format(time.DateOnly))
-	timeEndQuery := ctx.DefaultQuery("timeEnd", time.Now().Add(HoursPerDay*time.Hour).Format(time.DateOnly))
+	timeEndQuery := ctx.DefaultQuery("timeEnd", time.Now().Format(time.DateOnly))
 	timeStart, err := time.Parse(time.DateOnly, timeStartQuery)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
@@ -22,7 +22,7 @@ func getDates(ctx *gin.Context) (time.Time, time.Time, bool) {
 		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("error parsing time: %v", err)))
 		return time.Time{}, time.Time{}, true
 	}
-	return timeStart, timeEnd, false
+	return timeStart, timeEnd.Add(HoursPerDay * time.Hour), false
 }
 
 func getUintQueryParam(ctx *gin.Context, queryParam string) (uint64, bool) {
