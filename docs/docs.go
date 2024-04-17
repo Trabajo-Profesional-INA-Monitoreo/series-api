@@ -1399,6 +1399,9 @@ const docTemplate = `{
                 "configuredStreamId": {
                     "type": "integer"
                 },
+                "observedRelatedStreamId": {
+                    "type": "integer"
+                },
                 "procedureId": {
                     "type": "integer"
                 },
@@ -1462,6 +1465,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/dtos.MetricCard"
                     }
+                },
+                "observedRelatedStreamId": {
+                    "type": "integer"
                 },
                 "owner": {
                     "type": "string"

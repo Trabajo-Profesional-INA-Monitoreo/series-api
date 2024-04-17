@@ -1391,6 +1391,9 @@
                 "configuredStreamId": {
                     "type": "integer"
                 },
+                "observedRelatedStreamId": {
+                    "type": "integer"
+                },
                 "procedureId": {
                     "type": "integer"
                 },
@@ -1454,6 +1457,9 @@
                     "items": {
                         "$ref": "#/definitions/dtos.MetricCard"
                     }
+                },
+                "observedRelatedStreamId": {
+                    "type": "integer"
                 },
                 "owner": {
                     "type": "string"

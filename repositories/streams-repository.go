@@ -238,6 +238,7 @@ func (db *streamsRepository) GetStreamCards(parameters dtos.QueryParameters) (*d
 		"configured_streams.stream_id as stream_id",
 		"configured_streams.check_errors as check_errors",
 		"configured_streams.calibration_id as calibration_id",
+		"configured_streams.observed_related_stream_id as observed_related_stream_id",
 		"streams.procedure_id as procedure_id",
 		"streams.stream_type as stream_type",
 		"procedures.name as procedure_name",
