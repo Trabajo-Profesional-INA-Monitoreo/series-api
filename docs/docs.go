@@ -1141,6 +1141,9 @@ const docTemplate = `{
                         "$ref": "#/definitions/entities.Metric"
                     }
                 },
+                "observedRelatedStreamId": {
+                    "type": "integer"
+                },
                 "redundanciesIds": {
                     "type": "array",
                     "items": {
@@ -1178,6 +1181,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/entities.Metric"
                     }
+                },
+                "observedRelatedStreamId": {
+                    "type": "integer"
                 },
                 "redundanciesIds": {
                     "type": "array",

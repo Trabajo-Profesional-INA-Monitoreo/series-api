@@ -76,6 +76,8 @@ definitions:
         items:
           $ref: '#/definitions/entities.Metric'
         type: array
+      observedRelatedStreamId:
+        type: integer
       redundanciesIds:
         items:
           type: integer
@@ -101,6 +103,8 @@ definitions:
         items:
           $ref: '#/definitions/entities.Metric'
         type: array
+      observedRelatedStreamId:
+        type: integer
       redundanciesIds:
         items:
           type: integer

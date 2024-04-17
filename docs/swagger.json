@@ -1133,6 +1133,9 @@
                         "$ref": "#/definitions/entities.Metric"
                     }
                 },
+                "observedRelatedStreamId": {
+                    "type": "integer"
+                },
                 "redundanciesIds": {
                     "type": "array",
                     "items": {
@@ -1170,6 +1173,9 @@
                     "items": {
                         "$ref": "#/definitions/entities.Metric"
                     }
+                },
+                "observedRelatedStreamId": {
+                    "type": "integer"
                 },
                 "redundanciesIds": {
                     "type": "array",
