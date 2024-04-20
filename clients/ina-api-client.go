@@ -61,7 +61,7 @@ func (i inaApiClientImpl) GetLastForecast(calibrationId uint64) (*responses.Last
 }
 
 func (i inaApiClientImpl) GetObservedData(streamId uint64, timeStart time.Time, timeEnd time.Time) ([]responses.ObservedDataResponse, error) {
-	url := fmt.Sprintf("%v/obs/puntual/series/%v/observaciones?timestart=%v&timeend=%v", i.baseUrl, streamId, timeStart.Format(time.DateOnly), timeEnd.Format(time.DateOnly))
+	url := fmt.Sprintf("%v/obs/puntual/series/%v/observaciones?timestart=%v&timeend=%v", i.baseUrl, streamId, timeStart.Format(time.RFC3339Nano), timeEnd.Format(time.RFC3339Nano))
 	log.Debugf("Performing observed request: %v", url)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
