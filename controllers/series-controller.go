@@ -22,6 +22,7 @@ type SeriesController interface {
 	GetStreamCards(ctx *gin.Context)
 	GetOutputMetrics(ctx *gin.Context)
 	GetNodes(ctx *gin.Context)
+	GetRedundancies(ctx *gin.Context)
 }
 
 type seriesController struct {
@@ -286,5 +287,26 @@ func (s seriesController) GetOutputMetrics(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, dtos.NewErrorResponse(err))
 		return
 	}
+	ctx.JSON(http.StatusOK, res)
+}
+
+// GetRedundancies godoc
+//
+//	@Summary		Endpoint para obtener los ids de las redundancias de una serie configurada por id
+//	@Tags           Series
+//	@Produce		json
+//	@Param          configured_stream_id     path      int     true  "Id de la serie configurada"
+//	@Success		200	{object} dtos.Redundancies
+//	@Failure        400  {object}  dtos.ErrorResponse
+//	@Router			/series/redundancias/{configured_stream_id} [get]
+func (s seriesController) GetRedundancies(ctx *gin.Context) {
+	id, userSentId := ctx.Params.Get("configured_stream_id")
+	if !userSentId {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("Id was not send")))
+		return
+	}
+
+	res := s.seriesService.GetRedundancies(id)
+
 	ctx.JSON(http.StatusOK, res)
 }
