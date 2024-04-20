@@ -6,9 +6,9 @@ import (
 )
 
 func ConvertDtoToCreateConfiguration(dto dtos.CreateConfiguration) *entities.Configuration {
-	return &entities.Configuration{Name: dto.Name, Deleted: false}
+	return &entities.Configuration{Name: dto.Name, Deleted: false, SendNotifications: dto.SendNotifications}
 }
 
 func ConvertDtoToConfiguration(dto dtos.Configuration) *entities.Configuration {
-	return &entities.Configuration{Name: dto.Name, ConfigurationId: dto.Id}
+	return &entities.Configuration{Name: dto.Name, ConfigurationId: dto.Id, SendNotifications: dto.SendNotifications}
 }

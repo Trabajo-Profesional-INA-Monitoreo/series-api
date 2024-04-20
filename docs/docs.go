@@ -1117,6 +1117,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/dtos.Node"
                     }
+                },
+                "sendNotifications": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1219,6 +1222,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/dtos.CreateNode"
                     }
+                },
+                "sendNotifications": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1456,6 +1462,9 @@ const docTemplate = `{
                 },
                 "evacuationLevel": {
                     "type": "number"
+                },
+                "lastUpdate": {
+                    "type": "string"
                 },
                 "lowWaterLevel": {
                     "type": "number"

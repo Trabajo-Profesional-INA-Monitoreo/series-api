@@ -93,23 +93,34 @@ func (s streamService) GetPredictedSerieById(id string, streamId uint64) dtos.Ca
 	return streams.ConvertToCalibratedStreamsDataResponse(streamId)
 }
 
-func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, configured entities.ConfiguredStream, timeStart time.Time, timeEnd time.Time) *[]dtos.MetricCard {
+func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, configured entities.ConfiguredStream, timeStart time.Time, timeEnd time.Time) (*[]dtos.MetricCard, *time.Time) {
 	neededMetrics := configured.Metrics
 	waterLevelCalculator := NewCalculatorOfWaterLevelsDependingOnVariable(*stream.Station, stream.VariableId)
 	if stream.IsForecasted() {
 		values, err := s.inaApiClient.GetLastForecast(configured.CalibrationId)
 		if err != nil {
 			log.Errorf("Could not get metrics with calibration id %v: %v", configured.CalibrationId, err)
-			return nil
+			return nil, nil
 		}
-		return getMetricsForForecastedStream(values, neededMetrics, waterLevelCalculator)
+		return getMetricsForForecastedStream(values, neededMetrics, waterLevelCalculator), &values.ForecastDate
 	}
+	lastUpdateResponse := make(chan *time.Time)
+	go func() {
+		data, err := s.inaApiClient.GetStream(stream.StreamId)
+		defer close(lastUpdateResponse)
+		if err != nil {
+			lastUpdateResponse <- nil
+			return
+		}
+		lastUpdateResponse <- data.DateRange.TimeEnd
+	}()
 	values, err := s.inaApiClient.GetObservedData(stream.StreamId, timeStart, timeEnd)
 	if err != nil {
 		log.Errorf("Could not get metrics for stream with id %v: %v", stream.StreamId, err)
-		return nil
+		return nil, nil
 	}
-	return getMetricsForObservedOrCuratedStream(values, neededMetrics, waterLevelCalculator)
+
+	return getMetricsForObservedOrCuratedStream(values, neededMetrics, waterLevelCalculator), <-lastUpdateResponse
 }
 
 func (s streamService) GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error) {
@@ -122,7 +133,9 @@ func (s streamService) GetStreamData(streamId uint64, configId uint64, timeStart
 		return nil, err
 	}
 	streamData := dtos.NewStreamData(stream, configured)
-	streamData.Metrics = s.getMetricsFromConfiguredStream(stream, configured, timeStart, timeEnd)
+	metrics, lastUpdate := s.getMetricsFromConfiguredStream(stream, configured, timeStart, timeEnd)
+	streamData.Metrics = metrics
+	streamData.LastUpdate = lastUpdate
 	return streamData, nil
 }
 

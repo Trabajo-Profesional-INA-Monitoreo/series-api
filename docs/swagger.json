@@ -1109,6 +1109,9 @@
                     "items": {
                         "$ref": "#/definitions/dtos.Node"
                     }
+                },
+                "sendNotifications": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1211,6 +1214,9 @@
                     "items": {
                         "$ref": "#/definitions/dtos.CreateNode"
                     }
+                },
+                "sendNotifications": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1448,6 +1454,9 @@
                 },
                 "evacuationLevel": {
                     "type": "number"
+                },
+                "lastUpdate": {
+                    "type": "string"
                 },
                 "lowWaterLevel": {
                     "type": "number"

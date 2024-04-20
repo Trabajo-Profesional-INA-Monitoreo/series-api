@@ -34,7 +34,9 @@ func (c configurationRepository) GetConfigurationById(id string) *dtos.Configura
 	result := c.connection.Model(
 		&entities.Configuration{},
 	).Select(
-		"configurations.name as name, configurations.configuration_id as configuration_id",
+		"configurations.name as name",
+		"configurations.configuration_id as configuration_id",
+		"configurations.send_notifications as send_notifications",
 	).Where("configuration_id = ? AND deleted = false", id).Scan(&configuration)
 
 	if result.RowsAffected == 0 {

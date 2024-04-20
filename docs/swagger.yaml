@@ -59,6 +59,8 @@ definitions:
         items:
           $ref: '#/definitions/dtos.Node'
         type: array
+      sendNotifications:
+        type: boolean
     required:
     - name
     type: object
@@ -126,6 +128,8 @@ definitions:
         items:
           $ref: '#/definitions/dtos.CreateNode'
         type: array
+      sendNotifications:
+        type: boolean
     required:
     - name
     type: object
@@ -281,6 +285,8 @@ definitions:
         type: integer
       evacuationLevel:
         type: number
+      lastUpdate:
+        type: string
       lowWaterLevel:
         type: number
       metrics:
