@@ -1109,6 +1109,9 @@
                     "items": {
                         "$ref": "#/definitions/dtos.Node"
                     }
+                },
+                "sendNotifications": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1211,6 +1214,9 @@
                     "items": {
                         "$ref": "#/definitions/dtos.CreateNode"
                     }
+                },
+                "sendNotifications": {
+                    "type": "boolean"
                 }
             }
         },
