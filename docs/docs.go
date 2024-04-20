@@ -1463,6 +1463,9 @@ const docTemplate = `{
                 "evacuationLevel": {
                     "type": "number"
                 },
+                "lastUpdate": {
+                    "type": "string"
+                },
                 "lowWaterLevel": {
                     "type": "number"
                 },

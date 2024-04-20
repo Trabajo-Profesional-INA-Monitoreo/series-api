@@ -1,5 +1,7 @@
 package responses
 
+import "time"
+
 type InaStreamResponse struct {
 	Type      string    `json:"tipo"`
 	Id        uint      `json:"id"`
@@ -11,9 +13,9 @@ type InaStreamResponse struct {
 }
 
 type DateRange struct {
-	TimeStart *string `json:"timestart"`
-	TimeEnd   *string `json:"timeend"`
-	Count     *string `json:"count"`
+	TimeStart *time.Time `json:"timestart"`
+	TimeEnd   *time.Time `json:"timeend"`
+	Count     *string    `json:"count"`
 }
 
 type Unit struct {

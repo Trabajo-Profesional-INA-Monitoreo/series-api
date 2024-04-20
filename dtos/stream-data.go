@@ -1,6 +1,9 @@
 package dtos
 
-import "github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
+import (
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
+	"time"
+)
 
 type StreamData struct {
 	Metrics                 *[]MetricCard
@@ -19,6 +22,7 @@ type StreamData struct {
 	StreamType              entities.StreamType
 	CalibrationId           uint64
 	ObservedRelatedStreamId *uint64
+	LastUpdate              *time.Time
 }
 
 func NewStreamData(stream entities.Stream, configured entities.ConfiguredStream) *StreamData {
