@@ -29,9 +29,9 @@ type StreamRepository interface {
 	CreateStream(entity entities.Stream) error
 	GetStreamCards(parameters dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
 	GetStreamsForOutputMetrics(configId uint64) ([]dtos.BehaviourStream, error)
-	GetTotalStreamsWithNullValues(configId uint64, timeStart time.Time, timeEnd time.Time) int
 	GetErrorsOfNodes(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfNodes
 	GetRedundancies(configuredStreamId string) []int
+	GetTotalStreamsByError(id uint64, start time.Time, end time.Time, value entities.ErrorType) int
 }
 
 type streamsRepository struct {
@@ -153,7 +153,7 @@ func (db *streamsRepository) GetStreams() []entities.Stream {
 	return streams
 }
 
-func (db *streamsRepository) GetTotalStreamsWithNullValues(configId uint64, timeStart time.Time, timeEnd time.Time) int {
+func (db *streamsRepository) GetTotalStreamsByError(configId uint64, timeStart time.Time, timeEnd time.Time, error entities.ErrorType) int {
 	var count int64
 	db.connection.Model(
 		&entities.ConfiguredStream{},
@@ -166,7 +166,7 @@ func (db *streamsRepository) GetTotalStreamsWithNullValues(configId uint64, time
 	).Where(
 		"configured_streams.configuration_id = ?", configId,
 	).Where(
-		"detected_errors.error_type = ?", entities.NullValue,
+		"detected_errors.error_type = ?", error,
 	).Where(
 		"detected_errors.detected_date >= ? AND detected_errors.detected_date <= ?", timeStart, timeEnd,
 	).Where(
