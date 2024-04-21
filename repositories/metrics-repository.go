@@ -9,10 +9,26 @@ import (
 type MetricsRepository interface {
 	Create(metric entities.ConfiguredMetric) error
 	GetByConfiguredStreamId(id uint64) *[]entities.Metric
+	DeleteMetricsNotIncludedInNewConfig(id uint64, metrics []entities.Metric)
 }
 
 type metricsRepository struct {
 	connection *gorm.DB
+}
+
+func (db metricsRepository) DeleteMetricsNotIncludedInNewConfig(id uint64, metrics []entities.Metric) {
+	tx := db.connection.Where(
+		"configured_stream_id = ?", id,
+	)
+
+	if len(metrics) != 0 {
+		tx = tx.Where("metric_id NOT IN ?", metrics)
+	}
+	tx.Delete(&entities.ConfiguredMetric{})
+
+	if tx.Error != nil {
+		log.Errorf("Error executing DeleteMetricsNotIncludedInNewConfig query: %v", tx.Error)
+	}
 }
 
 func (db metricsRepository) GetByConfiguredStreamId(configuredStreamId uint64) *[]entities.Metric {

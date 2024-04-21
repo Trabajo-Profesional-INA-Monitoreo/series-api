@@ -43,9 +43,8 @@ func (c configurationController) GetAllConfigurations(ctx *gin.Context) {
 //	    @Failure        400 {object} dtos.ErrorResponse
 //		@Router			/configuracion/{id} [get]
 func (c configurationController) GetConfigurationById(ctx *gin.Context) {
-	id, userSentId := ctx.Params.Get("id")
-	if !userSentId {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("Id was not send")))
+	id, done := getUintPathParam(ctx, "id")
+	if done {
 		return
 	}
 	res := c.configurationService.GetConfigurationById(id)

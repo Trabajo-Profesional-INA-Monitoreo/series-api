@@ -9,10 +9,25 @@ import (
 type RedundancyRepository interface {
 	Create(redundancy entities.Redundancy) error
 	GetByConfiguredStreamId(id uint64) *[]uint64
+	DeleteRedundanciesNotIncludedInNewConfig(id uint64, redundancies []uint64)
 }
 
 type redundancyRepository struct {
 	connection *gorm.DB
+}
+
+func (db redundancyRepository) DeleteRedundanciesNotIncludedInNewConfig(id uint64, redundancies []uint64) {
+	tx := db.connection.Where(
+		"configured_stream_id = ?", id,
+	)
+	if len(redundancies) != 0 {
+		tx = tx.Where("redundancy_id NOT IN ?", redundancies)
+	}
+	tx.Delete(&entities.Redundancy{})
+
+	if tx.Error != nil {
+		log.Errorf("Error executing DeleteRedundanciesNotIncludedInNewConfig query: %v", tx.Error)
+	}
 }
 
 func (db redundancyRepository) GetByConfiguredStreamId(configuredStreamId uint64) *[]uint64 {
