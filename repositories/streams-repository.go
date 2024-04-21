@@ -30,6 +30,7 @@ type StreamRepository interface {
 	GetStreamCards(parameters dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
 	GetStreamsForOutputMetrics(configId uint64) ([]dtos.BehaviourStream, error)
 	GetErrorsOfNodes(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfNodes
+	GetRedundancies(configuredStreamId string) []int
 	GetTotalStreamsByError(id uint64, start time.Time, end time.Time, value entities.ErrorType) int
 }
 
@@ -333,4 +334,23 @@ func (db *streamsRepository) GetStreamsForOutputMetrics(configId uint64) ([]dtos
 	}
 
 	return streams, nil
+}
+
+func (db *streamsRepository) GetRedundancies(configuredStreamId string) []int {
+	var redundancies []int
+
+	tx := db.connection.Model(
+		&entities.Redundancy{},
+	).Select(
+		"redundancies.redundancy_id as redundancy_id",
+	).Where(
+		"redundancies.configured_stream_id = ?", configuredStreamId,
+	).Scan(&redundancies)
+
+	if tx.Error != nil {
+		log.Errorf("Error executing GetRedundancies query: %v", tx.Error)
+	}
+
+	log.Debugf("Get redundancies query result: %v", redundancies)
+	return redundancies
 }

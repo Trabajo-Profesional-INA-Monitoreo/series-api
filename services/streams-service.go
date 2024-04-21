@@ -24,6 +24,7 @@ type StreamService interface {
 	GetStreamCards(parameters *dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
 	GetOutputBehaviourMetrics(configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.BehaviourStreamsResponse, error)
 	GetNodes(start time.Time, end time.Time, id uint64) dtos.StreamsPerNodeResponse
+	GetRedundancies(configuredStreamId string) dtos.Redundancies
 }
 
 type streamService struct {
@@ -209,4 +210,10 @@ func (s streamService) GetOutputBehaviourMetrics(configId uint64, timeStart time
 	}
 
 	return getLevelsCountForAllStreams(behaviourStreams, timeStart, timeEnd, s.inaApiClient), nil
+}
+
+func (s streamService) GetRedundancies(configuredStreamId string) dtos.Redundancies {
+	redundancies := s.repository.GetRedundancies(configuredStreamId)
+
+	return dtos.Redundancies{Redundancies: redundancies}
 }

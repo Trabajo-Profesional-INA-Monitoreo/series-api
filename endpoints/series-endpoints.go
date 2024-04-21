@@ -21,6 +21,7 @@ func setSeriesEndpoints(apiGroup *gin.RouterGroup, repositories *config.Reposito
 		testApi.GET("/observadas/:serie_id", controller.GetObservatedSerieById)
 		testApi.GET("/pronosticadas/:calibrado_id", controller.GetPredictedSerieById)
 		testApi.GET("/nodos", controller.GetNodes)
+		testApi.GET("/redundancias/:configured_stream_id", controller.GetRedundancies)
 	}
 	log.Infof("Configured stream endpoints")
 }
