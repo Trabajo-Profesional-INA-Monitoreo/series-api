@@ -19,7 +19,11 @@ type redundancyRepository struct {
 func (db redundancyRepository) DeleteRedundanciesNotIncludedInNewConfig(id uint64, redundancies []uint64) {
 	tx := db.connection.Where(
 		"configured_stream_id = ?", id,
-	).Where("redundancy_id NOT IN ?", redundancies).Delete(&entities.ConfiguredMetric{})
+	)
+	if len(redundancies) != 0 {
+		tx = tx.Where("redundancy_id NOT IN ?", redundancies)
+	}
+	tx.Delete(&entities.Redundancy{})
 
 	if tx.Error != nil {
 		log.Errorf("Error executing DeleteRedundanciesNotIncludedInNewConfig query: %v", tx.Error)

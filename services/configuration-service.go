@@ -105,7 +105,7 @@ func (c configurationService) ModifyConfiguration(configuration dtos.Configurati
 				for _, metric := range *configuratedStream.Metrics {
 					// We perform this check to prevent duplicate records on the DB
 					found := false
-					for i := 0; i < len(*savedMetrics) && !found; i++ {
+					for i := 0; savedMetrics != nil && i < len(*savedMetrics) && !found; i++ {
 						found = (*savedMetrics)[i] == metric
 					}
 					if found {
@@ -132,7 +132,7 @@ func (c configurationService) ModifyConfiguration(configuration dtos.Configurati
 				for _, redundancyId := range *configuratedStream.RedundanciesIds {
 					// We perform this check to prevent duplicate records on the DB
 					found := false
-					for i := 0; i < len(*savedRedundancies) && !found; i++ {
+					for i := 0; savedRedundancies != nil && i < len(*savedRedundancies) && !found; i++ {
 						found = (*savedRedundancies)[i] == redundancyId
 					}
 					if found {
