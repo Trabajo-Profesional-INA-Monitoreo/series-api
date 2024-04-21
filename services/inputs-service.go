@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
 	"time"
 )
@@ -9,6 +10,7 @@ import (
 type InputsService interface {
 	GetGeneralMetrics(configurationId uint64) dtos.InputsGeneralMetrics
 	GetTotalStreamsWithNullValues(configurationId uint64, timeStart time.Time, timeEnd time.Time) dtos.TotalStreamsWithNullValues
+	GetTotalStreamsWithObservedOutlier(configurationId uint64, timeStart time.Time, timeEnd time.Time) dtos.TotalStreamsWithObservedOutlier
 }
 
 type inputsService struct {
@@ -38,8 +40,19 @@ func (s inputsService) GetTotalStreamsWithNullValues(configurationId uint64, tim
 	go func() {
 		streamsResult <- s.repository.GetTotalStreams(configurationId)
 	}()
-	streamsWithNull := s.repository.GetTotalStreamsWithNullValues(configurationId, timeStart, timeEnd)
+	streamsWithNull := s.repository.GetTotalStreamsByError(configurationId, timeStart, timeEnd, entities.NullValue)
 	totalStreams := <-streamsResult
 
 	return dtos.TotalStreamsWithNullValues{TotalStreams: totalStreams, TotalStreamsWithNull: streamsWithNull}
+}
+
+func (s inputsService) GetTotalStreamsWithObservedOutlier(configurationId uint64, timeStart time.Time, timeEnd time.Time) dtos.TotalStreamsWithObservedOutlier {
+	streamsResult := make(chan int, 1)
+	go func() {
+		streamsResult <- s.repository.GetTotalStreams(configurationId)
+	}()
+	streamsWithObservedOutlier := s.repository.GetTotalStreamsByError(configurationId, timeStart, timeEnd, entities.ObservedOutlier)
+	totalStreams := <-streamsResult
+
+	return dtos.TotalStreamsWithObservedOutlier{TotalStreams: totalStreams, TotalStreamsWithObservedOutlier: streamsWithObservedOutlier}
 }

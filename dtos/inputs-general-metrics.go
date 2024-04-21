@@ -9,3 +9,8 @@ type TotalStreamsWithNullValues struct {
 	TotalStreams         int
 	TotalStreamsWithNull int
 }
+
+type TotalStreamsWithObservedOutlier struct {
+	TotalStreams                    int
+	TotalStreamsWithObservedOutlier int
+}
