@@ -10,7 +10,7 @@ import (
 type ConfigurationRepository interface {
 	Create(configuration *entities.Configuration) error
 	GetAllConfigurations() []dtos.AllConfigurations
-	GetConfigurationById(id string) *dtos.Configuration
+	GetConfigurationById(id uint64) *dtos.Configuration
 	Delete(id string)
 	Update(configuration *entities.Configuration) error
 }
@@ -28,7 +28,7 @@ func (c configurationRepository) Delete(id string) {
 	c.connection.Model(&entities.Configuration{}).Where("configuration_id = ?", id).Update("deleted", true)
 }
 
-func (c configurationRepository) GetConfigurationById(id string) *dtos.Configuration {
+func (c configurationRepository) GetConfigurationById(id uint64) *dtos.Configuration {
 	var configuration dtos.Configuration
 
 	result := c.connection.Model(

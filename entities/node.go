@@ -5,4 +5,5 @@ type Node struct {
 	NodeId          uint64 `gorm:"primary_key;auto_increment"`
 	ConfigurationId uint64
 	Configuration   *Configuration `gorm:"references:ConfigurationId"`
+	Deleted         bool
 }

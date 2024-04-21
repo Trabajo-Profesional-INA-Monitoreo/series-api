@@ -10,12 +10,23 @@ import (
 type NodeRepository interface {
 	Create(node *entities.Node) (uint64, error)
 	Update(node *entities.Node) error
-	GetNodesById(id string) []*dtos.Node
+	GetNodesById(id uint64) []*dtos.Node
 	GetStreamsPerNodeById(formatUint string) []*dtos.StreamsPerNode
+	MarkAsDeletedOldNodes(id uint64, ids []uint64)
 }
 
 type nodeRepository struct {
 	connection *gorm.DB
+}
+
+func (n nodeRepository) MarkAsDeletedOldNodes(configId uint64, newNodeIds []uint64) {
+	n.connection.Model(
+		&entities.Node{},
+	).Where(
+		"nodes.configuration_id = ?", configId,
+	).Where(
+		"nodes.node_id NOT IN ?", newNodeIds,
+	).Update("deleted", true)
 }
 
 func (n nodeRepository) GetStreamsPerNodeById(configId string) []*dtos.StreamsPerNode {
@@ -53,14 +64,14 @@ func (n nodeRepository) Create(node *entities.Node) (uint64, error) {
 	return node.NodeId, result.Error
 }
 
-func (n nodeRepository) GetNodesById(id string) []*dtos.Node {
+func (n nodeRepository) GetNodesById(id uint64) []*dtos.Node {
 	var nodes []*dtos.Node
 
 	result := n.connection.Model(
 		&entities.Node{},
 	).Select(
 		"nodes.name as name, nodes.node_id as node_id",
-	).Where("configuration_id = ?", id).Scan(&nodes)
+	).Where("configuration_id = ?", id).Where("deleted = false").Scan(&nodes)
 
 	if result.RowsAffected == 0 {
 		return nil

@@ -12,7 +12,7 @@ import (
 type (
 	ConfigurationService interface {
 		GetAllConfigurations() []dtos.AllConfigurations
-		GetConfigurationById(id string) *dtos.Configuration
+		GetConfigurationById(id uint64) *dtos.Configuration
 		CreateConfiguration(configuration dtos.CreateConfiguration) error
 		DeleteConfiguration(id string)
 		ModifyConfiguration(configuration dtos.Configuration) error
@@ -35,6 +35,13 @@ func (c configurationService) ModifyConfiguration(configuration dtos.Configurati
 	if err != nil {
 		return err
 	}
+
+	var updatedNodesIds []uint64
+	for _, node := range configuration.Nodes {
+		updatedNodesIds = append(updatedNodesIds, node.Id)
+	}
+	c.nodeRepository.MarkAsDeletedOldNodes(configuration.Id, updatedNodesIds)
+
 	newNodes := converters.ConvertDtoToNodeModify(*newConfiguration, configuration.Nodes)
 	for _, newNode := range newNodes {
 		err := c.nodeRepository.Update(&newNode)
@@ -45,6 +52,14 @@ func (c configurationService) ModifyConfiguration(configuration dtos.Configurati
 
 	nodes := configuration.Nodes
 	for _, node := range nodes {
+
+		var updatedConfigStreamIds []uint64
+		for _, configStream := range *node.ConfiguredStreams {
+			updatedConfigStreamIds = append(updatedConfigStreamIds, configStream.ConfiguredStreamId)
+		}
+		c.configuratedStreamRepository.MarkAsDeletedOldConfiguredStreams(configuration.Id, updatedConfigStreamIds)
+
+		// TODO handle metrics and redundancies
 
 		for _, configuratedStream := range *node.ConfiguredStreams {
 
@@ -127,7 +142,7 @@ func (c configurationService) GetAllConfigurations() []dtos.AllConfigurations {
 	return c.configurationRepository.GetAllConfigurations()
 }
 
-func (c configurationService) GetConfigurationById(id string) *dtos.Configuration {
+func (c configurationService) GetConfigurationById(id uint64) *dtos.Configuration {
 	var configuration *dtos.Configuration
 	var nodes []*dtos.Node
 

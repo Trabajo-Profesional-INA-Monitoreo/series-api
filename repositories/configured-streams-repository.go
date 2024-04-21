@@ -16,13 +16,24 @@ type ConfiguredStreamsRepository interface {
 	FindConfiguredStreamsWithCheckErrorsForStream(stream entities.Stream) []entities.ConfiguredStream
 	FindConfiguredStreamById(configStreamId uint64) (entities.ConfiguredStream, error)
 	Create(e *entities.ConfiguredStream) (uint64, error)
-	FindConfiguredStreamsByNodeId(nodeId uint64, configurationId string) *[]*dtos.ConfiguredStream
+	FindConfiguredStreamsByNodeId(nodeId uint64, configurationId uint64) *[]*dtos.ConfiguredStream
 	Update(e *entities.ConfiguredStream) error
 	CountErrorOfConfigurations(ids []uint64, parameters *dtos.QueryParameters) ([]dtos.ErrorsPerConfigStream, error)
+	MarkAsDeletedOldConfiguredStreams(configId uint64, newConfigStreamIds []uint64)
 }
 
 type configuredStreamsRepository struct {
 	connection *gorm.DB
+}
+
+func (db configuredStreamsRepository) MarkAsDeletedOldConfiguredStreams(configId uint64, newConfigStreamIds []uint64) {
+	db.connection.Model(
+		&entities.ConfiguredStream{},
+	).Where(
+		"configured_streams.configuration_id = ?", configId,
+	).Where(
+		"configured_streams.configured_stream_id NOT IN ?", newConfigStreamIds,
+	).Update("deleted", true)
 }
 
 func NewConfiguredStreamsRepository(connection *gorm.DB) ConfiguredStreamsRepository {
@@ -62,7 +73,7 @@ func (db configuredStreamsRepository) Create(configuredStream *entities.Configur
 	return configuredStream.ConfiguredStreamId, result.Error
 }
 
-func (db configuredStreamsRepository) FindConfiguredStreamsByNodeId(nodeId uint64, configurationId string) *[]*dtos.ConfiguredStream {
+func (db configuredStreamsRepository) FindConfiguredStreamsByNodeId(nodeId uint64, configurationId uint64) *[]*dtos.ConfiguredStream {
 	var configuredStream *[]*dtos.ConfiguredStream
 
 	result := db.connection.Model(
@@ -77,7 +88,9 @@ func (db configuredStreamsRepository) FindConfiguredStreamsByNodeId(nodeId uint6
 		"configured_streams.normal_lower_threshold",
 		"configured_streams.calibration_id",
 		"configured_streams.observed_related_stream_id",
-	).Where("node_id = ? AND configuration_id = ?", nodeId, configurationId).Joins("JOIN streams ON streams.stream_id = configured_streams.stream_id ").Scan(&configuredStream)
+	).Where(
+		"node_id = ? AND configuration_id = ?", nodeId, configurationId,
+	).Where("configured_streams.deleted = false").Joins("JOIN streams ON streams.stream_id = configured_streams.stream_id ").Scan(&configuredStream)
 
 	if result.RowsAffected == 0 {
 		return nil

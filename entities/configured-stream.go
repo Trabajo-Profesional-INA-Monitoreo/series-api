@@ -16,4 +16,5 @@ type ConfiguredStream struct {
 	Node                    *Node `gorm:"references:NodeId"`
 	ConfigurationId         uint64
 	Configuration           *Configuration `gorm:"references:ConfigurationId"`
+	Deleted                 bool
 }
