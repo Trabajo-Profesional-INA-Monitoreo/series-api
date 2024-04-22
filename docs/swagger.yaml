@@ -54,15 +54,18 @@ definitions:
       id:
         type: integer
       name:
+        minLength: 1
         type: string
       nodes:
         items:
           $ref: '#/definitions/dtos.Node'
+        minItems: 1
         type: array
       sendNotifications:
         type: boolean
     required:
     - name
+    - nodes
     type: object
   dtos.ConfiguredStream:
     properties:
@@ -77,6 +80,8 @@ definitions:
       metrics:
         items:
           $ref: '#/definitions/entities.Metric'
+        maxItems: 4
+        minItems: 0
         type: array
       observedRelatedStreamId:
         type: integer
@@ -85,13 +90,20 @@ definitions:
           type: integer
         type: array
       streamId:
+        minimum: 1
         type: integer
       streamType:
-        type: integer
+        allOf:
+        - $ref: '#/definitions/entities.StreamType'
+        maximum: 2
+        minimum: 0
       updateFrequency:
+        minimum: 0
         type: number
       upperThreshold:
         type: number
+    required:
+    - streamId
     type: object
   dtos.ConfiguredStreamCreate:
     properties:
@@ -104,6 +116,8 @@ definitions:
       metrics:
         items:
           $ref: '#/definitions/entities.Metric'
+        maxItems: 4
+        minItems: 0
         type: array
       observedRelatedStreamId:
         type: integer
@@ -112,35 +126,49 @@ definitions:
           type: integer
         type: array
       streamId:
+        minimum: 1
         type: integer
       streamType:
-        type: integer
+        allOf:
+        - $ref: '#/definitions/entities.StreamType'
+        maximum: 2
       updateFrequency:
+        minimum: 0
         type: number
       upperThreshold:
         type: number
+    required:
+    - streamId
     type: object
   dtos.CreateConfiguration:
     properties:
       name:
+        minLength: 1
         type: string
       nodes:
         items:
           $ref: '#/definitions/dtos.CreateNode'
+        minItems: 1
         type: array
       sendNotifications:
         type: boolean
     required:
     - name
+    - nodes
     type: object
   dtos.CreateNode:
     properties:
       configuredStreams:
         items:
           $ref: '#/definitions/dtos.ConfiguredStreamCreate'
+        minItems: 1
         type: array
       name:
+        minLength: 1
         type: string
+    required:
+    - configuredStreams
+    - name
     type: object
   dtos.DetectedErrorsOfStream:
     properties:
@@ -208,11 +236,16 @@ definitions:
       configuredStreams:
         items:
           $ref: '#/definitions/dtos.ConfiguredStream'
+        minItems: 1
         type: array
       id:
         type: integer
       name:
+        minLength: 1
         type: string
+    required:
+    - configuredStreams
+    - name
     type: object
   dtos.Pageable:
     properties:

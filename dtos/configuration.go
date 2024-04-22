@@ -1,10 +1,10 @@
 package dtos
 
 type Configuration struct {
-	Name              string `binding:"required" ,gorm:"column:name"`
+	Name              string `binding:"required,min=1" ,gorm:"column:name"`
 	Id                uint64 `gorm:"column:configuration_id"`
 	SendNotifications bool
-	Nodes             []*Node `gorm:"-"`
+	Nodes             []*Node `binding:"required,min=1,dive" gorm:"-"`
 }
 
 type AllConfigurations struct {
@@ -13,7 +13,7 @@ type AllConfigurations struct {
 }
 
 type CreateConfiguration struct {
-	Name              string `binding:"required" ,gorm:"column:name"`
+	Name              string `binding:"required,min=1" ,gorm:"column:name"`
 	SendNotifications bool
-	Nodes             *[]CreateNode
+	Nodes             *[]CreateNode `binding:"required,min=1,dive"`
 }

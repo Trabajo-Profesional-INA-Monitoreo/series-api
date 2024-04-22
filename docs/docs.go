@@ -1179,17 +1179,20 @@ const docTemplate = `{
         "dtos.Configuration": {
             "type": "object",
             "required": [
-                "name"
+                "name",
+                "nodes"
             ],
             "properties": {
                 "id": {
                     "type": "integer"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                 },
                 "nodes": {
                     "type": "array",
+                    "minItems": 1,
                     "items": {
                         "$ref": "#/definitions/dtos.Node"
                     }
@@ -1201,6 +1204,9 @@ const docTemplate = `{
         },
         "dtos.ConfiguredStream": {
             "type": "object",
+            "required": [
+                "streamId"
+            ],
             "properties": {
                 "calibrationId": {
                     "type": "integer"
@@ -1216,6 +1222,8 @@ const docTemplate = `{
                 },
                 "metrics": {
                     "type": "array",
+                    "maxItems": 4,
+                    "minItems": 0,
                     "items": {
                         "$ref": "#/definitions/entities.Metric"
                     }
@@ -1230,13 +1238,21 @@ const docTemplate = `{
                     }
                 },
                 "streamId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1
                 },
                 "streamType": {
-                    "type": "integer"
+                    "maximum": 2,
+                    "minimum": 0,
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entities.StreamType"
+                        }
+                    ]
                 },
                 "updateFrequency": {
-                    "type": "number"
+                    "type": "number",
+                    "minimum": 0
                 },
                 "upperThreshold": {
                     "type": "number"
@@ -1245,6 +1261,9 @@ const docTemplate = `{
         },
         "dtos.ConfiguredStreamCreate": {
             "type": "object",
+            "required": [
+                "streamId"
+            ],
             "properties": {
                 "calibrationId": {
                     "type": "integer"
@@ -1257,6 +1276,8 @@ const docTemplate = `{
                 },
                 "metrics": {
                     "type": "array",
+                    "maxItems": 4,
+                    "minItems": 0,
                     "items": {
                         "$ref": "#/definitions/entities.Metric"
                     }
@@ -1271,13 +1292,20 @@ const docTemplate = `{
                     }
                 },
                 "streamId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1
                 },
                 "streamType": {
-                    "type": "integer"
+                    "maximum": 2,
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entities.StreamType"
+                        }
+                    ]
                 },
                 "updateFrequency": {
-                    "type": "number"
+                    "type": "number",
+                    "minimum": 0
                 },
                 "upperThreshold": {
                     "type": "number"
@@ -1287,14 +1315,17 @@ const docTemplate = `{
         "dtos.CreateConfiguration": {
             "type": "object",
             "required": [
-                "name"
+                "name",
+                "nodes"
             ],
             "properties": {
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                 },
                 "nodes": {
                     "type": "array",
+                    "minItems": 1,
                     "items": {
                         "$ref": "#/definitions/dtos.CreateNode"
                     }
@@ -1306,15 +1337,21 @@ const docTemplate = `{
         },
         "dtos.CreateNode": {
             "type": "object",
+            "required": [
+                "configuredStreams",
+                "name"
+            ],
             "properties": {
                 "configuredStreams": {
                     "type": "array",
+                    "minItems": 1,
                     "items": {
                         "$ref": "#/definitions/dtos.ConfiguredStreamCreate"
                     }
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                 }
             }
         },
@@ -1415,9 +1452,14 @@ const docTemplate = `{
         },
         "dtos.Node": {
             "type": "object",
+            "required": [
+                "configuredStreams",
+                "name"
+            ],
             "properties": {
                 "configuredStreams": {
                     "type": "array",
+                    "minItems": 1,
                     "items": {
                         "$ref": "#/definitions/dtos.ConfiguredStream"
                     }
@@ -1426,7 +1468,8 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                 }
             }
         },
