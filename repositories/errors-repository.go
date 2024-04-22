@@ -72,6 +72,8 @@ func (e errorsRepository) GetErrorsPerDay(timeStart time.Time, timeEnd time.Time
 		"detected_date >= ? AND detected_date <= ?", timeStart, timeEnd,
 	).Where(
 		"configured_streams.configuration_id = ?", configId,
+	).Where(
+		"configured_streams.deleted = false",
 	).Group(
 		"DATE(detected_errors.detected_date)",
 	).Group(
@@ -96,6 +98,8 @@ func (e errorsRepository) GetErrorIndicators(timeStart time.Time, timeEnd time.T
 		"JOIN configured_streams ON configured_streams.configured_stream_id=configured_streams_errors.configured_stream_configured_stream_id",
 	).Where(
 		"configured_streams.configuration_id = ?", configId,
+	).Where(
+		"configured_streams.deleted = false",
 	).Where(
 		"detected_date >= ? AND detected_date <= ?", timeStart, timeEnd,
 	).Group(
@@ -129,6 +133,8 @@ func (e errorsRepository) GetRelatedStreamsToError(parameters *dtos.QueryParamet
 		"JOIN stations ON stations.station_id = streams.station_id",
 	).Where(
 		"configured_streams.configuration_id = ?", configurationId,
+	).Where(
+		"configured_streams.deleted = false",
 	).Where(
 		"detected_errors.error_type = ?", errorId,
 	).Where(

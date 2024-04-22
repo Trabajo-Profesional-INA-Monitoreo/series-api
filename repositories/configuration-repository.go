@@ -11,7 +11,7 @@ type ConfigurationRepository interface {
 	Create(configuration *entities.Configuration) error
 	GetAllConfigurations() []dtos.AllConfigurations
 	GetConfigurationById(id uint64) *dtos.Configuration
-	Delete(id string)
+	Delete(id uint64)
 	Update(configuration *entities.Configuration) error
 }
 
@@ -24,7 +24,7 @@ func (c configurationRepository) Update(configuration *entities.Configuration) e
 	return result.Error
 }
 
-func (c configurationRepository) Delete(id string) {
+func (c configurationRepository) Delete(id uint64) {
 	c.connection.Model(&entities.Configuration{}).Where("configuration_id = ?", id).Update("deleted", true)
 }
 

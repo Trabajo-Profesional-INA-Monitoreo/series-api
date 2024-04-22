@@ -27,13 +27,17 @@ type configuredStreamsRepository struct {
 }
 
 func (db configuredStreamsRepository) MarkAsDeletedOldConfiguredStreams(configId uint64, newConfigStreamIds []uint64) {
-	db.connection.Model(
+	tx := db.connection.Model(
 		&entities.ConfiguredStream{},
 	).Where(
 		"configured_streams.configuration_id = ?", configId,
-	).Where(
-		"configured_streams.configured_stream_id NOT IN ?", newConfigStreamIds,
-	).Update("deleted", true)
+	)
+	if newConfigStreamIds != nil && len(newConfigStreamIds) != 0 {
+		tx = tx.Where(
+			"configured_streams.configured_stream_id NOT IN ?", newConfigStreamIds,
+		)
+	}
+	tx.Update("deleted", true)
 }
 
 func NewConfiguredStreamsRepository(connection *gorm.DB) ConfiguredStreamsRepository {

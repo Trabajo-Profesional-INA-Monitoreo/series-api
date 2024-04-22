@@ -232,6 +232,13 @@ definitions:
       name:
         type: string
     type: object
+  dtos.Redundancies:
+    properties:
+      redundancies:
+        items:
+          type: integer
+        type: array
+    type: object
   dtos.StationFilter:
     properties:
       id:
@@ -371,6 +378,13 @@ definitions:
       totalStreams:
         type: integer
       totalStreamsWithNull:
+        type: integer
+    type: object
+  dtos.TotalStreamsWithObservedOutlier:
+    properties:
+      totalStreams:
+        type: integer
+      totalStreamsWithObservedOutlier:
         type: integer
     type: object
   dtos.VariableFilter:
@@ -513,7 +527,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -532,7 +546,7 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       produces:
       - application/json
       responses:
@@ -815,6 +829,35 @@ paths:
           schema:
             $ref: '#/definitions/dtos.TotalStreamsWithNullValues'
       summary: Endpoint para obtener la cantidad de series con valores nulos
+      tags:
+      - Inputs
+  /inputs/series-fuera-umbral:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.TotalStreamsWithObservedOutlier'
+      summary: Endpoint para obtener la cantidad de series con valores fuera de los
+        umbrales
       tags:
       - Inputs
   /series:
@@ -1105,6 +1148,29 @@ paths:
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los valores de una serie pronosticadas por id
+      tags:
+      - Series
+  /series/redundancias/{configured_stream_id}:
+    get:
+      parameters:
+      - description: Id de la serie configurada
+        in: path
+        name: configured_stream_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.Redundancies'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los ids de las redundancias de una serie configurada
+        por id
       tags:
       - Series
 swagger: "2.0"

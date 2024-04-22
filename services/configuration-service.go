@@ -14,7 +14,7 @@ type ConfigurationService interface {
 	GetAllConfigurations() []dtos.AllConfigurations
 	GetConfigurationById(id uint64) *dtos.Configuration
 	CreateConfiguration(configuration dtos.CreateConfiguration) error
-	DeleteConfiguration(id string)
+	DeleteConfiguration(id uint64)
 	ModifyConfiguration(configuration dtos.Configuration) error
 }
 
@@ -150,8 +150,10 @@ func (c configurationService) ModifyConfiguration(configuration dtos.Configurati
 
 }
 
-func (c configurationService) DeleteConfiguration(id string) {
+func (c configurationService) DeleteConfiguration(id uint64) {
 	c.configurationRepository.Delete(id)
+	c.nodeRepository.MarkAsDeletedOldNodes(id, nil)
+	c.configuratedStreamRepository.MarkAsDeletedOldConfiguredStreams(id, nil)
 }
 
 func (c configurationService) CreateConfiguration(configuration dtos.CreateConfiguration) error {

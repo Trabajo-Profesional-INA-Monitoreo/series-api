@@ -20,13 +20,17 @@ type nodeRepository struct {
 }
 
 func (n nodeRepository) MarkAsDeletedOldNodes(configId uint64, newNodeIds []uint64) {
-	n.connection.Model(
+	tx := n.connection.Model(
 		&entities.Node{},
 	).Where(
 		"nodes.configuration_id = ?", configId,
-	).Where(
-		"nodes.node_id NOT IN ?", newNodeIds,
-	).Update("deleted", true)
+	)
+	if newNodeIds != nil && len(newNodeIds) != 0 {
+		tx = tx.Where(
+			"nodes.node_id NOT IN ?", newNodeIds,
+		)
+	}
+	tx.Update("deleted", true)
 }
 
 func (n nodeRepository) GetStreamsPerNodeById(configId string) []*dtos.StreamsPerNode {
@@ -42,6 +46,8 @@ func (n nodeRepository) GetStreamsPerNodeById(configId string) []*dtos.StreamsPe
 		"JOIN configured_streams ON configured_streams.node_id = nodes.node_id",
 	).Where(
 		"nodes.configuration_id = ?", configId,
+	).Where(
+		"configured_streams.deleted = false",
 	).Group(
 		"nodes.name, nodes.node_id",
 	).Scan(&nodes)

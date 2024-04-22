@@ -128,7 +128,7 @@ const docTemplate = `{
                 "summary": "Endpoint para obtener una configuracion por id",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Id de la configuracion",
                         "name": "id",
                         "in": "path",
@@ -160,7 +160,7 @@ const docTemplate = `{
                 "summary": "Endpoint para eliminar una configuracion por id",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Id de la configuracion",
                         "name": "id",
                         "in": "path",
@@ -587,6 +587,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/inputs/series-fuera-umbral": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inputs"
+                ],
+                "summary": "Endpoint para obtener la cantidad de series con valores fuera de los umbrales",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.TotalStreamsWithObservedOutlier"
+                        }
+                    }
+                }
+            }
+        },
         "/series": {
             "get": {
                 "produces": [
@@ -942,6 +984,40 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.CalibratedStreamsDataResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/series/redundancias/{configured_stream_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Series"
+                ],
+                "summary": "Endpoint para obtener los ids de las redundancias de una serie configurada por id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Id de la serie configurada",
+                        "name": "configured_stream_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.Redundancies"
                         }
                     },
                     "400": {
@@ -1382,6 +1458,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.Redundancies": {
+            "type": "object",
+            "properties": {
+                "redundancies": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "dtos.StationFilter": {
             "type": "object",
             "properties": {
@@ -1595,6 +1682,17 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "totalStreamsWithNull": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.TotalStreamsWithObservedOutlier": {
+            "type": "object",
+            "properties": {
+                "totalStreams": {
+                    "type": "integer"
+                },
+                "totalStreamsWithObservedOutlier": {
                     "type": "integer"
                 }
             }

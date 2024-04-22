@@ -57,6 +57,8 @@ func (db *streamsRepository) GetStations(configId uint64) *[]*dtos.StreamsPerSta
 		"JOIN configured_streams ON configured_streams.stream_id = streams.stream_id",
 	).Where(
 		"configured_streams.configuration_id = ?", configId,
+	).Where(
+		"configured_streams.deleted = false",
 	).Group(
 		"stations.name, stations.station_id",
 	).Scan(&stations)
@@ -85,6 +87,8 @@ func (db *streamsRepository) GetErrorsOfStations(configId uint64, timeStart time
 		"configured_streams.configuration_id = ?", configId,
 	).Where(
 		"detected_errors.detected_date >= ? AND detected_errors.detected_date <= ?", timeStart, timeEnd,
+	).Where(
+		"configured_streams.deleted = false",
 	).Group("streams.station_id").Scan(&errorsPerStation)
 
 	if tx.Error != nil {
@@ -110,6 +114,8 @@ func (db *streamsRepository) GetErrorsOfNodes(configId uint64, timeStart time.Ti
 		"configured_streams.configuration_id = ?", configId,
 	).Where(
 		"detected_errors.detected_date >= ? AND detected_errors.detected_date <= ?", timeStart, timeEnd,
+	).Where(
+		"configured_streams.deleted = false",
 	).Group("configured_streams.node_id").Scan(&errorsPerNode)
 
 	if tx.Error != nil {
@@ -127,6 +133,8 @@ func (db *streamsRepository) GetTotalStreams(configurationId uint64) int {
 		"JOIN configured_streams ON configured_streams.stream_id = streams.stream_id",
 	).Where(
 		"configured_streams.configuration_id = ?", configurationId,
+	).Where(
+		"configured_streams.deleted = false",
 	).Find(&count)
 	return int(count)
 }
@@ -139,6 +147,8 @@ func (db *streamsRepository) GetTotalStations(configurationId uint64) int {
 		"JOIN configured_streams ON configured_streams.stream_id = streams.stream_id",
 	).Where(
 		"configured_streams.configuration_id = ?", configurationId,
+	).Where(
+		"configured_streams.deleted = false",
 	).Group("streams.station_id").Find(&count)
 	return int(count)
 }
@@ -171,6 +181,8 @@ func (db *streamsRepository) GetTotalStreamsByError(configId uint64, timeStart t
 		"detected_errors.detected_date >= ? AND detected_errors.detected_date <= ?", timeStart, timeEnd,
 	).Where(
 		"streams.stream_type = ?", entities.Observed,
+	).Where(
+		"configured_streams.deleted = false",
 	).Find(&count)
 	return int(count)
 }
@@ -257,6 +269,8 @@ func (db *streamsRepository) GetStreamCards(parameters dtos.QueryParameters) (*d
 		"JOIN variables ON variables.variable_id=streams.variable_id",
 	).Where(
 		"configured_streams.configuration_id = ?", configId,
+	).Where(
+		"configured_streams.deleted = false",
 	)
 
 	var totalElements int
@@ -266,7 +280,11 @@ func (db *streamsRepository) GetStreamCards(parameters dtos.QueryParameters) (*d
 		"count(configured_streams.configured_stream_id)",
 	).Joins(
 		"JOIN streams ON configured_streams.stream_id=streams.stream_id",
-	).Where("configured_streams.configuration_id = ?", configId)
+	).Where(
+		"configured_streams.configuration_id = ?", configId,
+	).Where(
+		"configured_streams.deleted = false",
+	)
 
 	if streamId != nil {
 		tx.Where("streams.stream_id = ?", streamId)
@@ -320,6 +338,8 @@ func (db *streamsRepository) GetStreamsForOutputMetrics(configId uint64) ([]dtos
 		"JOIN stations ON stations.station_id=streams.station_id",
 	).Where(
 		"configured_streams.configuration_id = ?", configId,
+	).Where(
+		"configured_streams.deleted = false",
 	).Where(
 		"streams.variable_id = ?", waterLevelVariable, // TODO validar
 	).Where(
