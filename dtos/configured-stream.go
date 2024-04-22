@@ -10,7 +10,7 @@ type ConfiguredStream struct {
 	CheckErrors             bool                `gorm:"column:check_errors"`
 	UpperThreshold          float64             `gorm:"column:normal_upper_threshold"`
 	LowerThreshold          float64             `binding:"ltecsfield=UpperThreshold" gorm:"column:normal_lower_threshold"`
-	CalibrationId           uint64              `binding:"excluded_if=StreamType 0" gorm:"column:calibration_id"`
+	CalibrationId           uint64              `binding:"excluded_unless=StreamType 1" gorm:"column:calibration_id"`
 	RedundanciesIds         *[]uint64           `gorm:"-"`
 	Metrics                 *[]entities.Metric  `binding:"omitempty,gte=0,lte=4,dive,gte=0,lte=4" gorm:"-"`
 	ObservedRelatedStreamId *uint64             `binding:"excluded_unless=StreamType 1"`
@@ -23,7 +23,7 @@ type ConfiguredStreamCreate struct {
 	CheckErrors             bool                `gorm:"column:check_errors"`
 	UpperThreshold          float64             `gorm:"column:normal_upper_threshold"`
 	LowerThreshold          float64             `binding:"ltecsfield=UpperThreshold" gorm:"column:normal_lower_threshold"`
-	CalibrationId           uint64              `binding:"excluded_if=StreamType 0" gorm:"column:calibration_id"`
+	CalibrationId           uint64              `binding:"excluded_unless=StreamType 1" gorm:"column:calibration_id"`
 	RedundanciesIds         []uint64            `gorm:"-"`
 	Metrics                 []entities.Metric   `binding:"omitempty,gte=0,lte=4,dive,gte=0,lte=4" gorm:"-"`
 	ObservedRelatedStreamId *uint64             `binding:"excluded_unless=StreamType 1"`
