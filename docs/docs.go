@@ -1222,8 +1222,9 @@ const docTemplate = `{
                 },
                 "metrics": {
                     "type": "array",
-                    "maxItems": 4,
+                    "maxItems": 5,
                     "minItems": 0,
+                    "uniqueItems": true,
                     "items": {
                         "$ref": "#/definitions/entities.Metric"
                     }
@@ -1276,8 +1277,9 @@ const docTemplate = `{
                 },
                 "metrics": {
                     "type": "array",
-                    "maxItems": 4,
+                    "maxItems": 5,
                     "minItems": 0,
+                    "uniqueItems": true,
                     "items": {
                         "$ref": "#/definitions/entities.Metric"
                     }

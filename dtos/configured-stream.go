@@ -12,7 +12,7 @@ type ConfiguredStream struct {
 	LowerThreshold          float64             `binding:"ltecsfield=UpperThreshold" gorm:"column:normal_lower_threshold"`
 	CalibrationId           uint64              `binding:"excluded_unless=StreamType 1" gorm:"column:calibration_id"`
 	RedundanciesIds         *[]uint64           `gorm:"-"`
-	Metrics                 *[]entities.Metric  `binding:"omitempty,gte=0,lte=4,dive,gte=0,lte=4" gorm:"-"`
+	Metrics                 *[]entities.Metric  `binding:"omitempty,gte=0,lte=5,unique,dive,gte=0,lte=4" gorm:"-"`
 	ObservedRelatedStreamId *uint64             `binding:"excluded_unless=StreamType 1"`
 }
 
@@ -25,6 +25,6 @@ type ConfiguredStreamCreate struct {
 	LowerThreshold          float64             `binding:"ltecsfield=UpperThreshold" gorm:"column:normal_lower_threshold"`
 	CalibrationId           uint64              `binding:"excluded_unless=StreamType 1" gorm:"column:calibration_id"`
 	RedundanciesIds         []uint64            `gorm:"-"`
-	Metrics                 []entities.Metric   `binding:"omitempty,gte=0,lte=4,dive,gte=0,lte=4" gorm:"-"`
+	Metrics                 []entities.Metric   `binding:"omitempty,gte=0,lte=5,unique,dive,gte=0,lte=4" gorm:"-"`
 	ObservedRelatedStreamId *uint64             `binding:"excluded_unless=StreamType 1"`
 }

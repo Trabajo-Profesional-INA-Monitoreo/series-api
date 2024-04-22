@@ -80,9 +80,10 @@ definitions:
       metrics:
         items:
           $ref: '#/definitions/entities.Metric'
-        maxItems: 4
+        maxItems: 5
         minItems: 0
         type: array
+        uniqueItems: true
       observedRelatedStreamId:
         type: integer
       redundanciesIds:
@@ -116,9 +117,10 @@ definitions:
       metrics:
         items:
           $ref: '#/definitions/entities.Metric'
-        maxItems: 4
+        maxItems: 5
         minItems: 0
         type: array
+        uniqueItems: true
       observedRelatedStreamId:
         type: integer
       redundanciesIds:
