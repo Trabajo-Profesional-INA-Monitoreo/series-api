@@ -7,6 +7,7 @@ import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 	"math"
 	"strconv"
 	"time"
@@ -24,18 +25,21 @@ type faultDetectorService struct {
 	configuredStreamsRepository repositories.ConfiguredStreamsRepository
 	errorsRepository            repositories.ErrorsRepository
 	inaApiClient                clients.InaAPiClient
+	detectionMaxThreads         int
 }
 
 func NewFaultDetectorService(streamsRepository repositories.StreamRepository,
 	configuredStreamsRepository repositories.ConfiguredStreamsRepository,
 	errorsRepository repositories.ErrorsRepository,
 	inaApiClient clients.InaAPiClient,
+	detectionMaxThreads int,
 ) FaultDetector {
 	return &faultDetectorService{
 		streamsRepository:           streamsRepository,
 		configuredStreamsRepository: configuredStreamsRepository,
 		errorsRepository:            errorsRepository,
 		inaApiClient:                inaApiClient,
+		detectionMaxThreads:         detectionMaxThreads,
 	}
 }
 
@@ -273,16 +277,30 @@ func (f faultDetectorService) handleForecastedStream(stream entities.Stream) {
 	}
 }
 
+func (f faultDetectorService) handleStream(streamChannel chan entities.Stream) error {
+	stream := <-streamChannel
+	if stream.IsObserved() {
+		f.handleObservedStreams(stream)
+	} else if stream.IsForecasted() {
+		f.handleForecastedStream(stream)
+	}
+	return nil
+}
+
 func (f faultDetectorService) DetectFaults() {
 
-	log.Debugf("FaultsDetector | Performing fault checks...")
+	log.Infof("FaultsDetector | Performing fault checks...")
+	var goroutinePool errgroup.Group
+	goroutinePool.SetLimit(f.detectionMaxThreads)
 	streams := f.streamsRepository.GetStreams()
 	for _, stream := range streams {
-		if stream.IsObserved() {
-			f.handleObservedStreams(stream)
-		} else if stream.IsForecasted() {
-			f.handleForecastedStream(stream)
-		}
+		streamChannel := make(chan entities.Stream, 1)
+		streamChannel <- stream
+		goroutinePool.Go(func() error { return f.handleStream(streamChannel) })
 	}
-	log.Debugf("FaultsDetector | Fault check done")
+	err := goroutinePool.Wait()
+	if err != nil {
+		log.Errorf("FaultsDetector | Error waiting for all goroutines to finish %v", err)
+	}
+	log.Infof("FaultsDetector | Fault check done")
 }

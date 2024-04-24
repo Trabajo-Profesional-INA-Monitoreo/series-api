@@ -16,6 +16,7 @@ type ApiConfig struct {
 	ForecastMaxWaitingTimeHours float64
 	SecurityEnabled             bool
 	KeycloakConfig              *KeycloakConfiguration
+	DetectionMaxThreads         int
 }
 
 // initEnv Initializes the configuration properties from a config file and environment
@@ -35,6 +36,7 @@ func initEnv() (*viper.Viper, error) {
 	_ = v.BindEnv("server", "port")
 	_ = v.BindEnv("datasource", "connection")
 	_ = v.BindEnv("faults-detector", "cron")
+	_ = v.BindEnv("faults-detector", "max-threads")
 	_ = v.BindEnv("ina-client", "token")
 	_ = v.BindEnv("ina-client", "base-url")
 	_ = v.BindEnv("security", "enabled")
@@ -65,19 +67,21 @@ func GetConfig() *ApiConfig {
 	serverPort := getEnvString(env, "server.port")
 	dbConnection := getEnvString(env, "datasource.connection")
 	faultsDetectorCron := getEnvString(env, "faults-detector.cron")
+	detectionMaxThreads := getEnvUint(env, "faults-detector.max-threads")
 	inaBaseUrl := getEnvString(env, "ina-client.base-url")
 	inaToken := getEnvString(env, "ina-client.token")
 	securityEnabled := getEnvBool(env, "security.enabled")
 	kcConfig := getKeycloakConfig(env, securityEnabled)
 
 	return &ApiConfig{
-		LogLevel:        logLevel,
-		ServerPort:      serverPort,
-		DbUrl:           dbConnection,
-		FaultCronTime:   faultsDetectorCron,
-		InaBaseUrl:      inaBaseUrl,
-		InaToken:        inaToken,
-		SecurityEnabled: securityEnabled,
-		KeycloakConfig:  kcConfig,
+		LogLevel:            logLevel,
+		ServerPort:          serverPort,
+		DbUrl:               dbConnection,
+		FaultCronTime:       faultsDetectorCron,
+		InaBaseUrl:          inaBaseUrl,
+		InaToken:            inaToken,
+		SecurityEnabled:     securityEnabled,
+		KeycloakConfig:      kcConfig,
+		DetectionMaxThreads: int(detectionMaxThreads),
 	}
 }

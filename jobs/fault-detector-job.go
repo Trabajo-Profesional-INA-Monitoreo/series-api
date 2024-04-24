@@ -14,6 +14,7 @@ func SetUpJobs(repositories *config.Repositories, apiConfig *config.ApiConfig) {
 		repositories.ConfiguredStreamRepository,
 		repositories.ErrorsRepository,
 		clients.NewInaApiClientImpl(apiConfig),
+		apiConfig.DetectionMaxThreads,
 	)
 	entryId, err := c.AddFunc(apiConfig.FaultCronTime, faultDetector.DetectFaults)
 	if err != nil {

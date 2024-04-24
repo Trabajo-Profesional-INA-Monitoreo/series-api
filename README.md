@@ -15,6 +15,9 @@ El `Makefile` tiene las acciones:
 Se deben de configurar las siguientes propiedades:
 
 ```yaml
+log:
+  level: "info" # error, info, debug
+  
 server:
   port: 1234 # puerto de la aplicacion
 
@@ -23,8 +26,14 @@ datasource:
 
 faults-detector:
   cron: "{CRON JOB PARA CHEQUEO DE FALLAS}" # Cada cuanto tiempo se va a realizar el chequeo de errores
+  max-threads: 12 # Cantidad de hilos para la deteccion de los errores
 
 security.enabled: true # Habilita el chequeo del token
+
+ina-client:
+  base-url: "" # URL de la API del INA, incluir en el path /a6
+  token: "" # Token para poder autenticarse
+
 
 keycloak:
   client: "monitoreo-web"
