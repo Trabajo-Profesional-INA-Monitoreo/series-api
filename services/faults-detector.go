@@ -104,7 +104,7 @@ func (f faultDetectorService) handleObservedValues(data []responses.ObservedData
 						DetectedDate:     time.Now(),
 						RequestId:        reqId,
 						ErrorType:        entities.ObservedOutlier,
-						ExtraInfo:        fmt.Sprintf("Valor %v - Timestamp %v", observed.Value, observed.TimeStart),
+						ExtraInfo:        fmt.Sprintf("Valor %v - Timestamp %v", *observed.Value, observed.TimeStart),
 					}
 					f.errorsRepository.Create(detected)
 				} else if !contains(detectedError.ConfiguredStream, configuredStream) {
