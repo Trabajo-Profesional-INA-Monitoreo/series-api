@@ -139,7 +139,7 @@ func (e errorsRepository) GetRelatedStreamsToError(parameters *dtos.QueryParamet
 		"detected_errors.error_type = ?", errorId,
 	).Where(
 		"detected_errors.detected_date >= ? AND detected_errors.detected_date <= ?", timeStart, timeEnd,
-	).Find(&results)
+	).Group("streams.stream_id").Group("streams.station_id").Group("stations.name").Find(&results)
 	if tx.Error != nil {
 		log.Errorf("Error executing GetRelatedStreamsToError query: %v", tx.Error)
 		return nil, tx.Error
