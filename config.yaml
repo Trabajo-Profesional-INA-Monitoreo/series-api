@@ -10,6 +10,7 @@ datasource:
 
 faults-detector:
   cron: "@every 1h"
+  max-threads: 12
 
 ina-client:
   base-url: "https://alerta.ina.gob.ar/a6"
