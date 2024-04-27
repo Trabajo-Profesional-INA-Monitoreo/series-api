@@ -11,8 +11,9 @@ type ConfigurationRepository interface {
 	Create(configuration *entities.Configuration) error
 	GetAllConfigurations() []dtos.AllConfigurations
 	GetConfigurationById(id uint64) *dtos.Configuration
-	Delete(id uint64)
+	MarkAsDeleted(id uint64)
 	Update(configuration *entities.Configuration) error
+	DeleteById(id uint64)
 }
 
 type configurationRepository struct {
@@ -24,7 +25,11 @@ func (c configurationRepository) Update(configuration *entities.Configuration) e
 	return result.Error
 }
 
-func (c configurationRepository) Delete(id uint64) {
+func (c configurationRepository) DeleteById(id uint64) {
+	c.connection.Where("deleted = true").Where("configuration_id = ?", id).Delete(&entities.Configuration{})
+}
+
+func (c configurationRepository) MarkAsDeleted(id uint64) {
 	c.connection.Model(&entities.Configuration{}).Where("configuration_id = ?", id).Update("deleted", true)
 }
 

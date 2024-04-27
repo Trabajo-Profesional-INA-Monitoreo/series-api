@@ -27,6 +27,14 @@ type configurationService struct {
 	redundancyRepository         repositories.RedundancyRepository
 }
 
+func (c configurationService) deleteFromDbConfiguration(configId uint64) {
+
+	c.configuratedStreamRepository.DeleteByConfig(configId)
+	c.nodeRepository.DeleteByConfig(configId)
+	c.configurationRepository.DeleteById(configId)
+
+}
+
 func (c configurationService) ModifyConfiguration(configuration dtos.Configuration) error {
 	log.Debugf("Updating configuration %v", configuration.Id)
 	newConfiguration := converters.ConvertDtoToConfiguration(configuration)
@@ -151,9 +159,10 @@ func (c configurationService) ModifyConfiguration(configuration dtos.Configurati
 }
 
 func (c configurationService) DeleteConfiguration(id uint64) {
-	c.configurationRepository.Delete(id)
+	c.configurationRepository.MarkAsDeleted(id)
 	c.nodeRepository.MarkAsDeletedOldNodes(id, nil)
 	c.configuratedStreamRepository.MarkAsDeletedOldConfiguredStreams(id, nil)
+	go c.deleteFromDbConfiguration(id)
 }
 
 func (c configurationService) CreateConfiguration(configuration dtos.CreateConfiguration) error {

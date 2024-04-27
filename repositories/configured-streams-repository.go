@@ -20,10 +20,38 @@ type ConfiguredStreamsRepository interface {
 	Update(e *entities.ConfiguredStream) error
 	CountErrorOfConfigurations(ids []uint64, parameters *dtos.QueryParameters) ([]dtos.ErrorsPerConfigStream, error)
 	MarkAsDeletedOldConfiguredStreams(configId uint64, newConfigStreamIds []uint64)
+	DeleteByConfig(configId uint64)
 }
 
 type configuredStreamsRepository struct {
 	connection *gorm.DB
+}
+
+func (db configuredStreamsRepository) DeleteByConfig(configId uint64) {
+	db.connection.Where(
+		"configured_metrics.configured_stream_id IN "+
+			"(SELECT configured_stream_id FROM configured_streams "+
+			"WHERE configured_streams.configuration_id = ? "+
+			"AND configured_streams.deleted = true)", configId,
+	).Delete(&entities.ConfiguredMetric{})
+
+	db.connection.Where(
+		"redundancies.configured_stream_id IN "+
+			"(SELECT configured_stream_id FROM configured_streams "+
+			"WHERE configured_streams.configuration_id = ? "+
+			"AND configured_streams.deleted = true)", configId,
+	).Delete(&entities.Redundancy{})
+
+	db.connection.Exec("DELETE FROM configured_streams_errors WHERE "+
+		"configured_streams_errors.configured_stream_configured_stream_id IN "+
+		"(SELECT configured_stream_id FROM configured_streams "+
+		"WHERE configured_streams.configuration_id = ? "+
+		"AND configured_streams.deleted = true)", configId,
+	)
+
+	db.connection.Where(
+		"configured_streams.deleted = true",
+	).Where("configured_streams.configuration_id = ?", configId).Delete(&entities.ConfiguredStream{})
 }
 
 func (db configuredStreamsRepository) MarkAsDeletedOldConfiguredStreams(configId uint64, newConfigStreamIds []uint64) {

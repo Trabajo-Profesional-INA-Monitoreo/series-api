@@ -13,10 +13,15 @@ type NodeRepository interface {
 	GetNodesById(id uint64) []*dtos.Node
 	GetStreamsPerNodeById(formatUint string) []*dtos.StreamsPerNode
 	MarkAsDeletedOldNodes(id uint64, ids []uint64)
+	DeleteByConfig(configId uint64)
 }
 
 type nodeRepository struct {
 	connection *gorm.DB
+}
+
+func (n nodeRepository) DeleteByConfig(configId uint64) {
+	n.connection.Where("nodes.configuration_id = ?", configId).Where("nodes.deleted = true").Delete(&entities.Node{})
 }
 
 func (n nodeRepository) MarkAsDeletedOldNodes(configId uint64, newNodeIds []uint64) {
