@@ -335,6 +335,10 @@ definitions:
         items:
           $ref: '#/definitions/dtos.MetricCard'
         type: array
+      normalLowerThreshold:
+        type: number
+      normalUpperThreshold:
+        type: number
       observedRelatedStreamId:
         type: integer
       owner:

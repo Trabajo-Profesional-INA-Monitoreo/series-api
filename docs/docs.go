@@ -1607,6 +1607,12 @@ const docTemplate = `{
                         "$ref": "#/definitions/dtos.MetricCard"
                     }
                 },
+                "normalLowerThreshold": {
+                    "type": "number"
+                },
+                "normalUpperThreshold": {
+                    "type": "number"
+                },
                 "observedRelatedStreamId": {
                     "type": "integer"
                 },

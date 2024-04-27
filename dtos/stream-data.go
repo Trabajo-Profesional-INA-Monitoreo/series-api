@@ -23,6 +23,8 @@ type StreamData struct {
 	CalibrationId           uint64
 	ObservedRelatedStreamId *uint64
 	LastUpdate              *time.Time
+	NormalUpperThreshold    float64
+	NormalLowerThreshold    float64
 }
 
 func NewStreamData(stream entities.Stream, configured entities.ConfiguredStream) *StreamData {
@@ -42,5 +44,7 @@ func NewStreamData(stream entities.Stream, configured entities.ConfiguredStream)
 		UpdateFrequency:         configured.UpdateFrequency,
 		CalibrationId:           configured.CalibrationId,
 		ObservedRelatedStreamId: configured.ObservedRelatedStreamId,
+		NormalUpperThreshold:    configured.NormalUpperThreshold,
+		NormalLowerThreshold:    configured.NormalLowerThreshold,
 	}
 }
