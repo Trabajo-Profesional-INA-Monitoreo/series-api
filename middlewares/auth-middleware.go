@@ -28,7 +28,10 @@ func IsAValidToken(apiConfig *config.ApiConfig) gin.HandlerFunc {
 	}
 }
 
-func IsAnAdminToken(apiConfig config.ApiConfig) gin.HandlerFunc {
+func IsAnAdminToken(apiConfig *config.ApiConfig) gin.HandlerFunc {
+	if !apiConfig.SecurityEnabled {
+		return func(c *gin.Context) { c.Next() }
+	}
 	authService := services.NewKeycloakAuthService(apiConfig.KeycloakConfig)
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
