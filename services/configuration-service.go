@@ -46,7 +46,9 @@ func (c configurationService) ModifyConfiguration(configuration dtos.Configurati
 	log.Debugf("Updating nodes for configuration %v", configuration.Id)
 	var updatedNodesIds []uint64
 	for _, node := range configuration.Nodes {
-		updatedNodesIds = append(updatedNodesIds, node.Id)
+		if node.Id != 0 {
+			updatedNodesIds = append(updatedNodesIds, node.Id)
+		}
 	}
 	c.nodeRepository.MarkAsDeletedOldNodes(configuration.Id, updatedNodesIds)
 
@@ -67,15 +69,19 @@ func (c configurationService) ModifyConfiguration(configuration dtos.Configurati
 			return err
 		}
 	}
-
 	nodes := configuration.Nodes
+	var updatedConfigStreamIds []uint64
 	for _, node := range nodes {
-		log.Debugf("Updating configured streams for node %v", node.Id)
-		var updatedConfigStreamIds []uint64
 		for _, configStream := range *node.ConfiguredStreams {
-			updatedConfigStreamIds = append(updatedConfigStreamIds, configStream.ConfiguredStreamId)
+			if configStream.ConfiguredStreamId != 0 {
+				updatedConfigStreamIds = append(updatedConfigStreamIds, configStream.ConfiguredStreamId)
+			}
 		}
-		c.configuratedStreamRepository.MarkAsDeletedOldConfiguredStreams(configuration.Id, updatedConfigStreamIds)
+	}
+	c.configuratedStreamRepository.MarkAsDeletedOldConfiguredStreams(configuration.Id, updatedConfigStreamIds)
+
+	for i, node := range nodes {
+		log.Debugf("Updating configured streams for node %v", node.Id)
 
 		for _, configuratedStream := range *node.ConfiguredStreams {
 
@@ -86,8 +92,13 @@ func (c configurationService) ModifyConfiguration(configuration dtos.Configurati
 				return err
 			}
 
+			if node.Id == 0 {
+				// The stream is in a new node
+				newConfiguratedStreams.NodeId = newNodes[i].NodeId
+			}
+
 			if configuratedStream.ConfiguredStreamId == 0 {
-				log.Debugf("Added a new configured stream in node %v", node.Id)
+				log.Debugf("Added a new configured stream in node %v", newConfiguratedStreams.NodeId)
 				configuredStreamId, err := c.configuratedStreamRepository.Create(&newConfiguratedStreams)
 				if err != nil {
 					return err
