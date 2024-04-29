@@ -2,7 +2,7 @@ version: '3.9'
 name: ina-series-api
 services:
   keycloak:
-    container_name: keycloak
+    container_name: series-api
     image: series-api:latest
     ports:
       - "8080:8080"
