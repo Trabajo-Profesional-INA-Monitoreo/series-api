@@ -11,9 +11,9 @@ RUN mkdir -p /build
 WORKDIR /build/
 COPY . .
 # CGO_ENABLED must be disabled to run go binary in Alpine
-RUN CGO_ENABLED=0 GOOS=linux go build -o bin/inputs-api inputs-api
+RUN CGO_ENABLED=0 GOOS=linux go build .
 
 
 FROM busybox:latest
-COPY --from=builder /build/bin/inputs-api /inputs-api
-ENTRYPOINT ["/inputs-api"]
+COPY --from=builder /build/series-api /series-api
+ENTRYPOINT ["/series-api"]
