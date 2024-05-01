@@ -79,13 +79,7 @@ func addMetricsCards(neededMetrics []entities.ConfiguredMetric, metricsValues *m
 		metricName := entities.MapMetricToString(metric.MetricId)
 		metricValue := 0.0
 		if metric.MetricId == entities.Mediana {
-			sort.Float64s(metricsValues.validValues)
-			middle := totalValidValues / 2
-			if totalValidValues%2 == 0 {
-				metricValue = (metricsValues.validValues[middle-1] + metricsValues.validValues[middle]) / 2
-			} else {
-				metricValue = metricsValues.validValues[middle]
-			}
+			metricValue = calculateMedian(metricsValues, totalValidValues)
 		} else if metric.MetricId == entities.Maximo {
 			metricValue = metricsValues.maxValue
 		} else if metric.MetricId == entities.Minimo {
@@ -100,6 +94,15 @@ func addMetricsCards(neededMetrics []entities.ConfiguredMetric, metricsValues *m
 	metrics = waterLevelCalculator.AddMetrics(metrics)
 	metrics = append(metrics, dtos.NewMetricCard(entities.MapMetricToString(entities.Observaciones), float64(totalValidValues)))
 	return &metrics
+}
+
+func calculateMedian(metricsValues *metricParameters, totalValidValues int) float64 {
+	sort.Float64s(metricsValues.validValues)
+	middle := totalValidValues / 2
+	if totalValidValues%2 == 0 {
+		return (metricsValues.validValues[middle-1] + metricsValues.validValues[middle]) / 2
+	}
+	return metricsValues.validValues[middle]
 }
 
 func getLevelsCountForAllStreams(behaviourStreams []dtos.BehaviourStream, timeStart time.Time, timeEnd time.Time, inaApiClient clients.InaAPiClient) *dtos.BehaviourStreamsResponse {
