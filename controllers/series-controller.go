@@ -10,9 +10,6 @@ import (
 	"net/http"
 )
 
-const DaysDefaultCured = 5
-const DaysDefaultObservated = 1
-
 type SeriesController interface {
 	GetStations(ctx *gin.Context)
 	GetCuredSerieById(ctx *gin.Context)
@@ -89,11 +86,11 @@ func (s seriesController) GetStations(ctx *gin.Context) {
 //	@Param          serie_id     path      int     true  "Id de la serie"
 //	@Success		200	{object} dtos.StreamsDataResponse
 //	@Failure        400  {object}  dtos.ErrorResponse
+//	@Failure        404  {object}  dtos.ErrorResponse
 //	@Router			/series/curadas/{serie_id} [get]
 func (s seriesController) GetCuredSerieById(ctx *gin.Context) {
-	id, userSentId := ctx.Params.Get("serie_id")
-	if !userSentId {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("Id was not send")))
+	id, done := getUintPathParam(ctx, "serie_id")
+	if done {
 		return
 	}
 	timeStart, timeEnd, done := getDates(ctx)
@@ -101,8 +98,15 @@ func (s seriesController) GetCuredSerieById(ctx *gin.Context) {
 		return
 	}
 
-	res := s.seriesService.GetCuredSerieById(id, timeStart, timeEnd)
-
+	res, err := s.seriesService.GetCuredSerieById(id, timeStart, timeEnd)
+	if errors.Is(err, &exceptions.NotFound{}) {
+		ctx.JSON(http.StatusNotFound, dtos.NewErrorResponse(err))
+		return
+	}
+	if errors.Is(err, &exceptions.BadRequest{}) {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(err))
+		return
+	}
 	ctx.JSON(http.StatusOK, res)
 }
 
@@ -116,11 +120,11 @@ func (s seriesController) GetCuredSerieById(ctx *gin.Context) {
 //	@Param          serie_id     path      int     true  "Id de la serie"
 //	@Success		200	{object} dtos.StreamsDataResponse
 //	@Failure        400  {object}  dtos.ErrorResponse
+//	@Failure        404  {object}  dtos.ErrorResponse
 //	@Router			/series/observadas/{serie_id} [get]
 func (s seriesController) GetObservatedSerieById(ctx *gin.Context) {
-	id, userSentId := ctx.Params.Get("serie_id")
-	if !userSentId {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("serie_id was not send")))
+	id, done := getUintPathParam(ctx, "serie_id")
+	if done {
 		return
 	}
 	timeStart, timeEnd, done := getDates(ctx)
@@ -128,8 +132,15 @@ func (s seriesController) GetObservatedSerieById(ctx *gin.Context) {
 		return
 	}
 
-	res := s.seriesService.GetObservatedSerieById(id, timeStart, timeEnd)
-
+	res, err := s.seriesService.GetObservatedSerieById(id, timeStart, timeEnd)
+	if errors.Is(err, &exceptions.NotFound{}) {
+		ctx.JSON(http.StatusNotFound, dtos.NewErrorResponse(err))
+		return
+	}
+	if errors.Is(err, &exceptions.BadRequest{}) {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(err))
+		return
+	}
 	ctx.JSON(http.StatusOK, res)
 }
 
@@ -142,18 +153,26 @@ func (s seriesController) GetObservatedSerieById(ctx *gin.Context) {
 //	@Param          serieId      query     int  true  "Id de la serie"  Format(string)
 //	@Success		200	{object} dtos.CalibratedStreamsDataResponse
 //	@Failure        400  {object}  dtos.ErrorResponse
+//	@Failure        404  {object}  dtos.ErrorResponse
 //	@Router			/series/pronosticadas/{calibrado_id} [get]
 func (s seriesController) GetPredictedSerieById(ctx *gin.Context) {
-	id, userSentId := ctx.Params.Get("calibrado_id")
-	if !userSentId {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(fmt.Errorf("calibrado_id was not sent")))
+	id, done := getUintPathParam(ctx, "calibrado_id")
+	if done {
 		return
 	}
 	streamId, done := getUintQueryParam(ctx, "serieId")
 	if done {
 		return
 	}
-	res := s.seriesService.GetPredictedSerieById(id, streamId)
+	res, err := s.seriesService.GetPredictedSerieById(id, streamId)
+	if errors.Is(err, &exceptions.NotFound{}) {
+		ctx.JSON(http.StatusNotFound, dtos.NewErrorResponse(err))
+		return
+	}
+	if errors.Is(err, &exceptions.BadRequest{}) {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(err))
+		return
+	}
 
 	ctx.JSON(http.StatusOK, res)
 }

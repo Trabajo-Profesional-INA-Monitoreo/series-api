@@ -817,6 +817,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dtos.ErrorResponse"
                         }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -949,6 +955,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dtos.ErrorResponse"
                         }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -988,6 +1000,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/dtos.ErrorResponse"
                         }

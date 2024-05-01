@@ -1070,6 +1070,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los valores de una serie curada por id
       tags:
       - Series
@@ -1158,6 +1162,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los valores de una serie observada por id
       tags:
       - Series
@@ -1184,6 +1192,10 @@ paths:
             $ref: '#/definitions/dtos.CalibratedStreamsDataResponse'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los valores de una serie pronosticadas por id

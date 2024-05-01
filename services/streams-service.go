@@ -16,9 +16,9 @@ import (
 
 type StreamService interface {
 	GetStations(time.Time, time.Time, uint64) dtos.StreamsPerStationResponse
-	GetCuredSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse
-	GetObservatedSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse
-	GetPredictedSerieById(id string, streamId uint64) dtos.CalibratedStreamsDataResponse
+	GetCuredSerieById(id uint64, start time.Time, end time.Time) (dtos.StreamsDataResponse, error)
+	GetObservatedSerieById(id uint64, start time.Time, end time.Time) (dtos.StreamsDataResponse, error)
+	GetPredictedSerieById(id uint64, streamId uint64) (dtos.CalibratedStreamsDataResponse, error)
 	GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error)
 	CreateStream(streamId uint64, streamType entities.StreamType) error
 	GetStreamCards(parameters *dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
@@ -68,30 +68,36 @@ func (s streamService) GetStations(timeStart time.Time, timeEnd time.Time, confi
 	return dtos.StreamsPerStationResponse{Stations: *stations}
 }
 
-func (s streamService) GetCuredSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse {
-	num, _ := strconv.ParseUint(id, 10, 64)
-	streams, _ := s.inaApiClient.GetObservedData(num, start, end)
+func (s streamService) GetCuredSerieById(id uint64, start time.Time, end time.Time) (dtos.StreamsDataResponse, error) {
+	streams, err := s.inaApiClient.GetObservedData(id, start, end)
+	if err != nil {
+		return dtos.StreamsDataResponse{}, err
+	}
 	var streamsData []dtos.StreamsData
 	for _, stream := range streams {
 		streamsData = append(streamsData, stream.ConvertToStreamData())
 	}
-	return dtos.StreamsDataResponse{Streams: streamsData}
+	return dtos.StreamsDataResponse{Streams: streamsData}, nil
 }
 
-func (s streamService) GetObservatedSerieById(id string, start time.Time, end time.Time) dtos.StreamsDataResponse {
-	num, _ := strconv.ParseUint(id, 10, 64)
-	streams, _ := s.inaApiClient.GetObservedData(num, start, end)
+func (s streamService) GetObservatedSerieById(id uint64, start time.Time, end time.Time) (dtos.StreamsDataResponse, error) {
+	streams, err := s.inaApiClient.GetObservedData(id, start, end)
+	if err != nil {
+		return dtos.StreamsDataResponse{}, err
+	}
 	var streamsData []dtos.StreamsData
 	for _, stream := range streams {
 		streamsData = append(streamsData, stream.ConvertToStreamData())
 	}
-	return dtos.StreamsDataResponse{Streams: streamsData}
+	return dtos.StreamsDataResponse{Streams: streamsData}, nil
 }
 
-func (s streamService) GetPredictedSerieById(id string, streamId uint64) dtos.CalibratedStreamsDataResponse {
-	num, _ := strconv.ParseUint(id, 10, 64)
-	streams, _ := s.inaApiClient.GetLastForecast(num)
-	return streams.ConvertToCalibratedStreamsDataResponse(streamId)
+func (s streamService) GetPredictedSerieById(id uint64, streamId uint64) (dtos.CalibratedStreamsDataResponse, error) {
+	streams, err := s.inaApiClient.GetLastForecast(id)
+	if err != nil {
+		return dtos.CalibratedStreamsDataResponse{}, err
+	}
+	return streams.ConvertToCalibratedStreamsDataResponse(streamId), nil
 }
 
 func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, configured entities.ConfiguredStream, timeStart time.Time, timeEnd time.Time) (*[]dtos.MetricCard, *time.Time) {
