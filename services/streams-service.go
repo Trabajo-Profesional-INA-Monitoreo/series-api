@@ -103,7 +103,8 @@ func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, co
 			log.Errorf("Could not get metrics with calibration id %v: %v", configured.CalibrationId, err)
 			return nil, nil
 		}
-		return getMetricsForForecastedStream(values, neededMetrics, waterLevelCalculator), &values.ForecastDate
+		forecast := values.GetForecastOfStream(stream.StreamId)
+		return getMetricsForForecastedStream(forecast, neededMetrics, waterLevelCalculator), &values.ForecastDate
 	}
 	lastUpdateResponse := make(chan *time.Time)
 	go func() {

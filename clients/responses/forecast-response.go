@@ -41,18 +41,13 @@ func (f LastForecast) GetForecastOfStream(streamId uint64) *Forecast {
 	return forecast
 }
 
-func (f LastForecast) GetMainForecast() []float64 {
-	for _, stream := range f.Streams {
-		if stream.Qualifier == "main" {
-			var values []float64
-			for _, forecast := range stream.Forecasts {
-				value, _ := strconv.ParseFloat(forecast[2], 64)
-				values = append(values, value)
-			}
-			return values
-		}
+func ConvertToFloats(forecast [][]string) []float64 {
+	var values []float64
+	for _, forecast := range forecast {
+		value, _ := strconv.ParseFloat(forecast[2], 64)
+		values = append(values, value)
 	}
-	return []float64{}
+	return values
 }
 
 func (f LastForecast) ConvertToCalibratedStreamsDataResponse(streamId uint64) dtos.CalibratedStreamsDataResponse {

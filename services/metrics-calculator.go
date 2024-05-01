@@ -10,14 +10,14 @@ import (
 	"time"
 )
 
-func getMetricsForForecastedStream(data *responses.LastForecast, neededMetrics []entities.ConfiguredMetric, waterLevelCalculator WaterLevelsCalculator) *[]dtos.MetricCard {
+func getMetricsForForecastedStream(data *responses.Forecast, neededMetrics []entities.ConfiguredMetric, waterLevelCalculator WaterLevelsCalculator) *[]dtos.MetricCard {
 
 	var metrics []dtos.MetricCard
 	setUpFirstValues := false
 	var minValue float64
 	var maxValue float64
 	sumOfValues := 0.0
-	validValues := data.GetMainForecast()
+	validValues := responses.ConvertToFloats(data.MainForecast.Forecasts)
 	totalValues := len(validValues)
 	for _, value := range validValues {
 		if !setUpFirstValues {
@@ -33,7 +33,6 @@ func getMetricsForForecastedStream(data *responses.LastForecast, neededMetrics [
 		}
 		waterLevelCalculator.Compute(value)
 		sumOfValues += value
-		validValues = append(validValues, value)
 	}
 
 	for _, metric := range neededMetrics {
