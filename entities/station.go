@@ -8,7 +8,3 @@ type Station struct {
 	EvacuationLevel *float64
 	LowWaterLevel   *float64
 }
-
-func NewStation(stationId uint64, name string) *Station {
-	return &Station{StationId: stationId, Name: name}
-}

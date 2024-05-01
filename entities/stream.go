@@ -13,17 +13,6 @@ type Stream struct {
 	StreamType  StreamType
 }
 
-func NewStream(streamId uint64, station *Station, variable *Variable, procedure *Procedure, unit *Unit, streamType StreamType) *Stream {
-	return &Stream{
-		StreamId:   streamId,
-		Station:    station,
-		Variable:   variable,
-		Procedure:  procedure,
-		Unit:       unit,
-		StreamType: streamType,
-	}
-}
-
 func (s Stream) IsForecasted() bool {
 	return s.StreamType == Forecasted
 }
