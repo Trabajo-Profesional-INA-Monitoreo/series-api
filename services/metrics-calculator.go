@@ -10,107 +10,90 @@ import (
 	"time"
 )
 
+type metricParameters struct {
+	setUpFirstValues bool
+	validValues      []float64
+	maxValue         float64
+	minValue         float64
+	sumOfValues      float64
+	nullValues       int
+}
+
 func getMetricsForForecastedStream(data *responses.Forecast, neededMetrics []entities.ConfiguredMetric, waterLevelCalculator WaterLevelsCalculator) *[]dtos.MetricCard {
-
-	var metrics []dtos.MetricCard
-	setUpFirstValues := false
-	var minValue float64
-	var maxValue float64
-	sumOfValues := 0.0
-	validValues := responses.ConvertToFloats(data.MainForecast.Forecasts)
-	totalValues := len(validValues)
-	for _, value := range validValues {
-		if !setUpFirstValues {
-			minValue = value
-			maxValue = value
-			setUpFirstValues = true
-		}
-		if minValue > value {
-			minValue = value
-		}
-		if value > maxValue {
-			maxValue = value
-		}
-		waterLevelCalculator.Compute(value)
-		sumOfValues += value
+	metricsValues := &metricParameters{
+		setUpFirstValues: false,
+		validValues:      responses.ConvertToFloats(data.MainForecast.Forecasts),
+		maxValue:         0,
+		minValue:         0,
+		sumOfValues:      0,
 	}
 
-	for _, metric := range neededMetrics {
-		metricName := entities.MapMetricToString(metric.MetricId)
-		metricValue := 0.0
-		if metric.MetricId == entities.Mediana {
-			sort.Float64s(validValues)
-			middle := totalValues / 2
-			if len(validValues)%2 == 0 {
-				metricValue = (validValues[middle-1] + validValues[middle]) / 2
-			} else {
-				metricValue = validValues[middle]
-			}
-		} else if metric.MetricId == entities.Maximo {
-			metricValue = maxValue
-		} else if metric.MetricId == entities.Minimo {
-			metricValue = minValue
-		} else if metric.MetricId == entities.Media {
-			metricValue = sumOfValues / float64(totalValues)
-		}
-		metrics = append(metrics, dtos.NewMetricCard(metricName, metricValue))
+	for _, waterLevel := range metricsValues.validValues {
+		calculateMetrics(metricsValues, waterLevel, waterLevelCalculator)
 	}
-	metrics = waterLevelCalculator.AddMetrics(metrics)
-	metrics = append(metrics, dtos.NewMetricCard(entities.MapMetricToString(entities.Observaciones), float64(totalValues)))
-	return &metrics
+
+	return addMetricsCards(neededMetrics, metricsValues, waterLevelCalculator)
 }
 
 func getMetricsForObservedOrCuratedStream(data []responses.ObservedDataResponse, neededMetrics []entities.ConfiguredMetric, waterLevelCalculator WaterLevelsCalculator) *[]dtos.MetricCard {
-
-	var metrics []dtos.MetricCard
-	setUpFirstValues := false
-	var minValue float64
-	var maxValue float64
-	nullValues := 0
-	sumOfValues := 0.0
-	totalValidValues := 0
-	var validValues []float64
+	metricsValues := &metricParameters{
+		setUpFirstValues: false,
+		validValues:      []float64{},
+		maxValue:         0,
+		minValue:         0,
+		sumOfValues:      0,
+		nullValues:       0,
+	}
 	for _, dataNode := range data {
-		if dataNode.Value != nil {
-			if !setUpFirstValues {
-				minValue = *dataNode.Value
-				maxValue = *dataNode.Value
-				setUpFirstValues = true
-			}
-			if minValue > *dataNode.Value {
-				minValue = *dataNode.Value
-			}
-			if *dataNode.Value > maxValue {
-				maxValue = *dataNode.Value
-			}
-			waterLevelCalculator.Compute(*dataNode.Value)
-			sumOfValues += *dataNode.Value
-			totalValidValues++
-			validValues = append(validValues, *dataNode.Value)
-		} else {
-			nullValues++
+		if dataNode.Value == nil {
+			metricsValues.nullValues++
+			continue
 		}
+		calculateMetrics(metricsValues, *dataNode.Value, waterLevelCalculator)
+		metricsValues.validValues = append(metricsValues.validValues, *dataNode.Value)
 	}
 
+	return addMetricsCards(neededMetrics, metricsValues, waterLevelCalculator)
+}
+
+func calculateMetrics(metricsValues *metricParameters, waterLevel float64, waterLevelCalculator WaterLevelsCalculator) {
+	if !metricsValues.setUpFirstValues {
+		metricsValues.minValue = waterLevel
+		metricsValues.maxValue = waterLevel
+		metricsValues.setUpFirstValues = true
+	}
+	if metricsValues.minValue > waterLevel {
+		metricsValues.minValue = waterLevel
+	}
+	if waterLevel > metricsValues.maxValue {
+		metricsValues.maxValue = waterLevel
+	}
+	waterLevelCalculator.Compute(waterLevel)
+	metricsValues.sumOfValues += waterLevel
+}
+
+func addMetricsCards(neededMetrics []entities.ConfiguredMetric, metricsValues *metricParameters, waterLevelCalculator WaterLevelsCalculator) *[]dtos.MetricCard {
+	var metrics []dtos.MetricCard
+	totalValidValues := len(metricsValues.validValues)
 	for _, metric := range neededMetrics {
 		metricName := entities.MapMetricToString(metric.MetricId)
 		metricValue := 0.0
 		if metric.MetricId == entities.Mediana {
-			sort.Float64s(validValues)
+			sort.Float64s(metricsValues.validValues)
 			middle := totalValidValues / 2
-			if len(validValues)%2 == 0 {
-				metricValue = (validValues[middle-1] + validValues[middle]) / 2
+			if totalValidValues%2 == 0 {
+				metricValue = (metricsValues.validValues[middle-1] + metricsValues.validValues[middle]) / 2
 			} else {
-				metricValue = validValues[middle]
+				metricValue = metricsValues.validValues[middle]
 			}
 		} else if metric.MetricId == entities.Maximo {
-			metricValue = maxValue
+			metricValue = metricsValues.maxValue
 		} else if metric.MetricId == entities.Minimo {
-			metricValue = minValue
+			metricValue = metricsValues.minValue
 		} else if metric.MetricId == entities.Media {
-			metricValue = sumOfValues / float64(totalValidValues)
+			metricValue = metricsValues.sumOfValues / float64(totalValidValues)
 		} else if metric.MetricId == entities.Nulos {
-			metricValue = float64(nullValues)
+			metricValue = float64(metricsValues.nullValues)
 		}
 		metrics = append(metrics, dtos.NewMetricCard(metricName, metricValue))
 	}
