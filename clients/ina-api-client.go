@@ -2,9 +2,11 @@ package clients
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients/responses"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/config"
+	exceptions "github.com/Trabajo-Profesional-INA-Monitoreo/series-api/errors"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
@@ -49,7 +51,7 @@ func (i inaApiClientImpl) GetLastForecast(calibrationId uint64) (*responses.Last
 	}
 	defer closeReaderAndPrintError(res.Body)
 	if res.StatusCode != 200 {
-		return nil, fmt.Errorf("forecast response error: got %v", res.StatusCode)
+		return nil, errors.Join(exceptions.MapCodeToError(res.StatusCode), fmt.Errorf("forecast response error: got %v", res.StatusCode))
 	}
 	decodedBody := &responses.LastForecast{}
 	err = json.NewDecoder(res.Body).Decode(decodedBody)
@@ -76,7 +78,7 @@ func (i inaApiClientImpl) GetObservedData(streamId uint64, timeStart time.Time, 
 	}
 	defer closeReaderAndPrintError(res.Body)
 	if res.StatusCode != 200 {
-		return nil, fmt.Errorf("observed response error: got %v", res.StatusCode)
+		return nil, errors.Join(exceptions.MapCodeToError(res.StatusCode), fmt.Errorf("observed response error: got %v", res.StatusCode))
 	}
 	var decodedBody []responses.ObservedDataResponse
 	err = json.NewDecoder(res.Body).Decode(&decodedBody)
@@ -104,7 +106,7 @@ func (i inaApiClientImpl) GetStream(streamId uint64) (*responses.InaStreamRespon
 	}
 	defer closeReaderAndPrintError(res.Body)
 	if res.StatusCode != 200 {
-		return nil, fmt.Errorf("Stream response error: got %v", res.StatusCode)
+		return nil, errors.Join(exceptions.MapCodeToError(res.StatusCode), fmt.Errorf("Stream response error: got %v", res.StatusCode))
 	}
 	var decodedBody responses.InaStreamResponse
 	err = json.NewDecoder(res.Body).Decode(&decodedBody)
