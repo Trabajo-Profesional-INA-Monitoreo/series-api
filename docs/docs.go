@@ -725,7 +725,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Series"
+                    "Outputs"
                 ],
                 "summary": "Endpoint para obtener las metricas de comportamiento",
                 "parameters": [

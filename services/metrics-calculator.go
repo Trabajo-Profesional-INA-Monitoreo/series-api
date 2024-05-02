@@ -1,13 +1,10 @@
 package services
 
 import (
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients/responses"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
-	log "github.com/sirupsen/logrus"
 	"sort"
-	"time"
 )
 
 type metricParameters struct {
@@ -103,26 +100,4 @@ func calculateMedian(metricsValues *metricParameters, totalValidValues int) floa
 		return (metricsValues.validValues[middle-1] + metricsValues.validValues[middle]) / 2
 	}
 	return metricsValues.validValues[middle]
-}
-
-func getLevelsCountForAllStreams(behaviourStreams []dtos.BehaviourStream, timeStart time.Time, timeEnd time.Time, inaApiClient clients.InaAPiClient) *dtos.BehaviourStreamsResponse {
-	behaviourResponse := dtos.NewBehaviourStreamsResponse()
-	for _, stream := range behaviourStreams {
-		values, err := inaApiClient.GetObservedData(stream.StreamId, timeStart, timeEnd)
-		if err != nil {
-			log.Errorf("GetOutputBehaviourMetrics | Could not get metrics for stream with id %v: %v", stream.StreamId, err)
-			continue
-		}
-		calculator := NewCalculatorOfWaterLevels(stream.AlertLevel, stream.EvacuationLevel, stream.LowWaterLevel)
-		for _, observedData := range values {
-			if observedData.Value != nil {
-				calculator.Compute(*observedData.Value)
-				behaviourResponse.TotalValuesCount += 1
-			}
-		}
-		behaviourResponse.CountAlertLevel += calculator.GetAlertsCount()
-		behaviourResponse.CountLowWaterLevel += calculator.GetLowWaterCount()
-		behaviourResponse.CountEvacuationLevel += calculator.GetEvacuationCount()
-	}
-	return behaviourResponse
 }

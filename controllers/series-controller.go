@@ -10,11 +10,8 @@ import (
 )
 
 type SeriesController interface {
-	GetStations(ctx *gin.Context)
 	GetStreamDataById(ctx *gin.Context)
 	GetStreamCards(ctx *gin.Context)
-	GetOutputMetrics(ctx *gin.Context)
-	GetNodes(ctx *gin.Context)
 	GetRedundancies(ctx *gin.Context)
 }
 
@@ -24,52 +21,6 @@ type seriesController struct {
 
 func NewSeriesController(seriesService services.StreamService) SeriesController {
 	return &seriesController{seriesService}
-}
-
-// GetNodes godoc
-//
-//	@Summary		Endpoint para obtener el resumen de las series agrupado por nodo
-//	@Tags           Series
-//	@Produce		json
-//	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
-//	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: 5 dias despues"  Format(2006-01-02)
-//	@Param          configurationId     query      int     true  "ID de la configuracion"
-//	@Success		200	{object} dtos.StreamsPerNodeResponse
-//	@Router			/series/nodos [get]
-func (s seriesController) GetNodes(ctx *gin.Context) {
-	timeStart, timeEnd, done := getDates(ctx)
-	if done {
-		return
-	}
-	configId, done := getUintQueryParam(ctx, "configurationId")
-	if done {
-		return
-	}
-	res := s.seriesService.GetNodes(timeStart, timeEnd, configId)
-	ctx.JSON(http.StatusOK, res)
-}
-
-// GetStations godoc
-//
-//	@Summary		Endpoint para obtener el resumen de las series agrupado por estacion
-//	@Tags           Series
-//	@Produce		json
-//	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
-//	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: 5 dias despues"  Format(2006-01-02)
-//	@Param          configurationId     query      int     true  "ID de la configuracion"
-//	@Success		200	{object} dtos.StreamsPerStationResponse
-//	@Router			/series/estaciones [get]
-func (s seriesController) GetStations(ctx *gin.Context) {
-	timeStart, timeEnd, done := getDates(ctx)
-	if done {
-		return
-	}
-	configId, done := getUintQueryParam(ctx, "configurationId")
-	if done {
-		return
-	}
-	res := s.seriesService.GetStations(timeStart, timeEnd, configId)
-	ctx.JSON(http.StatusOK, res)
 }
 
 // GetStreamDataById godoc
@@ -171,36 +122,6 @@ func (s seriesController) GetStreamCards(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, res)
-}
-
-// GetOutputMetrics godoc
-//
-//	@Summary		Endpoint para obtener las metricas de comportamiento
-//	@Tags           Series
-//	@Produce		json
-//	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
-//	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: mañana"  Format(2006-01-02)
-//	@Param          configurationId     query      int     true  "ID de la configuracion"
-//	@Success		200	{object} dtos.BehaviourStreamsResponse
-//	@Failure        400  {object}  dtos.ErrorResponse
-//	@Failure        500  {object}  dtos.ErrorResponse
-//	@Router			/series/comportamiento [get]
-func (s seriesController) GetOutputMetrics(ctx *gin.Context) {
-	timeStart, timeEnd, done := getDates(ctx)
-	if done {
-		return
-	}
-	configurationId, done := getUintQueryParam(ctx, "configurationId")
-	if done {
-		return
-	}
-
-	res, err := s.seriesService.GetOutputBehaviourMetrics(configurationId, timeStart, timeEnd)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, dtos.NewErrorResponse(err))
-		return
-	}
 	ctx.JSON(http.StatusOK, res)
 }
 

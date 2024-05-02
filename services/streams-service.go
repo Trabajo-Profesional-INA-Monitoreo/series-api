@@ -3,7 +3,6 @@ package services
 import (
 	"errors"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/config"
-	"strconv"
 	"time"
 
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients"
@@ -16,12 +15,9 @@ import (
 )
 
 type StreamService interface {
-	GetStations(time.Time, time.Time, uint64) dtos.StreamsPerStationResponse
 	GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error)
 	CreateStream(streamId uint64, streamType entities.StreamType) error
 	GetStreamCards(parameters *dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
-	GetOutputBehaviourMetrics(configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.BehaviourStreamsResponse, error)
-	GetNodes(start time.Time, end time.Time, id uint64) dtos.StreamsPerNodeResponse
 	GetRedundancies(configuredStreamId uint64) dtos.Redundancies
 }
 
@@ -34,36 +30,6 @@ type streamService struct {
 
 func NewStreamService(repository *config.Repositories, inaApiClient clients.InaAPiClient) StreamService {
 	return &streamService{repository.StreamsRepository, inaApiClient, repository.ConfiguredStreamRepository, repository.NodeRepository}
-}
-
-func (s streamService) GetNodes(timeStart time.Time, timeEnd time.Time, configId uint64) dtos.StreamsPerNodeResponse {
-	nodes := s.nodesRepository.GetStreamsPerNodeById(strconv.FormatUint(configId, 10))
-	errorsPerNode := s.repository.GetErrorsOfNodes(configId, timeStart, timeEnd)
-
-	for _, errors := range errorsPerNode {
-		for _, node := range nodes {
-			if node.NodeId == errors.NodeId {
-				node.ErrorCount = errors.ErrorCount
-				break
-			}
-		}
-	}
-	return dtos.StreamsPerNodeResponse{Nodes: nodes}
-}
-
-func (s streamService) GetStations(timeStart time.Time, timeEnd time.Time, configId uint64) dtos.StreamsPerStationResponse {
-	stations := s.repository.GetStations(configId)
-	errorsPerStation := s.repository.GetErrorsOfStations(configId, timeStart, timeEnd)
-
-	for _, errors := range errorsPerStation {
-		for _, station := range *stations {
-			if station.StationId == errors.StationId {
-				station.ErrorCount = errors.ErrorCount
-				break
-			}
-		}
-	}
-	return dtos.StreamsPerStationResponse{Stations: *stations}
 }
 
 func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, configured entities.ConfiguredStream, timeStart time.Time, timeEnd time.Time) (*[]dtos.MetricCard, *time.Time) {
@@ -174,15 +140,6 @@ func (s streamService) GetStreamCards(parameters *dtos.QueryParameters) (*dtos.S
 		}
 	}
 	return result, nil
-}
-
-func (s streamService) GetOutputBehaviourMetrics(configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.BehaviourStreamsResponse, error) {
-	behaviourStreams, err := s.repository.GetStreamsForOutputMetrics(configId)
-	if err != nil {
-		return nil, err
-	}
-
-	return getLevelsCountForAllStreams(behaviourStreams, timeStart, timeEnd, s.inaApiClient), nil
 }
 
 func (s streamService) GetRedundancies(configuredStreamId uint64) dtos.Redundancies {

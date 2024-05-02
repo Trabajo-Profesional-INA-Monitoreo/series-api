@@ -1040,7 +1040,7 @@ paths:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener las metricas de comportamiento
       tags:
-      - Series
+      - Outputs
   /series/curadas/{serie_id}:
     get:
       parameters:
