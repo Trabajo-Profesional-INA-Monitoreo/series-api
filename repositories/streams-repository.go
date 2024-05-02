@@ -30,7 +30,7 @@ type StreamRepository interface {
 	GetStreamCards(parameters dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
 	GetStreamsForOutputMetrics(configId uint64) ([]dtos.BehaviourStream, error)
 	GetErrorsOfNodes(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfNodes
-	GetRedundancies(configuredStreamId string) []int
+	GetRedundancies(configuredStreamId uint64) []int
 	GetTotalStreamsByError(id uint64, start time.Time, end time.Time, value entities.ErrorType) int
 }
 
@@ -356,7 +356,7 @@ func (db *streamsRepository) GetStreamsForOutputMetrics(configId uint64) ([]dtos
 	return streams, nil
 }
 
-func (db *streamsRepository) GetRedundancies(configuredStreamId string) []int {
+func (db *streamsRepository) GetRedundancies(configuredStreamId uint64) []int {
 	var redundancies []int
 
 	tx := db.connection.Model(

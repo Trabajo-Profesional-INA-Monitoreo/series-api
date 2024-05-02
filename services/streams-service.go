@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/config"
 	"strconv"
 	"time"
 
@@ -16,15 +17,12 @@ import (
 
 type StreamService interface {
 	GetStations(time.Time, time.Time, uint64) dtos.StreamsPerStationResponse
-	GetCuredSerieById(id uint64, start time.Time, end time.Time) (dtos.StreamsDataResponse, error)
-	GetObservatedSerieById(id uint64, start time.Time, end time.Time) (dtos.StreamsDataResponse, error)
-	GetPredictedSerieById(id uint64, streamId uint64) (dtos.CalibratedStreamsDataResponse, error)
 	GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error)
 	CreateStream(streamId uint64, streamType entities.StreamType) error
 	GetStreamCards(parameters *dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
 	GetOutputBehaviourMetrics(configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.BehaviourStreamsResponse, error)
 	GetNodes(start time.Time, end time.Time, id uint64) dtos.StreamsPerNodeResponse
-	GetRedundancies(configuredStreamId string) dtos.Redundancies
+	GetRedundancies(configuredStreamId uint64) dtos.Redundancies
 }
 
 type streamService struct {
@@ -34,8 +32,8 @@ type streamService struct {
 	nodesRepository             repositories.NodeRepository
 }
 
-func NewStreamService(repository repositories.StreamRepository, inaApiClient clients.InaAPiClient, configuredStreamsRepository repositories.ConfiguredStreamsRepository, nodeRepository repositories.NodeRepository) StreamService {
-	return &streamService{repository, inaApiClient, configuredStreamsRepository, nodeRepository}
+func NewStreamService(repository *config.Repositories, inaApiClient clients.InaAPiClient) StreamService {
+	return &streamService{repository.StreamsRepository, inaApiClient, repository.ConfiguredStreamRepository, repository.NodeRepository}
 }
 
 func (s streamService) GetNodes(timeStart time.Time, timeEnd time.Time, configId uint64) dtos.StreamsPerNodeResponse {
@@ -66,38 +64,6 @@ func (s streamService) GetStations(timeStart time.Time, timeEnd time.Time, confi
 		}
 	}
 	return dtos.StreamsPerStationResponse{Stations: *stations}
-}
-
-func (s streamService) GetCuredSerieById(id uint64, start time.Time, end time.Time) (dtos.StreamsDataResponse, error) {
-	streams, err := s.inaApiClient.GetObservedData(id, start, end)
-	if err != nil {
-		return dtos.StreamsDataResponse{}, err
-	}
-	var streamsData []dtos.StreamsData
-	for _, stream := range streams {
-		streamsData = append(streamsData, stream.ConvertToStreamData())
-	}
-	return dtos.StreamsDataResponse{Streams: streamsData}, nil
-}
-
-func (s streamService) GetObservatedSerieById(id uint64, start time.Time, end time.Time) (dtos.StreamsDataResponse, error) {
-	streams, err := s.inaApiClient.GetObservedData(id, start, end)
-	if err != nil {
-		return dtos.StreamsDataResponse{}, err
-	}
-	var streamsData []dtos.StreamsData
-	for _, stream := range streams {
-		streamsData = append(streamsData, stream.ConvertToStreamData())
-	}
-	return dtos.StreamsDataResponse{Streams: streamsData}, nil
-}
-
-func (s streamService) GetPredictedSerieById(id uint64, streamId uint64) (dtos.CalibratedStreamsDataResponse, error) {
-	streams, err := s.inaApiClient.GetLastForecast(id)
-	if err != nil {
-		return dtos.CalibratedStreamsDataResponse{}, err
-	}
-	return streams.ConvertToCalibratedStreamsDataResponse(streamId), nil
 }
 
 func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, configured entities.ConfiguredStream, timeStart time.Time, timeEnd time.Time) (*[]dtos.MetricCard, *time.Time) {
@@ -219,7 +185,7 @@ func (s streamService) GetOutputBehaviourMetrics(configId uint64, timeStart time
 	return getLevelsCountForAllStreams(behaviourStreams, timeStart, timeEnd, s.inaApiClient), nil
 }
 
-func (s streamService) GetRedundancies(configuredStreamId string) dtos.Redundancies {
+func (s streamService) GetRedundancies(configuredStreamId uint64) dtos.Redundancies {
 	redundancies := s.repository.GetRedundancies(configuredStreamId)
 
 	return dtos.Redundancies{Redundancies: redundancies}

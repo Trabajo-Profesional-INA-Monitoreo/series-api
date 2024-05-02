@@ -1076,7 +1076,7 @@ paths:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los valores de una serie curada por id
       tags:
-      - Series
+      - Interfaz INA
   /series/estaciones:
     get:
       parameters:
@@ -1168,7 +1168,7 @@ paths:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los valores de una serie observada por id
       tags:
-      - Series
+      - Interfaz INA
   /series/pronosticadas/{calibrado_id}:
     get:
       parameters:
@@ -1200,7 +1200,7 @@ paths:
             $ref: '#/definitions/dtos.ErrorResponse'
       summary: Endpoint para obtener los valores de una serie pronosticadas por id
       tags:
-      - Series
+      - Interfaz INA
   /series/redundancias/{configured_stream_id}:
     get:
       parameters:

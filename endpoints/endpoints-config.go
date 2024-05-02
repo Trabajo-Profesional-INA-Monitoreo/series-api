@@ -10,16 +10,17 @@ import (
 
 // @BasePath /api/v1
 
-func SetUpEndpoints(server *gin.Engine, repositories *config.Repositories, apiConfig *config.ApiConfig) {
+func SetUpEndpoints(server *gin.Engine, repositories *config.Repositories, apiConfig *config.ServiceConfigurationData) {
 
 	log.Infof("Setting up endpoints")
 	api := server.Group("/api/v1")
 	if apiConfig.SecurityEnabled {
 		api.Use(middlewares.IsAValidToken(apiConfig))
 	}
-	setSeriesEndpoints(api, repositories, clients.NewInaApiClientImpl(apiConfig))
+	inaClient := clients.NewInaApiClientImpl(apiConfig)
+	setSeriesEndpoints(api, repositories, inaClient)
 	setInputsEndpoints(api, repositories.StreamsRepository)
-	setConfigurationEndpoints(api, repositories, clients.NewInaApiClientImpl(apiConfig), apiConfig)
+	setConfigurationEndpoints(api, repositories, inaClient, apiConfig)
 	setErrorEndpoints(api, repositories.ErrorsRepository)
 	setFiltersEndpoints(api, repositories.FilterRepository)
 	setUpHealthCheck(api)

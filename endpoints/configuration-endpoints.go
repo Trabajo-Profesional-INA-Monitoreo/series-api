@@ -10,7 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func setConfigurationEndpoints(apiGroup *gin.RouterGroup, repositories *config.Repositories, inaClient clients.InaAPiClient, apiConfig *config.ApiConfig) {
+func setConfigurationEndpoints(apiGroup *gin.RouterGroup, repositories *config.Repositories, inaClient clients.InaAPiClient, apiConfig *config.ServiceConfigurationData) {
 	controller := controllers.NewConfigurationController(services.NewConfigurationService(repositories, inaClient))
 	testApi := apiGroup.Group("/configuracion")
 	{

@@ -10,18 +10,21 @@ import (
 )
 
 func setSeriesEndpoints(apiGroup *gin.RouterGroup, repositories *config.Repositories, inaApiClient clients.InaAPiClient) {
-	controller := controllers.NewSeriesController(services.NewStreamService(repositories.StreamsRepository, inaApiClient, repositories.ConfiguredStreamRepository, repositories.NodeRepository))
+	streamsService := services.NewStreamService(repositories, inaApiClient)
+	streamsController := controllers.NewSeriesController(streamsService)
+
+	inaController := controllers.NewInaController(services.NewInaServiceApi(inaApiClient))
 	testApi := apiGroup.Group("/series")
 	{
-		testApi.GET("", controller.GetStreamCards)
-		testApi.GET("/comportamiento", controller.GetOutputMetrics)
-		testApi.GET("/estaciones", controller.GetStations)
-		testApi.GET("/:serie_id", controller.GetStreamDataById)
-		testApi.GET("/curadas/:serie_id", controller.GetCuredSerieById)
-		testApi.GET("/observadas/:serie_id", controller.GetObservatedSerieById)
-		testApi.GET("/pronosticadas/:calibrado_id", controller.GetPredictedSerieById)
-		testApi.GET("/nodos", controller.GetNodes)
-		testApi.GET("/redundancias/:configured_stream_id", controller.GetRedundancies)
+		testApi.GET("", streamsController.GetStreamCards)
+		testApi.GET("/comportamiento", streamsController.GetOutputMetrics)
+		testApi.GET("/estaciones", streamsController.GetStations)
+		testApi.GET("/:serie_id", streamsController.GetStreamDataById)
+		testApi.GET("/nodos", streamsController.GetNodes)
+		testApi.GET("/redundancias/:configured_stream_id", streamsController.GetRedundancies)
+		testApi.GET("/curadas/:serie_id", inaController.GetCuredSerieById)
+		testApi.GET("/observadas/:serie_id", inaController.GetObservatedSerieById)
+		testApi.GET("/pronosticadas/:calibrado_id", inaController.GetPredictedSerieById)
 	}
 	log.Infof("Configured stream endpoints")
 }

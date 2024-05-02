@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-type ApiConfig struct {
+type ServiceConfigurationData struct {
 	LogLevel                    string
 	ServerPort                  string
 	DbUrl                       string
@@ -57,7 +57,7 @@ func initEnv() (*viper.Viper, error) {
 	return v, nil
 }
 
-func GetConfig() *ApiConfig {
+func GetConfig() *ServiceConfigurationData {
 	env, err := initEnv()
 	if err != nil {
 		log.Fatalf("Failed to read environment, exiting")
@@ -73,7 +73,7 @@ func GetConfig() *ApiConfig {
 	securityEnabled := getEnvBool(env, "security.enabled")
 	kcConfig := getKeycloakConfig(env, securityEnabled)
 
-	return &ApiConfig{
+	return &ServiceConfigurationData{
 		LogLevel:            logLevel,
 		ServerPort:          serverPort,
 		DbUrl:               dbConnection,

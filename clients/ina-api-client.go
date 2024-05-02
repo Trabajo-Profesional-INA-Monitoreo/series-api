@@ -31,7 +31,7 @@ func closeReaderAndPrintError(Body io.ReadCloser) {
 	}
 }
 
-func NewInaApiClientImpl(apiConfig *config.ApiConfig) InaAPiClient {
+func NewInaApiClientImpl(apiConfig *config.ServiceConfigurationData) InaAPiClient {
 	return &inaApiClientImpl{baseUrl: apiConfig.InaBaseUrl, authHeader: fmt.Sprintf("Bearer %v", apiConfig.InaToken)}
 }
 

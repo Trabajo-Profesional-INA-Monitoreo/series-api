@@ -268,7 +268,7 @@ func NewConfigurationService(repositories *config.Repositories, client clients.I
 	return &configurationService{configurationRepository: repositories.ConfigurationRepository,
 		nodeRepository:               repositories.NodeRepository,
 		configuratedStreamRepository: repositories.ConfiguredStreamRepository,
-		streamService:                NewStreamService(repositories.StreamsRepository, client, repositories.ConfiguredStreamRepository, repositories.NodeRepository),
+		streamService:                NewStreamService(repositories, client),
 		metricsRepository:            repositories.MetricsRepository,
 		redundancyRepository:         repositories.RedundancyRepository,
 	}

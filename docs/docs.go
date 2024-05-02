@@ -779,7 +779,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Series"
+                    "Interfaz INA"
                 ],
                 "summary": "Endpoint para obtener los valores de una serie curada por id",
                 "parameters": [
@@ -917,7 +917,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Series"
+                    "Interfaz INA"
                 ],
                 "summary": "Endpoint para obtener los valores de una serie observada por id",
                 "parameters": [
@@ -971,7 +971,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Series"
+                    "Interfaz INA"
                 ],
                 "summary": "Endpoint para obtener los valores de una serie pronosticadas por id",
                 "parameters": [
