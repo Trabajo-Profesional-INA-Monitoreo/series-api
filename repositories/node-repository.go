@@ -11,7 +11,7 @@ type NodeRepository interface {
 	Create(node *entities.Node) (uint64, error)
 	Update(node *entities.Node) error
 	GetNodesById(id uint64) []*dtos.Node
-	GetStreamsPerNodeById(formatUint string) []*dtos.StreamsPerNode
+	GetStreamsPerNodeById(formatUint uint64) []*dtos.StreamsPerNode
 	MarkAsDeletedOldNodes(id uint64, ids []uint64)
 	DeleteByConfig(configId uint64)
 }
@@ -38,7 +38,7 @@ func (n nodeRepository) MarkAsDeletedOldNodes(configId uint64, newNodeIds []uint
 	tx.Update("deleted", true)
 }
 
-func (n nodeRepository) GetStreamsPerNodeById(configId string) []*dtos.StreamsPerNode {
+func (n nodeRepository) GetStreamsPerNodeById(configId uint64) []*dtos.StreamsPerNode {
 	var nodes []*dtos.StreamsPerNode
 
 	tx := n.connection.Model(

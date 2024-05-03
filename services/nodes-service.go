@@ -4,7 +4,6 @@ import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/config"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
-	"strconv"
 	"time"
 )
 
@@ -22,7 +21,7 @@ func NewNodesService(repositories *config.Repositories) NodesService {
 }
 
 func (s nodesServiceImpl) GetNodes(timeStart time.Time, timeEnd time.Time, configId uint64) dtos.StreamsPerNodeResponse {
-	nodes := s.nodesRepository.GetStreamsPerNodeById(strconv.FormatUint(configId, 10))
+	nodes := s.nodesRepository.GetStreamsPerNodeById(configId)
 	errorsPerNode := s.repository.GetErrorsOfNodes(configId, timeStart, timeEnd)
 
 	for _, errors := range errorsPerNode {
