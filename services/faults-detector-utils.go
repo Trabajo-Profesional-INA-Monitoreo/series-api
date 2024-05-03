@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients/responses"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	"strconv"
@@ -59,4 +61,24 @@ func observedIsOutsideErrorBands(forecast *responses.Forecast, forecastedIndex i
 
 func tooManyValuesOutsideBands(outsideBands int, totalObservedValues int) bool {
 	return float64(outsideBands) > float64(totalObservedValues)*0.7
+}
+
+func getObservedDataFromStream(streamId uint64, timeStart time.Time, timeEnd time.Time, inaApiClient clients.InaAPiClient) ([]responses.ObservedDataResponse, error) {
+	res, err := inaApiClient.GetObservedData(streamId, timeStart, timeEnd)
+	if err != nil {
+		return nil, fmt.Errorf("error performing check for stream %v: %v", streamId, err)
+	}
+	return res, nil
+}
+
+func convertForecastStringData(stringDate string, stringValue string) (*time.Time, float64, error) {
+	timestamp, err := time.Parse("2006-01-02T15:04:05.999Z", stringDate)
+	if err != nil {
+		return nil, 0, fmt.Errorf("error parsing timestamp - %v", err)
+	}
+	value, err := strconv.ParseFloat(stringValue, 64)
+	if err != nil {
+		return nil, 0, fmt.Errorf("error parsing value - %v", err)
+	}
+	return &timestamp, value, err
 }
