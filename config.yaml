@@ -1,6 +1,7 @@
 
 log:
   level: "debug"
+  sql: "info"
 
 server:
   port: "8080"

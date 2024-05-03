@@ -17,6 +17,7 @@ Se deben de configurar las siguientes propiedades:
 ```yaml
 log:
   level: "info" # error, info, debug
+  sql: "info" # error, info, debug
   
 server:
   port: 1234 # puerto de la aplicacion
