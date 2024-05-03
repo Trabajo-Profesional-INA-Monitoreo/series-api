@@ -14,7 +14,7 @@ type InputsService interface {
 }
 
 type inputsService struct {
-	repository repositories.StreamRepository
+	repository repositories.InputsRepository
 }
 
 func NewInputsService(repository repositories.StreamRepository) InputsService {

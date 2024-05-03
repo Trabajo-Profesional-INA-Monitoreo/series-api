@@ -15,6 +15,12 @@ import (
 const directMeasurementProcedure = 1
 const waterLevelVariable = 2
 
+type InputsRepository interface {
+	GetTotalStreams(configurationId uint64) int
+	GetTotalStations(configurationId uint64) int
+	GetTotalStreamsByError(id uint64, start time.Time, end time.Time, value entities.ErrorType) int
+}
+
 type StreamRepository interface {
 	GetStations(configId uint64) *[]*dtos.StreamsPerStation
 	GetErrorsOfStations(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfStations
