@@ -23,7 +23,6 @@ func TestShouldReturnLevelCountForAStream(t *testing.T) {
 		},
 	}
 
-	s := &outputsServiceImpl{inaApiClient: mockInaApiClient}
 	var observedData []responses.ObservedDataResponse
 
 	for i := 0; i < 10; i++ {
@@ -33,6 +32,7 @@ func TestShouldReturnLevelCountForAStream(t *testing.T) {
 
 	mockInaApiClient.ObservedData = observedData
 
+	s := &outputsServiceImpl{inaApiClient: mockInaApiClient}
 	result := s.getLevelsCountForAllStreams(streams, time.Now(), time.Now())
 
 	assert.Equal(t, uint64(10), result.TotalValuesCount)
