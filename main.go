@@ -18,7 +18,7 @@ func main() {
 	config.InitLogger(apiConfig.LogLevel)
 	server := gin.New()
 
-	repositories := config.CreateRepositories(apiConfig.DbUrl)
+	repositories := config.CreateRepositories(apiConfig.DbUrl, apiConfig.SqlLogLevel)
 	middlewares.SetUpMiddlewares(server)
 	endpoints.SetUpEndpoints(server, repositories, apiConfig)
 	jobs.SetUpJobs(repositories, apiConfig)

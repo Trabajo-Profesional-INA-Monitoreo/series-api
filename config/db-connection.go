@@ -20,10 +20,25 @@ type Repositories struct {
 	RedundancyRepository       repositories.RedundancyRepository
 }
 
-func CreateRepositories(connectionData string) *Repositories {
+func loggerStringToGormLogger(loggerConfig string) logger.LogLevel {
+	switch loggerConfig {
+	case "silent":
+		return logger.Silent
+	case "info":
+		return logger.Info
+	case "warn":
+		return logger.Warn
+	case "error":
+		return logger.Error
+	default:
+		return logger.Info
+	}
+}
+
+func CreateRepositories(connectionData string, loggerConfig string) *Repositories {
 	log.Infof("Attempting connection to DB")
 	connection, err := gorm.Open(postgres.Open(connectionData), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		Logger: logger.Default.LogMode(loggerStringToGormLogger(loggerConfig)),
 	})
 	if err != nil {
 		log.Fatalf("Failed to connect to DB: %v", err)
