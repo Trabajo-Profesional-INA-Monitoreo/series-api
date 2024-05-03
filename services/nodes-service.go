@@ -12,17 +12,16 @@ type NodesService interface {
 }
 
 type nodesServiceImpl struct {
-	repository      repositories.StreamRepository
 	nodesRepository repositories.NodeRepository
 }
 
 func NewNodesService(repositories *config.Repositories) NodesService {
-	return &nodesServiceImpl{repositories.StreamsRepository, repositories.NodeRepository}
+	return &nodesServiceImpl{repositories.NodeRepository}
 }
 
 func (s nodesServiceImpl) GetNodes(timeStart time.Time, timeEnd time.Time, configId uint64) dtos.StreamsPerNodeResponse {
 	nodes := s.nodesRepository.GetStreamsPerNodeById(configId)
-	errorsPerNode := s.repository.GetErrorsOfNodes(configId, timeStart, timeEnd)
+	errorsPerNode := s.nodesRepository.GetErrorsOfNodes(configId, timeStart, timeEnd)
 
 	for _, errors := range errorsPerNode {
 		for _, node := range nodes {

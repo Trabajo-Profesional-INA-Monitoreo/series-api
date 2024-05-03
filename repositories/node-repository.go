@@ -5,6 +5,7 @@ import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+	"time"
 )
 
 type NodeRepository interface {
@@ -14,6 +15,7 @@ type NodeRepository interface {
 	GetStreamsPerNodeById(formatUint uint64) []*dtos.StreamsPerNode
 	MarkAsDeletedOldNodes(id uint64, ids []uint64)
 	DeleteByConfig(configId uint64)
+	GetErrorsOfNodes(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfNodes
 }
 
 type nodeRepository struct {
@@ -90,6 +92,33 @@ func (n nodeRepository) GetNodesById(id uint64) []*dtos.Node {
 
 	log.Debugf("Get node query result: %v", nodes)
 	return nodes
+}
+
+func (n nodeRepository) GetErrorsOfNodes(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfNodes {
+	var errorsPerNode []dtos.ErrorsOfNodes
+
+	tx := n.connection.Model(
+		&entities.ConfiguredStream{},
+	).Select(
+		"configured_streams.node_id as node_id",
+		"count(detected_errors.error_id) as error_count",
+	).Joins(
+		"JOIN configured_streams_errors ON configured_streams.configured_stream_id = configured_streams_errors.configured_stream_configured_stream_id",
+	).Joins(
+		"JOIN detected_errors ON detected_errors.error_id = configured_streams_errors.detected_error_error_id ",
+	).Where(
+		"configured_streams.configuration_id = ?", configId,
+	).Where(
+		"detected_errors.detected_date >= ? AND detected_errors.detected_date <= ?", timeStart, timeEnd,
+	).Where(
+		"configured_streams.deleted = false",
+	).Group("configured_streams.node_id").Scan(&errorsPerNode)
+
+	if tx.Error != nil {
+		log.Errorf("Error executing GetErrorsOfStations query: %v", tx.Error)
+	}
+
+	return errorsPerNode
 }
 
 func NewNodeRepository(connection *gorm.DB) NodeRepository {
