@@ -14,22 +14,29 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type StreamService interface {
-	GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error)
+type StreamCreationService interface {
 	CreateStream(streamId uint64, streamType entities.StreamType) error
+}
+
+type StreamRetrievalService interface {
+	GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error)
 	GetStreamCards(parameters *dtos.QueryParameters) (*dtos.StreamCardsResponse, error)
 	GetRedundancies(configuredStreamId uint64) dtos.Redundancies
+}
+
+type StreamService interface {
+	StreamCreationService
+	StreamRetrievalService
 }
 
 type streamService struct {
 	repository                  repositories.ManagerStreamsRepository
 	inaApiClient                clients.InaAPiClient
 	configuredStreamsRepository repositories.MetricsConfiguredStreamsRepository
-	nodesRepository             repositories.NodeRepository
 }
 
 func NewStreamService(repository *config.Repositories, inaApiClient clients.InaAPiClient) StreamService {
-	return &streamService{repository.StreamsRepository, inaApiClient, repository.ConfiguredStreamRepository, repository.NodeRepository}
+	return &streamService{repository.StreamsRepository, inaApiClient, repository.ConfiguredStreamRepository}
 }
 
 func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, configured entities.ConfiguredStream, timeStart time.Time, timeEnd time.Time) (*[]dtos.MetricCard, *time.Time) {

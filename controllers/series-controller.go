@@ -16,7 +16,7 @@ type SeriesController interface {
 }
 
 type seriesController struct {
-	seriesService services.StreamService
+	seriesService services.StreamRetrievalService
 }
 
 func NewSeriesController(seriesService services.StreamService) SeriesController {

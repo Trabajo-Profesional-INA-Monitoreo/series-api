@@ -22,7 +22,7 @@ type configurationService struct {
 	configurationRepository      repositories.ConfigurationRepository
 	nodeRepository               repositories.NodeRepository
 	configuratedStreamRepository repositories.ManagerConfiguredStreamsRepository
-	streamService                StreamService
+	streamService                StreamCreationService
 	metricsRepository            repositories.MetricsRepository
 	redundancyRepository         repositories.RedundancyRepository
 }
