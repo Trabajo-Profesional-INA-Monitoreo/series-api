@@ -21,6 +21,11 @@ type InputsRepository interface {
 	GetTotalStreamsByError(id uint64, start time.Time, end time.Time, value entities.ErrorType) int
 }
 
+type StationsRepository interface {
+	GetStations(configId uint64) *[]*dtos.StreamsPerStation
+	GetErrorsOfStations(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfStations
+}
+
 type StreamRepository interface {
 	GetStations(configId uint64) *[]*dtos.StreamsPerStation
 	GetErrorsOfStations(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfStations

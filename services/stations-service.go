@@ -11,10 +11,10 @@ type StationsService interface {
 }
 
 type stationsServiceImpl struct {
-	repository repositories.StreamRepository
+	repository repositories.StationsRepository
 }
 
-func NewStationsService(repository repositories.StreamRepository) StationsService {
+func NewStationsService(repository repositories.StationsRepository) StationsService {
 	return &stationsServiceImpl{repository: repository}
 }
 
