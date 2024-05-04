@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services/inputs_service"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -13,10 +13,10 @@ type InputsController interface {
 }
 
 type inputsController struct {
-	inputsService services.InputsService
+	inputsService inputs_service.InputsService
 }
 
-func NewInputsController(inputsService services.InputsService) InputsController {
+func NewInputsController(inputsService inputs_service.InputsService) InputsController {
 	return &inputsController{inputsService}
 }
 

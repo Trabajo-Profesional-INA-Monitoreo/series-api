@@ -1,16 +1,17 @@
-package services
+package outputs_service
 
 import (
 	"errors"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients/responses"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services/metrics-service"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
 
 func TestShouldReturnLevelCountForAStream(t *testing.T) {
-	mockInaApiClient := MockInaApiClient{}
+	mockInaApiClient := metrics_service.MockInaApiClient{}
 	evacuationLevel := 5.0
 	alertLevel := 3.0
 	lowWaterLevel := 1.0
@@ -43,7 +44,7 @@ func TestShouldReturnLevelCountForAStream(t *testing.T) {
 
 func TestShouldReturnAnEmptyListIfThereIsAnErrorFetchingTheData(t *testing.T) {
 
-	mockInaApiClient := MockInaApiClient{}
+	mockInaApiClient := metrics_service.MockInaApiClient{}
 	evacuationLevel := 5.0
 	alertLevel := 3.0
 	lowWaterLevel := 1.0

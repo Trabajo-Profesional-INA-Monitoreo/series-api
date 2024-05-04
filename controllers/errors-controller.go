@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services/metrics-service"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -18,7 +18,7 @@ type ErrorsController interface {
 }
 
 type errorsController struct {
-	errorsService services.ErrorsService
+	errorsService metrics_service.ErrorsService
 }
 
 // GetErrorsPerDay godoc
@@ -147,6 +147,6 @@ func (e errorsController) GetErrorsOfConfiguredStream(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func NewErrorsController(errorsService services.ErrorsService) ErrorsController {
+func NewErrorsController(errorsService metrics_service.ErrorsService) ErrorsController {
 	return &errorsController{errorsService: errorsService}
 }

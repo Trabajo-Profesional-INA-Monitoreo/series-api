@@ -3,13 +3,13 @@ package endpoints
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/controllers"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services/inputs_service"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
 
 func setInputsEndpoints(apiGroup *gin.RouterGroup, inputsRepository repositories.InputsRepository) {
-	controller := controllers.NewInputsController(services.NewInputsService(inputsRepository))
+	controller := controllers.NewInputsController(inputs_service.NewInputsService(inputsRepository))
 	testApi := apiGroup.Group("/inputs")
 	{
 		testApi.GET("/metricas-generales", controller.GetGeneralMetrics)

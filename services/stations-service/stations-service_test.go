@@ -1,4 +1,4 @@
-package services
+package stations_service
 
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"

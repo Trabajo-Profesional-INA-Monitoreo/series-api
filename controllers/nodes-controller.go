@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services/nodes-service"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -11,10 +11,10 @@ type NodesController interface {
 }
 
 type nodesControllerImpl struct {
-	nodesService services.NodesService
+	nodesService nodes_service.NodesService
 }
 
-func NewNodesController(nodesService services.NodesService) NodesController {
+func NewNodesController(nodesService nodes_service.NodesService) NodesController {
 	return &nodesControllerImpl{nodesService: nodesService}
 }
 

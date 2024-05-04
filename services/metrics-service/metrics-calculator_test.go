@@ -1,4 +1,4 @@
-package services
+package metrics_service
 
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients/responses"
@@ -46,7 +46,7 @@ func TestShouldReturnAllTheConfigurableMetricsOfAnObservedStream(t *testing.T) {
 		observedData = append(observedData, responses.ObservedDataResponse{Value: &level})
 	}
 
-	metrics := getMetricsForObservedOrCuratedStream(observedData, neededMetrics, &noWaterLevel{})
+	metrics := GetMetricsForObservedOrCuratedStream(observedData, neededMetrics, &noWaterLevel{})
 	assert.Equal(t, 6, len(*metrics))
 }
 
@@ -60,7 +60,7 @@ func TestShouldReturnTheNullMetricOfAnObservedStream(t *testing.T) {
 	observedData = append(observedData, responses.ObservedDataResponse{Value: nil})
 	observedData = append(observedData, responses.ObservedDataResponse{Value: nil})
 
-	metrics := getMetricsForObservedOrCuratedStream(observedData, neededMetrics, &noWaterLevel{})
+	metrics := GetMetricsForObservedOrCuratedStream(observedData, neededMetrics, &noWaterLevel{})
 	assert.Equal(t, 2, len(*metrics))
 	assert.Equal(t, 2.0, (*metrics)[0].Value)
 }
@@ -79,7 +79,7 @@ func TestShouldReturnTheMinValueMetricOfAnObservedStream(t *testing.T) {
 		observedData = append(observedData, responses.ObservedDataResponse{Value: &level})
 	}
 
-	metrics := getMetricsForObservedOrCuratedStream(observedData, neededMetrics, &noWaterLevel{})
+	metrics := GetMetricsForObservedOrCuratedStream(observedData, neededMetrics, &noWaterLevel{})
 	assert.Equal(t, 2, len(*metrics))
 	assert.Equal(t, 3.0, (*metrics)[0].Value)
 }
@@ -98,7 +98,7 @@ func TestShouldReturnTheMaxValueMetricOfAnObservedStream(t *testing.T) {
 		observedData = append(observedData, responses.ObservedDataResponse{Value: &level})
 	}
 
-	metrics := getMetricsForObservedOrCuratedStream(observedData, neededMetrics, &noWaterLevel{})
+	metrics := GetMetricsForObservedOrCuratedStream(observedData, neededMetrics, &noWaterLevel{})
 	assert.Equal(t, 2, len(*metrics))
 	assert.Equal(t, 9.0, (*metrics)[0].Value)
 }
@@ -114,7 +114,7 @@ func TestShouldReturnAllTheConfigurableMetricsOfAForecastedStream(t *testing.T) 
 		MainForecast: &responses.ForecastedStream{Forecasts: [][]string{{"", "", "1.0", ""}, {"", "", "1.1", ""}, {"", "", "1.2", ""}, {"", "", "1.5", ""}}},
 	}
 
-	metrics := getMetricsForForecastedStream(lastForecast, neededMetrics, &noWaterLevel{})
+	metrics := GetMetricsForForecastedStream(lastForecast, neededMetrics, &noWaterLevel{})
 	assert.Equal(t, 5, len(*metrics))
 }
 
@@ -126,7 +126,7 @@ func TestShouldReturnMinValueOfAForecastedStream(t *testing.T) {
 		MainForecast: &responses.ForecastedStream{Forecasts: [][]string{{"", "", "1.0", ""}, {"", "", "0.5", ""}, {"", "", "1.2", ""}, {"", "", "1.5", ""}}},
 	}
 
-	metrics := getMetricsForForecastedStream(lastForecast, neededMetrics, &noWaterLevel{})
+	metrics := GetMetricsForForecastedStream(lastForecast, neededMetrics, &noWaterLevel{})
 	assert.Equal(t, 2, len(*metrics))
 	assert.Equal(t, 0.5, (*metrics)[0].Value)
 }
@@ -139,7 +139,7 @@ func TestShouldReturnMaxValueOfAForecastedStream(t *testing.T) {
 		MainForecast: &responses.ForecastedStream{Forecasts: [][]string{{"", "", "1.0", ""}, {"", "", "0.5", ""}, {"", "", "1.2", ""}, {"", "", "1.5", ""}}},
 	}
 
-	metrics := getMetricsForForecastedStream(lastForecast, neededMetrics, &noWaterLevel{})
+	metrics := GetMetricsForForecastedStream(lastForecast, neededMetrics, &noWaterLevel{})
 	assert.Equal(t, 2, len(*metrics))
 	assert.Equal(t, 1.5, (*metrics)[0].Value)
 }
@@ -152,7 +152,7 @@ func TestShouldReturnMedianValueOfAForecastedStream(t *testing.T) {
 		MainForecast: &responses.ForecastedStream{Forecasts: [][]string{{"", "", "1.0", ""}, {"", "", "2.0", ""}, {"", "", "3.0", ""}, {"", "", "4.0", ""}}},
 	}
 
-	metrics := getMetricsForForecastedStream(lastForecast, neededMetrics, &noWaterLevel{})
+	metrics := GetMetricsForForecastedStream(lastForecast, neededMetrics, &noWaterLevel{})
 	assert.Equal(t, 2, len(*metrics))
 	assert.Equal(t, 2.5, (*metrics)[0].Value)
 }
@@ -165,7 +165,7 @@ func TestShouldReturnAvgValueOfAForecastedStream(t *testing.T) {
 		MainForecast: &responses.ForecastedStream{Forecasts: [][]string{{"", "", "1.0", ""}, {"", "", "2.0", ""}, {"", "", "3.0", ""}}},
 	}
 
-	metrics := getMetricsForForecastedStream(lastForecast, neededMetrics, &noWaterLevel{})
+	metrics := GetMetricsForForecastedStream(lastForecast, neededMetrics, &noWaterLevel{})
 	assert.Equal(t, 2, len(*metrics))
 	assert.Equal(t, float64(2), (*metrics)[0].Value)
 }

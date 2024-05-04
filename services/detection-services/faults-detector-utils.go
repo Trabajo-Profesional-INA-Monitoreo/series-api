@@ -1,4 +1,4 @@
-package services
+package detection_services
 
 import (
 	"fmt"

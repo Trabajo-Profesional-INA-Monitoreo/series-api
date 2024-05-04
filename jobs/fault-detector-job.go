@@ -3,14 +3,14 @@ package jobs
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/config"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services/detection-services"
 	"github.com/robfig/cron/v3"
 	log "github.com/sirupsen/logrus"
 )
 
 func SetUpJobs(repositories *config.Repositories, apiConfig *config.ServiceConfigurationData) {
 	c := cron.New()
-	faultDetector := services.NewFaultDetectorService(repositories.StreamsRepository,
+	faultDetector := detection_services.NewFaultDetectorService(repositories.StreamsRepository,
 		repositories.ConfiguredStreamRepository,
 		repositories.ErrorsRepository,
 		clients.NewInaApiClientImpl(apiConfig),

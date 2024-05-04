@@ -1,9 +1,10 @@
-package services
+package outputs_service
 
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services/metrics-service"
 	log "github.com/sirupsen/logrus"
 	"time"
 )
@@ -29,7 +30,7 @@ func (s outputsServiceImpl) getLevelsCountForAllStreams(behaviourStreams []dtos.
 			log.Errorf("GetOutputBehaviourMetrics | Could not get metrics for stream with id %v: %v", stream.StreamId, err)
 			continue
 		}
-		calculator := NewCalculatorOfWaterLevels(stream.AlertLevel, stream.EvacuationLevel, stream.LowWaterLevel)
+		calculator := metrics_service.NewCalculatorOfWaterLevels(stream.AlertLevel, stream.EvacuationLevel, stream.LowWaterLevel)
 		for _, observedData := range values {
 			if observedData.Value != nil {
 				calculator.Compute(*observedData.Value)

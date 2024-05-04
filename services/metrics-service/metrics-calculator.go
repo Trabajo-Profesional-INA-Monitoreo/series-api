@@ -1,4 +1,4 @@
-package services
+package metrics_service
 
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients/responses"
@@ -16,7 +16,7 @@ type metricParameters struct {
 	nullValues       int
 }
 
-func getMetricsForForecastedStream(data *responses.Forecast, neededMetrics []entities.ConfiguredMetric, waterLevelCalculator WaterLevelsCalculator) *[]dtos.MetricCard {
+func GetMetricsForForecastedStream(data *responses.Forecast, neededMetrics []entities.ConfiguredMetric, waterLevelCalculator WaterLevelsCalculator) *[]dtos.MetricCard {
 	metricsValues := &metricParameters{
 		setUpFirstValues: false,
 		validValues:      responses.ConvertToFloats(data.MainForecast.Forecasts),
@@ -32,7 +32,7 @@ func getMetricsForForecastedStream(data *responses.Forecast, neededMetrics []ent
 	return addMetricsCards(neededMetrics, metricsValues, waterLevelCalculator)
 }
 
-func getMetricsForObservedOrCuratedStream(data []responses.ObservedDataResponse, neededMetrics []entities.ConfiguredMetric, waterLevelCalculator WaterLevelsCalculator) *[]dtos.MetricCard {
+func GetMetricsForObservedOrCuratedStream(data []responses.ObservedDataResponse, neededMetrics []entities.ConfiguredMetric, waterLevelCalculator WaterLevelsCalculator) *[]dtos.MetricCard {
 	metricsValues := &metricParameters{
 		setUpFirstValues: false,
 		validValues:      []float64{},

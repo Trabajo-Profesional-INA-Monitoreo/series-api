@@ -5,6 +5,9 @@ import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/config"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/controllers"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services/nodes-service"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services/outputs-service"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services/stations-service"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
@@ -12,10 +15,10 @@ import (
 func setSeriesEndpoints(apiGroup *gin.RouterGroup, repositories *config.Repositories, inaApiClient clients.InaAPiClient) {
 	streamsService := services.NewStreamService(repositories, inaApiClient)
 	streamsController := controllers.NewSeriesController(streamsService)
-	outputsController := controllers.NewOutputsController(services.NewOutputsService(repositories.OutputsRepository, inaApiClient))
+	outputsController := controllers.NewOutputsController(outputs_service.NewOutputsService(repositories.OutputsRepository, inaApiClient))
 	inaController := controllers.NewInaController(services.NewInaServiceApi(inaApiClient))
-	nodesController := controllers.NewNodesController(services.NewNodesService(repositories))
-	stationsController := controllers.NewStationsController(services.NewStationsService(repositories.StationsRepository))
+	nodesController := controllers.NewNodesController(nodes_service.NewNodesService(repositories))
+	stationsController := controllers.NewStationsController(stations_service.NewStationsService(repositories.StationsRepository))
 	testApi := apiGroup.Group("/series")
 	{
 		testApi.GET("", streamsController.GetStreamCards)

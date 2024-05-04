@@ -1,4 +1,4 @@
-package services
+package detection_services
 
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients"

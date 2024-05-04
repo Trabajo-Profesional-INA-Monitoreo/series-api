@@ -1,4 +1,4 @@
-package services
+package metrics_service
 
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"

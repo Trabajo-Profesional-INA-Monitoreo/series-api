@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
-	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services/outputs-service"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -12,10 +12,10 @@ type OutputsController interface {
 }
 
 type outputsControllerImpl struct {
-	outputsService services.OutputsService
+	outputsService outputs_service.OutputsService
 }
 
-func NewOutputsController(outputsService services.OutputsService) OutputsController {
+func NewOutputsController(outputsService outputs_service.OutputsService) OutputsController {
 	return &outputsControllerImpl{outputsService: outputsService}
 }
 

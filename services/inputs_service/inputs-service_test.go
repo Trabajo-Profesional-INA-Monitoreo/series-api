@@ -1,4 +1,4 @@
-package services
+package inputs_service
 
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"

@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/config"
+	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services/metrics-service"
 	"time"
 
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/clients"
@@ -41,7 +42,7 @@ func NewStreamService(repository *config.Repositories, inaApiClient clients.InaA
 
 func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, configured entities.ConfiguredStream, timeStart time.Time, timeEnd time.Time) (*[]dtos.MetricCard, *time.Time) {
 	neededMetrics := configured.Metrics
-	waterLevelCalculator := NewCalculatorOfWaterLevelsDependingOnVariable(*stream.Station, stream.VariableId)
+	waterLevelCalculator := metrics_service.NewCalculatorOfWaterLevelsDependingOnVariable(*stream.Station, stream.VariableId)
 	if stream.IsForecasted() {
 		values, err := s.inaApiClient.GetLastForecast(configured.CalibrationId)
 		if err != nil {
@@ -49,7 +50,7 @@ func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, co
 			return nil, nil
 		}
 		forecast := values.GetForecastOfStream(stream.StreamId)
-		return getMetricsForForecastedStream(forecast, neededMetrics, waterLevelCalculator), &values.ForecastDate
+		return metrics_service.GetMetricsForForecastedStream(forecast, neededMetrics, waterLevelCalculator), &values.ForecastDate
 	}
 	lastUpdateResponse := make(chan *time.Time)
 	go func() {
@@ -67,7 +68,7 @@ func (s streamService) getMetricsFromConfiguredStream(stream entities.Stream, co
 		return nil, nil
 	}
 
-	return getMetricsForObservedOrCuratedStream(values, neededMetrics, waterLevelCalculator), <-lastUpdateResponse
+	return metrics_service.GetMetricsForObservedOrCuratedStream(values, neededMetrics, waterLevelCalculator), <-lastUpdateResponse
 }
 
 func (s streamService) GetStreamData(streamId uint64, configId uint64, timeStart time.Time, timeEnd time.Time) (*dtos.StreamData, error) {

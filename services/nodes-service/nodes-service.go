@@ -1,4 +1,4 @@
-package services
+package nodes_service
 
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/config"
