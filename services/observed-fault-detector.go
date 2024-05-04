@@ -11,12 +11,12 @@ import (
 )
 
 type observedFaultDetectorService struct {
-	configuredStreamsRepository repositories.ConfiguredStreamsRepository
-	errorsRepository            repositories.ErrorsRepository
+	configuredStreamsRepository repositories.DetectionConfiguredStreamsRepository
+	errorsRepository            repositories.ErrorDetectionRepository
 	inaApiClient                clients.InaAPiClient
 }
 
-func newObservedFaultDetectorService(configuredStreamsRepository repositories.ConfiguredStreamsRepository, errorsRepository repositories.ErrorsRepository, inaApiClient clients.InaAPiClient) StreamFaultDetector {
+func newObservedFaultDetectorService(configuredStreamsRepository repositories.DetectionConfiguredStreamsRepository, errorsRepository repositories.ErrorDetectionRepository, inaApiClient clients.InaAPiClient) StreamFaultDetector {
 	return &observedFaultDetectorService{configuredStreamsRepository: configuredStreamsRepository, errorsRepository: errorsRepository, inaApiClient: inaApiClient}
 }
 

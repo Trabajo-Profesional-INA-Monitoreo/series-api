@@ -8,15 +8,23 @@ import (
 	"time"
 )
 
-type ErrorsRepository interface {
+type ErrorDetectionRepository interface {
 	AlreadyDetectedErrorForStreamWithIdAndType(uint64, string, entities.ErrorType) bool
 	GetDetectedErrorForStreamWithIdAndType(streamId uint64, requestId string, errorType entities.ErrorType) entities.DetectedError
 	Create(detectedError entities.DetectedError)
 	Update(detectedError entities.DetectedError)
+}
+
+type ErrorMetricsRepository interface {
 	GetErrorsPerDay(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorsCountPerDayAndType
 	GetErrorIndicators(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorIndicator
 	GetRelatedStreamsToError(parameters *dtos.QueryParameters) ([]dtos.ErrorRelatedStream, error)
 	GetErrorsOfConfiguredStream(parameters *dtos.QueryParameters) (*dtos.DetectedErrorsOfStream, error)
+}
+
+type ErrorsRepository interface {
+	ErrorDetectionRepository
+	ErrorMetricsRepository
 }
 
 type errorsRepository struct {

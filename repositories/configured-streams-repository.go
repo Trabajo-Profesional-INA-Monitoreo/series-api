@@ -12,15 +12,27 @@ import (
 	"gorm.io/gorm"
 )
 
-type ConfiguredStreamsRepository interface {
-	FindConfiguredStreamsWithCheckErrorsForStream(stream entities.Stream) []entities.ConfiguredStream
+type MetricsConfiguredStreamsRepository interface {
 	FindConfiguredStreamById(configStreamId uint64) (entities.ConfiguredStream, error)
+	CountErrorOfConfigurations(ids []uint64, parameters *dtos.QueryParameters) ([]dtos.ErrorsPerConfigStream, error)
+}
+
+type DetectionConfiguredStreamsRepository interface {
+	FindConfiguredStreamsWithCheckErrorsForStream(stream entities.Stream) []entities.ConfiguredStream
+}
+
+type ManagerConfiguredStreamsRepository interface {
 	Create(e *entities.ConfiguredStream) (uint64, error)
 	FindConfiguredStreamsByNodeId(nodeId uint64, configurationId uint64) *[]*dtos.ConfiguredStream
 	Update(e *entities.ConfiguredStream) error
-	CountErrorOfConfigurations(ids []uint64, parameters *dtos.QueryParameters) ([]dtos.ErrorsPerConfigStream, error)
 	MarkAsDeletedOldConfiguredStreams(configId uint64, newConfigStreamIds []uint64)
 	DeleteByConfig(configId uint64)
+}
+
+type ConfiguredStreamsRepository interface {
+	MetricsConfiguredStreamsRepository
+	DetectionConfiguredStreamsRepository
+	ManagerConfiguredStreamsRepository
 }
 
 type configuredStreamsRepository struct {

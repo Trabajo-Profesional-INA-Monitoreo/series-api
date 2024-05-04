@@ -12,12 +12,12 @@ import (
 )
 
 type forecastFaultDetectorService struct {
-	configuredStreamsRepository repositories.ConfiguredStreamsRepository
-	errorsRepository            repositories.ErrorsRepository
+	configuredStreamsRepository repositories.DetectionConfiguredStreamsRepository
+	errorsRepository            repositories.ErrorDetectionRepository
 	inaApiClient                clients.InaAPiClient
 }
 
-func newForecastFaultDetectorService(configuredStreamsRepository repositories.ConfiguredStreamsRepository, errorsRepository repositories.ErrorsRepository, inaApiClient clients.InaAPiClient) *forecastFaultDetectorService {
+func newForecastFaultDetectorService(configuredStreamsRepository repositories.DetectionConfiguredStreamsRepository, errorsRepository repositories.ErrorDetectionRepository, inaApiClient clients.InaAPiClient) *forecastFaultDetectorService {
 	return &forecastFaultDetectorService{configuredStreamsRepository: configuredStreamsRepository, errorsRepository: errorsRepository, inaApiClient: inaApiClient}
 }
 

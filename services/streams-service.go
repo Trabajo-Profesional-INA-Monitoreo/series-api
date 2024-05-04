@@ -22,9 +22,9 @@ type StreamService interface {
 }
 
 type streamService struct {
-	repository                  repositories.StreamRepository
+	repository                  repositories.ManagerStreamsRepository
 	inaApiClient                clients.InaAPiClient
-	configuredStreamsRepository repositories.ConfiguredStreamsRepository
+	configuredStreamsRepository repositories.MetricsConfiguredStreamsRepository
 	nodesRepository             repositories.NodeRepository
 }
 

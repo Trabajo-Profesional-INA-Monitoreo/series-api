@@ -14,10 +14,10 @@ type OutputsService interface {
 
 type outputsServiceImpl struct {
 	inaApiClient clients.InaAPiClient
-	repository   repositories.StreamRepository
+	repository   repositories.OutputsRepository
 }
 
-func NewOutputsService(repository repositories.StreamRepository, inaApiClient clients.InaAPiClient) OutputsService {
+func NewOutputsService(repository repositories.OutputsRepository, inaApiClient clients.InaAPiClient) OutputsService {
 	return &outputsServiceImpl{repository: repository, inaApiClient: inaApiClient}
 }
 

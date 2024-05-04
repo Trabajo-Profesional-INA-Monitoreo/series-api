@@ -18,6 +18,9 @@ type Repositories struct {
 	FilterRepository           repositories.FilterRepository
 	MetricsRepository          repositories.MetricsRepository
 	RedundancyRepository       repositories.RedundancyRepository
+	InputsRepository           repositories.InputsRepository
+	StationsRepository         repositories.StationsRepository
+	OutputsRepository          repositories.OutputsRepository
 }
 
 func loggerStringToGormLogger(loggerConfig string) logger.LogLevel {
@@ -73,6 +76,9 @@ func CreateRepositories(connectionData string, loggerConfig string) *Repositorie
 		FilterRepository:           repositories.NewFilterRepository(connection),
 		MetricsRepository:          repositories.NewMetricsRepository(connection),
 		RedundancyRepository:       repositories.NewRedundancyRepository(connection),
+		InputsRepository:           repositories.NewInputsRepository(connection),
+		StationsRepository:         repositories.NewStationsRepository(connection),
+		OutputsRepository:          repositories.NewOutputsRepository(connection),
 	}
 	log.Infof("Done creating repositories")
 	return &repos

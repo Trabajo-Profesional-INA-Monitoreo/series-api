@@ -21,7 +21,7 @@ type ConfigurationService interface {
 type configurationService struct {
 	configurationRepository      repositories.ConfigurationRepository
 	nodeRepository               repositories.NodeRepository
-	configuratedStreamRepository repositories.ConfiguredStreamsRepository
+	configuratedStreamRepository repositories.ManagerConfiguredStreamsRepository
 	streamService                StreamService
 	metricsRepository            repositories.MetricsRepository
 	redundancyRepository         repositories.RedundancyRepository

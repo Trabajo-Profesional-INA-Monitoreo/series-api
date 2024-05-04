@@ -20,7 +20,7 @@ type StreamFaultDetector interface {
 }
 
 type faultDetectorService struct {
-	streamsRepository            repositories.StreamRepository
+	streamsRepository            repositories.FaultDetectionStreamsRepository
 	observedFaultDetectorService StreamFaultDetector
 	forecastFaultDetectorService StreamFaultDetector
 	detectionMaxThreads          int
@@ -28,7 +28,7 @@ type faultDetectorService struct {
 
 func NewFaultDetectorService(streamsRepository repositories.StreamRepository,
 	configuredStreamsRepository repositories.ConfiguredStreamsRepository,
-	errorsRepository repositories.ErrorsRepository,
+	errorsRepository repositories.ErrorDetectionRepository,
 	inaApiClient clients.InaAPiClient,
 	detectionMaxThreads int,
 ) FaultDetector {

@@ -17,7 +17,7 @@ type inputsService struct {
 	repository repositories.InputsRepository
 }
 
-func NewInputsService(repository repositories.StreamRepository) InputsService {
+func NewInputsService(repository repositories.InputsRepository) InputsService {
 	return &inputsService{repository}
 }
 

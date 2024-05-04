@@ -14,10 +14,10 @@ type ErrorsService interface {
 }
 
 type errorsService struct {
-	repository repositories.ErrorsRepository
+	repository repositories.ErrorMetricsRepository
 }
 
-func NewErrorsService(repository repositories.ErrorsRepository) ErrorsService {
+func NewErrorsService(repository repositories.ErrorMetricsRepository) ErrorsService {
 	return &errorsService{repository: repository}
 }
 

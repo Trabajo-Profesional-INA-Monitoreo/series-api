@@ -8,8 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func setInputsEndpoints(apiGroup *gin.RouterGroup, streamsRepository repositories.StreamRepository) {
-	controller := controllers.NewInputsController(services.NewInputsService(streamsRepository))
+func setInputsEndpoints(apiGroup *gin.RouterGroup, inputsRepository repositories.InputsRepository) {
+	controller := controllers.NewInputsController(services.NewInputsService(inputsRepository))
 	testApi := apiGroup.Group("/inputs")
 	{
 		testApi.GET("/metricas-generales", controller.GetGeneralMetrics)
