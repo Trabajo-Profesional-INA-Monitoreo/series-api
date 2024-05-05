@@ -8,6 +8,7 @@ import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
 	log "github.com/sirupsen/logrus"
+	"time"
 )
 
 type ConfigurationService interface {
@@ -28,11 +29,22 @@ type configurationService struct {
 }
 
 func (c configurationService) deleteFromDbConfiguration(configId uint64) {
-
+	waitForDeletion()
+	log.Infof("Deleting configuration %v from DB", configId)
 	c.configuratedStreamRepository.DeleteByConfig(configId)
 	c.nodeRepository.DeleteByConfig(configId)
 	c.configurationRepository.DeleteById(configId)
+}
 
+func waitForDeletion() {
+	t := time.Now()
+	n := time.Date(t.Year(), t.Month(), t.Day(), 3, 0, 0, 0, t.Location())
+	d := n.Sub(t)
+	if d < 0 {
+		n = n.Add(24 * time.Hour)
+		d = n.Sub(t)
+	}
+	time.Sleep(d)
 }
 
 func (c configurationService) ModifyConfiguration(configuration dtos.Configuration) error {
@@ -170,6 +182,7 @@ func (c configurationService) ModifyConfiguration(configuration dtos.Configurati
 }
 
 func (c configurationService) DeleteConfiguration(id uint64) {
+	log.Infof("Setting configuration %v as deleted", id)
 	c.configurationRepository.MarkAsDeleted(id)
 	c.nodeRepository.MarkAsDeletedOldNodes(id, nil)
 	c.configuratedStreamRepository.MarkAsDeletedOldConfiguredStreams(id, nil)
