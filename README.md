@@ -1,4 +1,6 @@
-# Inputs API
+# Series API
+
+Servicio para monitorear y detectar fallas en las series observadas, curadas y pronosticadas del INA.
 
 ## Ejecución
 La aplicación se puede ejecutar de forma local o contanerizada. 
