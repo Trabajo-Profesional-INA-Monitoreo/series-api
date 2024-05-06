@@ -6,8 +6,8 @@ import (
 )
 
 type DetectedErrorsOfStream struct {
-	Content  []*ErrorDto
-	Pageable Pageable
+	Content  []*ErrorDto `json:"Content"`
+	Pageable Pageable    `json:"Pageable"`
 }
 
 func NewDetectedErrorsOfStream(content []*ErrorDto, pageable Pageable) *DetectedErrorsOfStream {
@@ -15,11 +15,11 @@ func NewDetectedErrorsOfStream(content []*ErrorDto, pageable Pageable) *Detected
 }
 
 type ErrorDto struct {
-	ErrorId       uint64
-	DetectedDate  time.Time
-	ErrorTypeId   entities.ErrorType
-	ErrorTypeName string
-	ExtraInfo     string
+	ErrorId       uint64             `json:"ErrorId"`
+	DetectedDate  time.Time          `json:"DetectedDate"`
+	ErrorTypeId   entities.ErrorType `json:"ErrorTypeId"`
+	ErrorTypeName string             `json:"ErrorTypeName"`
+	ExtraInfo     string             `json:"ExtraInfo"`
 }
 
 func (d *DetectedErrorsOfStream) ConvertToResponse() {

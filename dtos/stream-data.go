@@ -6,25 +6,25 @@ import (
 )
 
 type StreamData struct {
-	Metrics                 *[]MetricCard
-	Station                 string
-	VarId                   uint64
-	VarName                 string
-	AlertLevel              *float64
-	EvacuationLevel         *float64
-	LowWaterLevel           *float64
-	Owner                   string
-	Unit                    string
-	UnitId                  uint64
-	Procedure               string
-	ProcId                  uint64
-	UpdateFrequency         float64
-	StreamType              entities.StreamType
-	CalibrationId           uint64
-	ObservedRelatedStreamId *uint64
-	LastUpdate              *time.Time
-	NormalUpperThreshold    float64
-	NormalLowerThreshold    float64
+	Metrics                 *[]MetricCard       `json:"Metrics"`
+	Station                 string              `json:"Station"`
+	VarId                   uint64              `json:"VarId"`
+	VarName                 string              `json:"VarName"`
+	AlertLevel              *float64            `json:"AlertLevel"`
+	EvacuationLevel         *float64            `json:"EvacuationLevel"`
+	LowWaterLevel           *float64            `json:"LowWaterLevel"`
+	Owner                   string              `json:"Owner"`
+	Unit                    string              `json:"Unit"`
+	UnitId                  uint64              `json:"UnitId"`
+	Procedure               string              `json:"Procedure"`
+	ProcId                  uint64              `json:"ProcId"`
+	UpdateFrequency         float64             `json:"UpdateFrequency"`
+	StreamType              entities.StreamType `json:"StreamType"`
+	CalibrationId           uint64              `json:"CalibrationId"`
+	ObservedRelatedStreamId *uint64             `json:"ObservedRelatedStreamId"`
+	LastUpdate              *time.Time          `json:"LastUpdate"`
+	NormalUpperThreshold    float64             `json:"NormalUpperThreshold"`
+	NormalLowerThreshold    float64             `json:"NormalLowerThreshold"`
 }
 
 func NewStreamData(stream entities.Stream, configured entities.ConfiguredStream) *StreamData {

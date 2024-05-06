@@ -1,16 +1,16 @@
 package dtos
 
 type InputsGeneralMetrics struct {
-	TotalStreams  int
-	TotalStations int
+	TotalStreams  int `json:"TotalStreams"`
+	TotalStations int `json:"TotalStations"`
 }
 
 type TotalStreamsWithNullValues struct {
-	TotalStreams         int
-	TotalStreamsWithNull int
+	TotalStreams         int `json:"TotalStreams"`
+	TotalStreamsWithNull int `json:"TotalStreamsWithNull"`
 }
 
 type TotalStreamsWithObservedOutlier struct {
-	TotalStreams                    int
-	TotalStreamsWithObservedOutlier int
+	TotalStreams                    int `json:"TotalStreams"`
+	TotalStreamsWithObservedOutlier int `json:"TotalStreamsWithObservedOutlier"`
 }

@@ -3,10 +3,10 @@ package dtos
 import "math"
 
 type Pageable struct {
-	Pages         int
-	TotalElements int
-	Page          int
-	PageSize      int
+	Pages         int `json:"Pages"`
+	TotalElements int `json:"TotalElements"`
+	Page          int `json:"Page"`
+	PageSize      int `json:"PageSize"`
 }
 
 func NewPageable(totalElements int, page int, pageSize int) Pageable {

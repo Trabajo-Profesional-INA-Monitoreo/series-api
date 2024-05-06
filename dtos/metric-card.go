@@ -1,8 +1,8 @@
 package dtos
 
 type MetricCard struct {
-	Name  string
-	Value float64
+	Name  string  `json:"Name"`
+	Value float64 `json:"Value"`
 }
 
 func NewMetricCard(name string, value float64) MetricCard {

@@ -5,13 +5,13 @@ type StreamsPerStationResponse struct {
 }
 
 type StreamsPerStation struct {
-	StationName  string `gorm:"column:station_name"`
-	StationId    string `gorm:"column:station_id"`
-	StreamsCount int    `gorm:"column:streams_count"`
-	ErrorCount   int
+	StationName  string `gorm:"column:station_name" json:"StationName"`
+	StationId    string `gorm:"column:station_id" json:"StationId"`
+	StreamsCount int    `gorm:"column:streams_count" json:"StreamsCount"`
+	ErrorCount   int    `json:"ErrorCount"`
 }
 
 type ErrorsOfStations struct {
-	StationId  string `gorm:"column:station_id"`
-	ErrorCount int    `gorm:"column:error_count"`
+	StationId  string `gorm:"column:station_id" json:"StationId"`
+	ErrorCount int    `gorm:"column:error_count" json:"ErrorCount"`
 }

@@ -1,17 +1,17 @@
 package dtos
 
 type BehaviourStream struct {
-	StreamId        uint64
-	AlertLevel      *float64
-	EvacuationLevel *float64
-	LowWaterLevel   *float64
+	StreamId        uint64   `json:"StreamId"`
+	AlertLevel      *float64 `json:"AlertLevel"`
+	EvacuationLevel *float64 `json:"EvacuationLevel"`
+	LowWaterLevel   *float64 `json:"LowWaterLevel"`
 }
 
 type BehaviourStreamsResponse struct {
-	TotalValuesCount     uint64
-	CountAlertLevel      uint64
-	CountEvacuationLevel uint64
-	CountLowWaterLevel   uint64
+	TotalValuesCount     uint64 `json:"TotalValuesCount"`
+	CountAlertLevel      uint64 `json:"CountAlertLevel"`
+	CountEvacuationLevel uint64 `json:"CountEvacuationLevel"`
+	CountLowWaterLevel   uint64 `json:"CountLowWaterLevel"`
 }
 
 func NewBehaviourStreamsResponse() *BehaviourStreamsResponse {

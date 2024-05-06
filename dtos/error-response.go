@@ -3,8 +3,8 @@ package dtos
 import "time"
 
 type ErrorResponse struct {
-	Message   string    `json:"message"`
-	Timestamp time.Time `json:"timestamp"`
+	Message   string    `json:"Message"`
+	Timestamp time.Time `json:"Timestamp"`
 }
 
 func NewErrorResponse(err error) *ErrorResponse {

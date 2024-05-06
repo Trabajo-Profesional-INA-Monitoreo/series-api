@@ -1,408 +1,408 @@
 definitions:
   dtos.AllConfigurations:
     properties:
-      id:
+      Id:
         type: integer
-      name:
+      Name:
         type: string
     type: object
   dtos.BehaviourStreamsResponse:
     properties:
-      countAlertLevel:
+      CountAlertLevel:
         type: integer
-      countEvacuationLevel:
+      CountEvacuationLevel:
         type: integer
-      countLowWaterLevel:
+      CountLowWaterLevel:
         type: integer
-      totalValuesCount:
+      TotalValuesCount:
         type: integer
     type: object
   dtos.CalibratedStreamsData:
     properties:
-      qualifier:
+      Qualifier:
         type: string
-      time:
+      Time:
         type: string
-      value:
+      Value:
         type: number
     type: object
   dtos.CalibratedStreamsDataResponse:
     properties:
-      mainStreams:
+      MainStreams:
         items:
           $ref: '#/definitions/dtos.CalibratedStreamsData'
         type: array
-      p05Streams:
+      P05Streams:
         items:
           $ref: '#/definitions/dtos.CalibratedStreamsData'
         type: array
-      p25Streams:
+      P25Streams:
         items:
           $ref: '#/definitions/dtos.CalibratedStreamsData'
         type: array
-      p75Streams:
+      P75Streams:
         items:
           $ref: '#/definitions/dtos.CalibratedStreamsData'
         type: array
-      p95Streams:
+      P95Streams:
         items:
           $ref: '#/definitions/dtos.CalibratedStreamsData'
         type: array
     type: object
   dtos.Configuration:
     properties:
-      id:
+      Id:
         type: integer
-      name:
+      Name:
         minLength: 1
         type: string
-      nodes:
+      Nodes:
         items:
           $ref: '#/definitions/dtos.Node'
         minItems: 1
         type: array
-      sendNotifications:
+      SendNotifications:
         type: boolean
     required:
-    - name
-    - nodes
+    - Name
+    - Nodes
     type: object
   dtos.ConfiguredStream:
     properties:
-      calibrationId:
+      CalibrationId:
         type: integer
-      checkErrors:
+      CheckErrors:
         type: boolean
-      configuredStreamId:
+      ConfiguredStreamId:
         type: integer
-      lowerThreshold:
+      LowerThreshold:
         type: number
-      metrics:
+      Metrics:
         items:
           $ref: '#/definitions/entities.Metric'
         maxItems: 5
         minItems: 0
         type: array
         uniqueItems: true
-      observedRelatedStreamId:
+      ObservedRelatedStreamId:
         type: integer
-      redundanciesIds:
+      RedundanciesIds:
         items:
           type: integer
         type: array
-      streamId:
+      StreamId:
         minimum: 1
         type: integer
-      streamType:
+      StreamType:
         allOf:
         - $ref: '#/definitions/entities.StreamType'
         maximum: 2
         minimum: 0
-      updateFrequency:
+      UpdateFrequency:
         minimum: 0
         type: number
-      upperThreshold:
+      UpperThreshold:
         type: number
     required:
-    - streamId
+    - StreamId
     type: object
   dtos.ConfiguredStreamCreate:
     properties:
-      calibrationId:
+      CalibrationId:
         type: integer
-      checkErrors:
+      CheckErrors:
         type: boolean
-      lowerThreshold:
+      LowerThreshold:
         type: number
-      metrics:
+      Metrics:
         items:
           $ref: '#/definitions/entities.Metric'
         maxItems: 5
         minItems: 0
         type: array
         uniqueItems: true
-      observedRelatedStreamId:
+      ObservedRelatedStreamId:
         type: integer
-      redundanciesIds:
+      RedundanciesIds:
         items:
           type: integer
         type: array
-      streamId:
+      StreamId:
         minimum: 1
         type: integer
-      streamType:
+      StreamType:
         allOf:
         - $ref: '#/definitions/entities.StreamType'
         maximum: 2
-      updateFrequency:
+      UpdateFrequency:
         minimum: 0
         type: number
-      upperThreshold:
+      UpperThreshold:
         type: number
     required:
-    - streamId
+    - StreamId
     type: object
   dtos.CreateConfiguration:
     properties:
-      name:
+      Name:
         minLength: 1
         type: string
-      nodes:
+      Nodes:
         items:
           $ref: '#/definitions/dtos.CreateNode'
         minItems: 1
         type: array
-      sendNotifications:
+      SendNotifications:
         type: boolean
     required:
-    - name
-    - nodes
+    - Name
+    - Nodes
     type: object
   dtos.CreateNode:
     properties:
-      configuredStreams:
+      ConfiguredStreams:
         items:
           $ref: '#/definitions/dtos.ConfiguredStreamCreate'
         minItems: 1
         type: array
-      name:
+      Name:
         minLength: 1
         type: string
     required:
-    - configuredStreams
-    - name
+    - ConfiguredStreams
+    - Name
     type: object
   dtos.DetectedErrorsOfStream:
     properties:
-      content:
+      Content:
         items:
           $ref: '#/definitions/dtos.ErrorDto'
         type: array
-      pageable:
+      Pageable:
         $ref: '#/definitions/dtos.Pageable'
     type: object
   dtos.ErrorDto:
     properties:
-      detectedDate:
+      DetectedDate:
         type: string
-      errorId:
+      ErrorId:
         type: integer
-      errorTypeId:
+      ErrorTypeId:
         $ref: '#/definitions/entities.ErrorType'
-      errorTypeName:
+      ErrorTypeName:
         type: string
-      extraInfo:
+      ExtraInfo:
         type: string
     type: object
   dtos.ErrorIndicator:
     properties:
+      Count:
+        type: integer
       ErrorId:
         $ref: '#/definitions/entities.ErrorType'
-      count:
-        type: integer
-      errorType:
+      ErrorType:
         type: string
     type: object
   dtos.ErrorResponse:
     properties:
-      message:
+      Message:
         type: string
-      timestamp:
+      Timestamp:
         type: string
     type: object
   dtos.ErrorsCountPerDayAndType:
     properties:
-      date:
+      Date:
         type: string
-      errorType:
+      ErrorType:
         type: string
-      total:
+      Total:
         type: integer
     type: object
   dtos.InputsGeneralMetrics:
     properties:
-      totalStations:
+      TotalStations:
         type: integer
-      totalStreams:
+      TotalStreams:
         type: integer
     type: object
   dtos.MetricCard:
     properties:
-      name:
+      Name:
         type: string
-      value:
+      Value:
         type: number
     type: object
   dtos.Node:
     properties:
-      configuredStreams:
+      ConfiguredStreams:
         items:
           $ref: '#/definitions/dtos.ConfiguredStream'
         minItems: 1
         type: array
-      id:
+      Id:
         type: integer
-      name:
+      Name:
         minLength: 1
         type: string
     required:
-    - configuredStreams
-    - name
+    - ConfiguredStreams
+    - Name
     type: object
   dtos.Pageable:
     properties:
-      page:
+      Page:
         type: integer
-      pageSize:
+      PageSize:
         type: integer
-      pages:
+      Pages:
         type: integer
-      totalElements:
+      TotalElements:
         type: integer
     type: object
   dtos.ProcedureFilter:
     properties:
-      id:
+      Id:
         type: integer
-      name:
+      Name:
         type: string
     type: object
   dtos.Redundancies:
     properties:
-      redundancies:
+      Redundancies:
         items:
           type: integer
         type: array
     type: object
   dtos.StationFilter:
     properties:
-      id:
+      Id:
         type: integer
-      name:
+      Name:
         type: string
     type: object
   dtos.StreamCard:
     properties:
-      calibrationId:
+      CalibrationId:
         type: integer
-      checkErrors:
+      CheckErrors:
         type: boolean
-      configuredStreamId:
+      ConfiguredStreamId:
         type: integer
-      observedRelatedStreamId:
+      ObservedRelatedStreamId:
         type: integer
-      procedureId:
+      ProcedureId:
         type: integer
-      procedureName:
+      ProcedureName:
         type: string
-      stationId:
+      StationId:
         type: integer
-      stationName:
+      StationName:
         type: string
-      streamId:
+      StreamId:
         type: integer
-      streamType:
+      StreamType:
         $ref: '#/definitions/entities.StreamType'
-      totalErrors:
+      TotalErrors:
         type: integer
-      variableId:
+      VariableId:
         type: integer
-      variableName:
+      VariableName:
         type: string
     type: object
   dtos.StreamCardsResponse:
     properties:
-      content:
+      Content:
         items:
           $ref: '#/definitions/dtos.StreamCard'
         type: array
-      pageable:
+      Pageable:
         $ref: '#/definitions/dtos.Pageable'
     type: object
   dtos.StreamData:
     properties:
-      alertLevel:
+      AlertLevel:
         type: number
-      calibrationId:
+      CalibrationId:
         type: integer
-      evacuationLevel:
+      EvacuationLevel:
         type: number
-      lastUpdate:
+      LastUpdate:
         type: string
-      lowWaterLevel:
+      LowWaterLevel:
         type: number
-      metrics:
+      Metrics:
         items:
           $ref: '#/definitions/dtos.MetricCard'
         type: array
-      normalLowerThreshold:
+      NormalLowerThreshold:
         type: number
-      normalUpperThreshold:
+      NormalUpperThreshold:
         type: number
-      observedRelatedStreamId:
+      ObservedRelatedStreamId:
         type: integer
-      owner:
+      Owner:
         type: string
-      procId:
+      ProcId:
         type: integer
-      procedure:
+      Procedure:
         type: string
-      station:
+      Station:
         type: string
-      streamType:
+      StreamType:
         $ref: '#/definitions/entities.StreamType'
-      unit:
+      Unit:
         type: string
-      unitId:
+      UnitId:
         type: integer
-      updateFrequency:
+      UpdateFrequency:
         type: number
-      varId:
+      VarId:
         type: integer
-      varName:
+      VarName:
         type: string
     type: object
   dtos.StreamsData:
     properties:
-      time:
+      Time:
         type: string
-      value:
+      Value:
         type: number
     type: object
   dtos.StreamsDataResponse:
     properties:
-      streams:
+      Streams:
         items:
           $ref: '#/definitions/dtos.StreamsData'
         type: array
     type: object
   dtos.StreamsPerNode:
     properties:
-      errorCount:
+      ErrorCount:
         type: integer
-      nodeId:
+      NodeId:
         type: string
-      nodeName:
+      NodeName:
         type: string
-      streamsCount:
+      StreamsCount:
         type: integer
     type: object
   dtos.StreamsPerNodeResponse:
     properties:
-      nodes:
+      Nodes:
         items:
           $ref: '#/definitions/dtos.StreamsPerNode'
         type: array
     type: object
   dtos.StreamsPerStation:
     properties:
-      errorCount:
+      ErrorCount:
         type: integer
-      stationId:
+      StationId:
         type: string
-      stationName:
+      StationName:
         type: string
-      streamsCount:
+      StreamsCount:
         type: integer
     type: object
   dtos.StreamsPerStationResponse:
@@ -414,23 +414,23 @@ definitions:
     type: object
   dtos.TotalStreamsWithNullValues:
     properties:
-      totalStreams:
+      TotalStreams:
         type: integer
-      totalStreamsWithNull:
+      TotalStreamsWithNull:
         type: integer
     type: object
   dtos.TotalStreamsWithObservedOutlier:
     properties:
-      totalStreams:
+      TotalStreams:
         type: integer
-      totalStreamsWithObservedOutlier:
+      TotalStreamsWithObservedOutlier:
         type: integer
     type: object
   dtos.VariableFilter:
     properties:
-      id:
+      Id:
         type: integer
-      name:
+      Name:
         type: string
     type: object
   entities.ErrorType:

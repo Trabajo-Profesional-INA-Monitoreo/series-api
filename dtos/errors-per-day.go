@@ -7,9 +7,9 @@ import (
 
 type ErrorsCountPerDayAndType struct {
 	ErrorTypeId entities.ErrorType `gorm:"column:error_type" json:"-"`
-	ErrorType   string             `gorm:"-"`
-	Total       int                `gorm:"column:total"`
-	Date        time.Time          `gorm:"column:date"`
+	ErrorType   string             `gorm:"-" json:"ErrorType"`
+	Total       int                `gorm:"column:total" json:"Total"`
+	Date        time.Time          `gorm:"column:date" json:"Date"`
 }
 
 func (e *ErrorsCountPerDayAndType) ConvertToResponse() {

@@ -1,5 +1,5 @@
 package dtos
 
 type Redundancies struct {
-	Redundancies []int
+	Redundancies []int `json:"Redundancies"`
 }

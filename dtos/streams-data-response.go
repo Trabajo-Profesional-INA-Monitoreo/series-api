@@ -3,10 +3,10 @@ package dtos
 import "time"
 
 type StreamsDataResponse struct {
-	Streams []StreamsData
+	Streams []StreamsData `json:"Streams"`
 }
 
 type StreamsData struct {
-	Time  time.Time
-	Value *float64
+	Time  time.Time `json:"Time"`
+	Value *float64  `json:"Value"`
 }
