@@ -8,7 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func SetUpJobs(repositories *config.Repositories, apiConfig *config.ServiceConfigurationData) {
+func SetUpFaultDetectorJobs(repositories *config.Repositories, apiConfig *config.ServiceConfigurationData) {
 	c := cron.New()
 	faultDetector := detection_services.NewFaultDetectorService(repositories.StreamsRepository,
 		repositories.ConfiguredStreamRepository,
