@@ -12,8 +12,10 @@ type ServiceConfigurationData struct {
 	ServerPort                  string
 	DbUrl                       string
 	FaultCronTime               string
+	DailyNotificationCronTime   string
 	InaToken                    string
 	InaBaseUrl                  string
+	NotificationApiBaseUrl      string
 	ForecastMaxWaitingTimeHours float64
 	SecurityEnabled             bool
 	KeycloakConfig              *KeycloakConfiguration
@@ -39,8 +41,10 @@ func initEnv() (*viper.Viper, error) {
 	_ = v.BindEnv("datasource", "connection")
 	_ = v.BindEnv("faults-detector", "cron")
 	_ = v.BindEnv("faults-detector", "max-threads")
+	_ = v.BindEnv("daily-notifications", "cron")
 	_ = v.BindEnv("ina-client", "token")
 	_ = v.BindEnv("ina-client", "base-url")
+	_ = v.BindEnv("notifications-api-client", "base-url")
 	_ = v.BindEnv("security", "enabled")
 	_ = v.BindEnv("keycloak", "url")
 	_ = v.BindEnv("keycloak", "realm")
@@ -71,21 +75,25 @@ func GetConfig() *ServiceConfigurationData {
 	dbConnection := getEnvString(env, "datasource.connection")
 	faultsDetectorCron := getEnvString(env, "faults-detector.cron")
 	detectionMaxThreads := getEnvUint(env, "faults-detector.max-threads")
+	dailyNotificationsCron := getEnvString(env, "daily-notifications.cron")
 	inaBaseUrl := getEnvString(env, "ina-client.base-url")
 	inaToken := getEnvString(env, "ina-client.token")
+	notificationApiBaseUrl := getEnvString(env, "notifications-api-client.base-url")
 	securityEnabled := getEnvBool(env, "security.enabled")
 	kcConfig := getKeycloakConfig(env, securityEnabled)
 
 	return &ServiceConfigurationData{
-		LogLevel:            logLevel,
-		SqlLogLevel:         sqlLogLevel,
-		ServerPort:          serverPort,
-		DbUrl:               dbConnection,
-		FaultCronTime:       faultsDetectorCron,
-		InaBaseUrl:          inaBaseUrl,
-		InaToken:            inaToken,
-		SecurityEnabled:     securityEnabled,
-		KeycloakConfig:      kcConfig,
-		DetectionMaxThreads: int(detectionMaxThreads),
+		LogLevel:                  logLevel,
+		SqlLogLevel:               sqlLogLevel,
+		ServerPort:                serverPort,
+		DbUrl:                     dbConnection,
+		FaultCronTime:             faultsDetectorCron,
+		DailyNotificationCronTime: dailyNotificationsCron,
+		InaBaseUrl:                inaBaseUrl,
+		InaToken:                  inaToken,
+		NotificationApiBaseUrl:    notificationApiBaseUrl,
+		SecurityEnabled:           securityEnabled,
+		KeycloakConfig:            kcConfig,
+		DetectionMaxThreads:       int(detectionMaxThreads),
 	}
 }
