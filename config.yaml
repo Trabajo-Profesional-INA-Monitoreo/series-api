@@ -16,6 +16,9 @@ faults-detector:
 ina-client:
   base-url: "https://alerta.ina.gob.ar/a6"
   token: ""
+notifications-api-client:
+  base-url: ""
+
 security.enabled: true
 
 keycloak:
