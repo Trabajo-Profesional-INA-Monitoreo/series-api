@@ -249,11 +249,6 @@ definitions:
     - ConfiguredStreams
     - Name
     type: object
-  dtos.Notification:
-    properties:
-      Message:
-        type: string
-    type: object
   dtos.Pageable:
     properties:
       Page:
@@ -904,27 +899,6 @@ paths:
         umbrales
       tags:
       - Inputs
-  /notificacion:
-    post:
-      parameters:
-      - description: Notification
-        in: body
-        name: notification
-        required: true
-        schema:
-          $ref: '#/definitions/dtos.Notification'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-      summary: Endpoint para crear una notificacion
-      tags:
-      - Notificacion
   /series:
     get:
       parameters:
