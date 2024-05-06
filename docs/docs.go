@@ -629,6 +629,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/notificacion": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notificacion"
+                ],
+                "summary": "Endpoint para crear una notificacion",
+                "parameters": [
+                    {
+                        "description": "Notification",
+                        "name": "notification",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.Notification"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/series": {
             "get": {
                 "produces": [
@@ -1490,6 +1523,14 @@ const docTemplate = `{
                 "Name": {
                     "type": "string",
                     "minLength": 1
+                }
+            }
+        },
+        "dtos.Notification": {
+            "type": "object",
+            "properties": {
+                "Message": {
+                    "type": "string"
                 }
             }
         },
