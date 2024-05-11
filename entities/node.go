@@ -6,4 +6,5 @@ type Node struct {
 	ConfigurationId uint64
 	Configuration   *Configuration `gorm:"references:ConfigurationId"`
 	Deleted         bool
+	MainStreamId    *uint64
 }

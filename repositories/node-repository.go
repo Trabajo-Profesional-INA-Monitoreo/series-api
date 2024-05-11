@@ -83,7 +83,7 @@ func (n nodeRepository) GetNodesById(id uint64) []*dtos.Node {
 	result := n.connection.Model(
 		&entities.Node{},
 	).Select(
-		"nodes.name as name, nodes.node_id as node_id",
+		"nodes.name as name, nodes.node_id as node_id, nodes.main_stream_id as main_stream_id",
 	).Where("configuration_id = ?", id).Where("deleted = false").Scan(&nodes)
 
 	if result.RowsAffected == 0 {

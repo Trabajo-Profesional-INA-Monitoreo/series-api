@@ -9,7 +9,7 @@ func ConvertDtoToNode(configuration entities.Configuration, nodes *[]dtos.Create
 	var newNodes []entities.Node
 
 	for _, node := range *nodes {
-		newNodes = append(newNodes, entities.Node{ConfigurationId: configuration.ConfigurationId, Name: node.Name})
+		newNodes = append(newNodes, entities.Node{ConfigurationId: configuration.ConfigurationId, Name: node.Name, MainStreamId: node.MainStreamId})
 	}
 
 	return newNodes
@@ -19,7 +19,7 @@ func ConvertDtoToNodeModify(configuration entities.Configuration, nodes []*dtos.
 	var newNodes []entities.Node
 
 	for _, node := range nodes {
-		newNodes = append(newNodes, entities.Node{ConfigurationId: configuration.ConfigurationId, Name: node.Name, NodeId: node.Id})
+		newNodes = append(newNodes, entities.Node{ConfigurationId: configuration.ConfigurationId, Name: node.Name, NodeId: node.Id, MainStreamId: node.MainStreamId})
 	}
 
 	return newNodes

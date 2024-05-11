@@ -165,6 +165,9 @@ definitions:
           $ref: '#/definitions/dtos.ConfiguredStreamCreate'
         minItems: 1
         type: array
+      MainStreamId:
+        minimum: 1
+        type: integer
       Name:
         minLength: 1
         type: string
@@ -241,6 +244,9 @@ definitions:
         minItems: 1
         type: array
       Id:
+        type: integer
+      MainStreamId:
+        minimum: 1
         type: integer
       Name:
         minLength: 1

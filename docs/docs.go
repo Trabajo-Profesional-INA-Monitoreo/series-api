@@ -1369,6 +1369,10 @@ const docTemplate = `{
                         "$ref": "#/definitions/dtos.ConfiguredStreamCreate"
                     }
                 },
+                "MainStreamId": {
+                    "type": "integer",
+                    "minimum": 1
+                },
                 "Name": {
                     "type": "string",
                     "minLength": 1
@@ -1486,6 +1490,10 @@ const docTemplate = `{
                 },
                 "Id": {
                     "type": "integer"
+                },
+                "MainStreamId": {
+                    "type": "integer",
+                    "minimum": 1
                 },
                 "Name": {
                     "type": "string",
