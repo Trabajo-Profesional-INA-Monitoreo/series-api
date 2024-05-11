@@ -411,13 +411,59 @@
                     "Filtros"
                 ],
                 "summary": "Endpoint para obtener las estaciones",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dtos.StationFilter"
+                                "$ref": "#/definitions/dtos.FilterValue"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/filtro/nodos": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Filtros"
+                ],
+                "summary": "Endpoint para obtener los nodos",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.FilterValue"
                             }
                         }
                     },
@@ -439,13 +485,22 @@
                     "Filtros"
                 ],
                 "summary": "Endpoint para obtener los procedimientos",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dtos.ProcedureFilter"
+                                "$ref": "#/definitions/dtos.FilterValue"
                             }
                         }
                     },
@@ -467,13 +522,22 @@
                     "Filtros"
                 ],
                 "summary": "Endpoint para obtener las variables",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dtos.VariableFilter"
+                                "$ref": "#/definitions/dtos.FilterValue"
                             }
                         }
                     },
@@ -1444,6 +1508,17 @@
                 }
             }
         },
+        "dtos.FilterValue": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer"
+                },
+                "Name": {
+                    "type": "string"
+                }
+            }
+        },
         "dtos.InputsGeneralMetrics": {
             "type": "object",
             "properties": {
@@ -1510,17 +1585,6 @@
                 }
             }
         },
-        "dtos.ProcedureFilter": {
-            "type": "object",
-            "properties": {
-                "Id": {
-                    "type": "integer"
-                },
-                "Name": {
-                    "type": "string"
-                }
-            }
-        },
         "dtos.Redundancies": {
             "type": "object",
             "properties": {
@@ -1529,17 +1593,6 @@
                     "items": {
                         "type": "integer"
                     }
-                }
-            }
-        },
-        "dtos.StationFilter": {
-            "type": "object",
-            "properties": {
-                "Id": {
-                    "type": "integer"
-                },
-                "Name": {
-                    "type": "string"
                 }
             }
         },
@@ -1775,17 +1828,6 @@
                 },
                 "TotalStreamsWithObservedOutlier": {
                     "type": "integer"
-                }
-            }
-        },
-        "dtos.VariableFilter": {
-            "type": "object",
-            "properties": {
-                "Id": {
-                    "type": "integer"
-                },
-                "Name": {
-                    "type": "string"
                 }
             }
         },

@@ -8,52 +8,84 @@ import (
 )
 
 type FilterRepository interface {
-	GetProcedures() []dtos.ProcedureFilter
-	GetStations() []dtos.StationFilter
-	GetVariables() []dtos.VariableFilter
+	GetProcedures(configId uint64) []dtos.FilterValue
+	GetStations(configId uint64) []dtos.FilterValue
+	GetVariables(configId uint64) []dtos.FilterValue
+	GetNodes(configId uint64) []dtos.FilterValue
 }
 
 type filterRepository struct {
 	connection *gorm.DB
 }
 
-func (f filterRepository) GetProcedures() []dtos.ProcedureFilter {
-	var procedures []dtos.ProcedureFilter
+func (f filterRepository) GetNodes(configId uint64) []dtos.FilterValue {
+	var filters []dtos.FilterValue
 
 	f.connection.Model(
-		&entities.Procedure{},
+		&entities.Node{},
 	).Select(
-		"procedures.name as name, procedures.procedure_id as id",
-	).Scan(&procedures)
+		"nodes.name as name, nodes.node_id as id",
+	).Where("nodes.configuration_id = ?", configId).Scan(&filters)
 
-	log.Debugf("Get procedures query result: %v", procedures)
-	return procedures
+	log.Debugf("Get nodes query result: %v", filters)
+	return filters
 }
 
-func (f filterRepository) GetStations() []dtos.StationFilter {
-	var stations []dtos.StationFilter
+func (f filterRepository) GetProcedures(configId uint64) []dtos.FilterValue {
+	var filters []dtos.FilterValue
 
 	f.connection.Model(
-		&entities.Station{},
+		&entities.ConfiguredStream{},
 	).Select(
-		"stations.name as name, stations.station_id as id",
-	).Scan(&stations)
+		"distinct(procedures.name) as name, procedures.procedure_id as id",
+	).Joins(
+		"JOIN streams ON configured_streams.stream_id = streams.stream_id",
+	).Joins(
+		"JOIN procedures ON streams.procedure_id = procedures.procedure_id",
+	).Where(
+		"configured_streams.configuration_id = ?", configId,
+	).Scan(&filters)
 
-	log.Debugf("Get stations query result: %v", stations)
-	return stations
+	log.Debugf("Get procedures query result: %v", filters)
+	return filters
 }
 
-func (f filterRepository) GetVariables() []dtos.VariableFilter {
-	var variable []dtos.VariableFilter
+func (f filterRepository) GetStations(configId uint64) []dtos.FilterValue {
+	var filters []dtos.FilterValue
 
 	f.connection.Model(
-		&entities.Variable{},
+		&entities.ConfiguredStream{},
 	).Select(
-		"variables.name as name, variables.variable_id as id",
-	).Scan(&variable)
+		"distinct(stations.name) as name, stations.station_id as id",
+	).Joins(
+		"JOIN streams ON configured_streams.stream_id = streams.stream_id",
+	).Joins(
+		"JOIN stations ON streams.station_id = stations.station_id",
+	).Where(
+		"configured_streams.configuration_id = ?", configId,
+	).Scan(&filters)
 
-	log.Debugf("Get variable query result: %v", variable)
-	return variable
+	log.Debugf("Get stations query result: %v", filters)
+	return filters
+}
+
+func (f filterRepository) GetVariables(configId uint64) []dtos.FilterValue {
+	var filters []dtos.FilterValue
+
+	f.connection.Model(
+		&entities.ConfiguredStream{},
+	).Select(
+		"distinct(variables.name) as name, variables.variable_id as id",
+	).Joins(
+		"JOIN streams ON configured_streams.stream_id = streams.stream_id",
+	).Joins(
+		"JOIN variables ON streams.variable_id = variables.variable_id",
+	).Where(
+		"configured_streams.configuration_id = ?", configId,
+	).Scan(&filters)
+
+	log.Debugf("Get variable query result: %v", filters)
+	return filters
 }
 
 func NewFilterRepository(connection *gorm.DB) FilterRepository {
