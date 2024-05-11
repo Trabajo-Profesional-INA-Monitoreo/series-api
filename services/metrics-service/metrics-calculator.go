@@ -82,7 +82,7 @@ func addMetricsCards(neededMetrics []entities.ConfiguredMetric, metricsValues *m
 		} else if metric.MetricId == entities.Minimo {
 			metricValue = metricsValues.minValue
 		} else if metric.MetricId == entities.Media {
-			metricValue = metricsValues.sumOfValues / float64(totalValidValues)
+			metricValue = calculateAverage(totalValidValues, metricsValues)
 		} else if metric.MetricId == entities.Nulos {
 			metricValue = float64(metricsValues.nullValues)
 		}
@@ -93,9 +93,22 @@ func addMetricsCards(neededMetrics []entities.ConfiguredMetric, metricsValues *m
 	return &metrics
 }
 
+func calculateAverage(totalValidValues int, metricsValues *metricParameters) float64 {
+	if totalValidValues == 0 {
+		return 0
+	}
+	return metricsValues.sumOfValues / float64(totalValidValues)
+}
+
 func calculateMedian(metricsValues *metricParameters, totalValidValues int) float64 {
+	if totalValidValues == 0 {
+		return 0
+	}
 	sort.Float64s(metricsValues.validValues)
 	middle := totalValidValues / 2
+	if middle == 0 {
+		return metricsValues.validValues[0]
+	}
 	if totalValidValues%2 == 0 {
 		return (metricsValues.validValues[middle-1] + metricsValues.validValues[middle]) / 2
 	}
