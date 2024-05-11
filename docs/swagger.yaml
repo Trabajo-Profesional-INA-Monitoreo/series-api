@@ -384,13 +384,21 @@ definitions:
     type: object
   dtos.StreamsPerNode:
     properties:
+      AlertWaterLevels:
+        type: integer
       ErrorCount:
+        type: integer
+      LastUpdate:
+        type: string
+      MainStreamId:
         type: integer
       NodeId:
         type: string
       NodeName:
         type: string
       StreamsCount:
+        type: integer
+      TotalWaterLevels:
         type: integer
     type: object
   dtos.StreamsPerNodeResponse:

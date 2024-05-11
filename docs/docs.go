@@ -1699,7 +1699,16 @@ const docTemplate = `{
         "dtos.StreamsPerNode": {
             "type": "object",
             "properties": {
+                "AlertWaterLevels": {
+                    "type": "integer"
+                },
                 "ErrorCount": {
+                    "type": "integer"
+                },
+                "LastUpdate": {
+                    "type": "string"
+                },
+                "MainStreamId": {
                     "type": "integer"
                 },
                 "NodeId": {
@@ -1709,6 +1718,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "StreamsCount": {
+                    "type": "integer"
+                },
+                "TotalWaterLevels": {
                     "type": "integer"
                 }
             }

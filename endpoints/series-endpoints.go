@@ -17,7 +17,7 @@ func setSeriesEndpoints(apiGroup *gin.RouterGroup, repositories *config.Reposito
 	streamsController := controllers.NewSeriesController(streamsService)
 	outputsController := controllers.NewOutputsController(outputs_service.NewOutputsService(repositories.OutputsRepository, inaApiClient))
 	inaController := controllers.NewInaController(services.NewInaServiceApi(inaApiClient))
-	nodesController := controllers.NewNodesController(nodes_service.NewNodesService(repositories))
+	nodesController := controllers.NewNodesController(nodes_service.NewNodesService(repositories, inaApiClient))
 	stationsController := controllers.NewStationsController(stations_service.NewStationsService(repositories.StationsRepository))
 	testApi := apiGroup.Group("/series")
 	{

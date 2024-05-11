@@ -49,6 +49,7 @@ func (n nodeRepository) GetStreamsPerNodeById(configId uint64) []*dtos.StreamsPe
 		"nodes.name as name",
 		"nodes.node_id as node_id",
 		"count(distinct(configured_streams.stream_id)) as streams_count",
+		"nodes.main_stream_id as main_stream_id",
 	).Joins(
 		"JOIN configured_streams ON configured_streams.node_id = nodes.node_id",
 	).Where(

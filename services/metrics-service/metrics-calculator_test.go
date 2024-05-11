@@ -5,32 +5,7 @@ import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"time"
 )
-
-type MockInaApiClient struct {
-	ObservedData []responses.ObservedDataResponse
-	Error        error
-	LastForecast responses.LastForecast
-}
-
-func (m MockInaApiClient) GetLastForecast(calibrationId uint64) (*responses.LastForecast, error) {
-	if m.Error != nil {
-		return nil, m.Error
-	}
-	return &m.LastForecast, nil
-}
-
-func (m MockInaApiClient) GetObservedData(streamId uint64, timeStart time.Time, timeEnd time.Time) ([]responses.ObservedDataResponse, error) {
-	if m.Error != nil {
-		return nil, m.Error
-	}
-	return m.ObservedData, nil
-}
-
-func (m MockInaApiClient) GetStream(streamId uint64) (*responses.InaStreamResponse, error) {
-	return nil, nil
-}
 
 func TestShouldReturnAllTheConfigurableMetricsOfAnObservedStream(t *testing.T) {
 	neededMetrics := []entities.ConfiguredMetric{

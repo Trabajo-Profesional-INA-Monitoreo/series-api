@@ -1691,7 +1691,16 @@
         "dtos.StreamsPerNode": {
             "type": "object",
             "properties": {
+                "AlertWaterLevels": {
+                    "type": "integer"
+                },
                 "ErrorCount": {
+                    "type": "integer"
+                },
+                "LastUpdate": {
+                    "type": "string"
+                },
+                "MainStreamId": {
                     "type": "integer"
                 },
                 "NodeId": {
@@ -1701,6 +1710,9 @@
                     "type": "string"
                 },
                 "StreamsCount": {
+                    "type": "integer"
+                },
+                "TotalWaterLevels": {
                     "type": "integer"
                 }
             }
