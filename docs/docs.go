@@ -743,6 +743,12 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
+                        "description": "Filtro por ID de nodo",
+                        "name": "nodeId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
                         "description": "Numero de pagina, por defecto 1",
                         "name": "page",
                         "in": "query"

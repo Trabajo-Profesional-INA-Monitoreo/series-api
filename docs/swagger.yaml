@@ -970,6 +970,10 @@ paths:
         in: query
         name: varId
         type: integer
+      - description: Filtro por ID de nodo
+        in: query
+        name: nodeId
+        type: integer
       - description: Numero de pagina, por defecto 1
         in: query
         name: page
