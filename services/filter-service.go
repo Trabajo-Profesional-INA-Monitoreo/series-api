@@ -6,25 +6,30 @@ import (
 )
 
 type FilterService interface {
-	GetProcedures() []dtos.ProcedureFilter
-	GetStations() []dtos.StationFilter
-	GetVariables() []dtos.VariableFilter
+	GetProcedures(configId uint64) []dtos.FilterValue
+	GetStations(configId uint64) []dtos.FilterValue
+	GetVariables(configId uint64) []dtos.FilterValue
+	GetNodes(configId uint64) []dtos.FilterValue
 }
 
 type filterService struct {
 	repository repositories.FilterRepository
 }
 
-func (f filterService) GetProcedures() []dtos.ProcedureFilter {
-	return f.repository.GetProcedures()
+func (f filterService) GetProcedures(configId uint64) []dtos.FilterValue {
+	return f.repository.GetProcedures(configId)
 }
 
-func (f filterService) GetStations() []dtos.StationFilter {
-	return f.repository.GetStations()
+func (f filterService) GetNodes(configId uint64) []dtos.FilterValue {
+	return f.repository.GetNodes(configId)
 }
 
-func (f filterService) GetVariables() []dtos.VariableFilter {
-	return f.repository.GetVariables()
+func (f filterService) GetStations(configId uint64) []dtos.FilterValue {
+	return f.repository.GetStations(configId)
+}
+
+func (f filterService) GetVariables(configId uint64) []dtos.FilterValue {
+	return f.repository.GetVariables(configId)
 }
 
 func NewFilterService(repository repositories.FilterRepository) FilterService {

@@ -222,6 +222,13 @@ definitions:
       Total:
         type: integer
     type: object
+  dtos.FilterValue:
+    properties:
+      Id:
+        type: integer
+      Name:
+        type: string
+    type: object
   dtos.InputsGeneralMetrics:
     properties:
       TotalStations:
@@ -266,26 +273,12 @@ definitions:
       TotalElements:
         type: integer
     type: object
-  dtos.ProcedureFilter:
-    properties:
-      Id:
-        type: integer
-      Name:
-        type: string
-    type: object
   dtos.Redundancies:
     properties:
       Redundancies:
         items:
           type: integer
         type: array
-    type: object
-  dtos.StationFilter:
-    properties:
-      Id:
-        type: integer
-      Name:
-        type: string
     type: object
   dtos.StreamCard:
     properties:
@@ -439,13 +432,6 @@ definitions:
         type: integer
       TotalStreamsWithObservedOutlier:
         type: integer
-    type: object
-  dtos.VariableFilter:
-    properties:
-      Id:
-        type: integer
-      Name:
-        type: string
     type: object
   entities.ErrorType:
     enum:
@@ -771,6 +757,12 @@ paths:
       - Errores
   /filtro/estaciones:
     get:
+      parameters:
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -778,7 +770,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/dtos.StationFilter'
+              $ref: '#/definitions/dtos.FilterValue'
             type: array
         "400":
           description: Bad Request
@@ -787,8 +779,14 @@ paths:
       summary: Endpoint para obtener las estaciones
       tags:
       - Filtros
-  /filtro/procedimientos:
+  /filtro/nodos:
     get:
+      parameters:
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -796,7 +794,31 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/dtos.ProcedureFilter'
+              $ref: '#/definitions/dtos.FilterValue'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los nodos
+      tags:
+      - Filtros
+  /filtro/procedimientos:
+    get:
+      parameters:
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.FilterValue'
             type: array
         "400":
           description: Bad Request
@@ -807,6 +829,12 @@ paths:
       - Filtros
   /filtro/variables:
     get:
+      parameters:
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -814,7 +842,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/dtos.VariableFilter'
+              $ref: '#/definitions/dtos.FilterValue'
             type: array
         "400":
           description: Bad Request
@@ -941,6 +969,10 @@ paths:
       - description: Filtro por ID de variable
         in: query
         name: varId
+        type: integer
+      - description: Filtro por ID de nodo
+        in: query
+        name: nodeId
         type: integer
       - description: Numero de pagina, por defecto 1
         in: query

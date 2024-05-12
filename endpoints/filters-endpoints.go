@@ -15,6 +15,7 @@ func setFiltersEndpoints(apiGroup *gin.RouterGroup, filterRepository repositorie
 		testApi.GET("/procedimientos", controller.GetProcedures)
 		testApi.GET("/estaciones", controller.GetStations)
 		testApi.GET("/variables", controller.GetVariables)
+		testApi.GET("/nodos", controller.GetNodes)
 	}
 	log.Infof("Configured filter endpoints")
 }

@@ -73,6 +73,7 @@ func (s seriesController) GetStreamDataById(ctx *gin.Context) {
 //	@Param          stationId    query      int     false  "Filtro por ID de la estacion"
 //	@Param          procId    	 query      int     false  "Filtro por ID de procedimiento"
 //	@Param          varId    	 query      int     false  "Filtro por ID de variable"
+//	@Param          nodeId    	 query      int     false  "Filtro por ID de nodo"
 //	@Param          page    	 query      int     false  "Numero de pagina, por defecto 1"
 //	@Param          pageSize     query      int     false  "Cantidad de series por pagina, por defecto 15"
 //	@Param          configurationId     query      int     true  "ID de la configuracion"
@@ -97,6 +98,9 @@ func (s seriesController) GetStreamCards(ctx *gin.Context) {
 
 	query, found := ctx.GetQuery("streamId")
 	parameters.AddParamIfFound("streamId", query, found)
+
+	query, found = ctx.GetQuery("nodeId")
+	parameters.AddParamIfFound("nodeId", query, found)
 
 	query, found = ctx.GetQuery("stationId")
 	parameters.AddParamIfFound("stationId", query, found)

@@ -104,6 +104,7 @@ func (db *streamsRepository) GetStreamCards(parameters dtos.QueryParameters) (*d
 	stationId := parameters.GetAsInt("stationId")
 	procId := parameters.GetAsInt("procId")
 	varId := parameters.GetAsInt("varId")
+	nodeId := parameters.GetAsInt("nodeId")
 	streamType := parameters.GetAsInt("streamType")
 	pageSize := *parameters.GetAsInt("pageSize")
 	page := *parameters.GetAsInt("page")
@@ -153,6 +154,10 @@ func (db *streamsRepository) GetStreamCards(parameters dtos.QueryParameters) (*d
 	if streamId != nil {
 		tx.Where("streams.stream_id = ?", streamId)
 		countTx.Where("streams.stream_id = ?", streamId)
+	}
+	if nodeId != nil {
+		tx.Where("configured_streams.node_id = ? ", nodeId)
+		countTx.Where("configured_streams.node_id = ?", nodeId)
 	}
 	if stationId != nil {
 		tx.Where("stations.station_id = ? ", stationId)

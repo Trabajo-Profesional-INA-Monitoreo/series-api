@@ -419,13 +419,59 @@ const docTemplate = `{
                     "Filtros"
                 ],
                 "summary": "Endpoint para obtener las estaciones",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dtos.StationFilter"
+                                "$ref": "#/definitions/dtos.FilterValue"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/filtro/nodos": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Filtros"
+                ],
+                "summary": "Endpoint para obtener los nodos",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.FilterValue"
                             }
                         }
                     },
@@ -447,13 +493,22 @@ const docTemplate = `{
                     "Filtros"
                 ],
                 "summary": "Endpoint para obtener los procedimientos",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dtos.ProcedureFilter"
+                                "$ref": "#/definitions/dtos.FilterValue"
                             }
                         }
                     },
@@ -475,13 +530,22 @@ const docTemplate = `{
                     "Filtros"
                 ],
                 "summary": "Endpoint para obtener las variables",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dtos.VariableFilter"
+                                "$ref": "#/definitions/dtos.FilterValue"
                             }
                         }
                     },
@@ -675,6 +739,12 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Filtro por ID de variable",
                         "name": "varId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtro por ID de nodo",
+                        "name": "nodeId",
                         "in": "query"
                     },
                     {
@@ -1452,6 +1522,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.FilterValue": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer"
+                },
+                "Name": {
+                    "type": "string"
+                }
+            }
+        },
         "dtos.InputsGeneralMetrics": {
             "type": "object",
             "properties": {
@@ -1518,17 +1599,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.ProcedureFilter": {
-            "type": "object",
-            "properties": {
-                "Id": {
-                    "type": "integer"
-                },
-                "Name": {
-                    "type": "string"
-                }
-            }
-        },
         "dtos.Redundancies": {
             "type": "object",
             "properties": {
@@ -1537,17 +1607,6 @@ const docTemplate = `{
                     "items": {
                         "type": "integer"
                     }
-                }
-            }
-        },
-        "dtos.StationFilter": {
-            "type": "object",
-            "properties": {
-                "Id": {
-                    "type": "integer"
-                },
-                "Name": {
-                    "type": "string"
                 }
             }
         },
@@ -1783,17 +1842,6 @@ const docTemplate = `{
                 },
                 "TotalStreamsWithObservedOutlier": {
                     "type": "integer"
-                }
-            }
-        },
-        "dtos.VariableFilter": {
-            "type": "object",
-            "properties": {
-                "Id": {
-                    "type": "integer"
-                },
-                "Name": {
-                    "type": "string"
                 }
             }
         },

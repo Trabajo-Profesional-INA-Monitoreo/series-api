@@ -14,6 +14,7 @@ type QueryParameters struct {
 	//varId           *uint64
 	//procId          *uint64
 	//stationId       *uint64
+	//nodeId       	  *uint64
 	//streamType      *entities.StreamType
 	//page            int
 	//pageSize        int
