@@ -403,13 +403,21 @@ definitions:
     type: object
   dtos.StreamsPerStation:
     properties:
+      AlertWaterLevels:
+        type: integer
       ErrorCount:
+        type: integer
+      LastUpdate:
+        type: string
+      MainStreamId:
         type: integer
       StationId:
         type: string
       StationName:
         type: string
       StreamsCount:
+        type: integer
+      TotalWaterLevels:
         type: integer
     type: object
   dtos.StreamsPerStationResponse:

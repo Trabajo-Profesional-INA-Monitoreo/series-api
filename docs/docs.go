@@ -1798,7 +1798,16 @@ const docTemplate = `{
         "dtos.StreamsPerStation": {
             "type": "object",
             "properties": {
+                "AlertWaterLevels": {
+                    "type": "integer"
+                },
                 "ErrorCount": {
+                    "type": "integer"
+                },
+                "LastUpdate": {
+                    "type": "string"
+                },
+                "MainStreamId": {
                     "type": "integer"
                 },
                 "StationId": {
@@ -1808,6 +1817,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "StreamsCount": {
+                    "type": "integer"
+                },
+                "TotalWaterLevels": {
                     "type": "integer"
                 }
             }

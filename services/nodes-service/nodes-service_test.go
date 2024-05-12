@@ -64,6 +64,10 @@ func (m MockInaApiClient) GetStream(streamId uint64) (*responses.InaStreamRespon
 	return &m.Stream, nil
 }
 
+func (m MockInaApiClient) GetMainStreamFromStation(stationId uint64) (*responses.MainStreamFromStation, error) {
+	return nil, nil
+}
+
 func TestShouldReturnTheNodesSummary(t *testing.T) {
 	mockRepository := nodesRepositoryMock{}
 	mainStream := uint64(26)
