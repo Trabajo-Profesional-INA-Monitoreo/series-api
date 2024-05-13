@@ -9,18 +9,19 @@ server:
 datasource:
   connection: "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"
 
-faults-detector:
+faults.detector:
   cron: "@every 1h"
-  max-threads: 12
+  max.threads: 12
 
-daily-notifications:
+daily.notifications:
   cron: "0 30 9 * * *"
 
-ina-client:
-  base-url: "https://alerta.ina.gob.ar/a6"
+ina.client:
+  base.url: "https://alerta.ina.gob.ar/a6"
   token: ""
-notifications-api-client:
-  base-url: ""
+
+notifications.api.client:
+  base.url: "localhost:8081"
 
 security.enabled: true
 
