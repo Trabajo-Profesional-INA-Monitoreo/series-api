@@ -6,10 +6,20 @@ import (
 	"strings"
 )
 
-type ApiConfig struct {
-	LogLevel   string
-	ServerPort string
-	DbUrl      string
+type ServiceConfigurationData struct {
+	LogLevel                    string
+	SqlLogLevel                 string
+	ServerPort                  string
+	DbUrl                       string
+	FaultCronTime               string
+	DailyNotificationCronTime   string
+	InaToken                    string
+	InaBaseUrl                  string
+	NotificationApiBaseUrl      string
+	ForecastMaxWaitingTimeHours float64
+	SecurityEnabled             bool
+	KeycloakConfig              *KeycloakConfiguration
+	DetectionMaxThreads         int
 }
 
 // initEnv Initializes the configuration properties from a config file and environment
@@ -26,8 +36,20 @@ func initEnv() (*viper.Viper, error) {
 
 	// Add env variables supported
 	_ = v.BindEnv("log", "level")
+	_ = v.BindEnv("log", "sql")
 	_ = v.BindEnv("server", "port")
 	_ = v.BindEnv("datasource", "connection")
+	_ = v.BindEnv("faults", "detector", "cron")
+	_ = v.BindEnv("faults", "detector", "max", "threads")
+	_ = v.BindEnv("daily", "notifications", "cron")
+	_ = v.BindEnv("ina", "client", "token")
+	_ = v.BindEnv("ina", "client", "base", "url")
+	_ = v.BindEnv("notifications", "api", "client", "base", "url")
+	_ = v.BindEnv("security", "enabled")
+	_ = v.BindEnv("keycloak", "url")
+	_ = v.BindEnv("keycloak", "realm")
+	_ = v.BindEnv("keycloak", "client")
+	_ = v.BindEnv("keycloak", "secret")
 
 	// Try to read configuration from config file. If config file
 	// does not exist then ReadInConfig will fail but configuration
@@ -41,27 +63,37 @@ func initEnv() (*viper.Viper, error) {
 	return v, nil
 }
 
-func GetConfig() *ApiConfig {
+func GetConfig() *ServiceConfigurationData {
 	env, err := initEnv()
 	if err != nil {
 		log.Fatalf("Failed to read environment, exiting")
 	}
-	logLevel := env.GetString("log.level")
-	if logLevel == "" {
-		log.Warnf("Missing log level, using info")
-		logLevel = "info"
-	}
-	serverPort := env.GetString("server.port")
-	if serverPort == "" {
-		log.Fatalf("Missing server port, exiting")
-	}
-	dbConnection := env.GetString("datasource.connection")
-	if serverPort == "" {
-		log.Fatalf("Missing server port, exiting")
-	}
-	return &ApiConfig{
-		LogLevel:   logLevel,
-		ServerPort: serverPort,
-		DbUrl:      dbConnection,
+
+	logLevel := getEnvString(env, "log.level")
+	sqlLogLevel := getEnvString(env, "log.sql")
+	serverPort := getEnvString(env, "server.port")
+	dbConnection := getEnvString(env, "datasource.connection")
+	faultsDetectorCron := getEnvString(env, "faults.detector.cron")
+	detectionMaxThreads := getEnvUint(env, "faults.detector.max.threads")
+	dailyNotificationsCron := getEnvString(env, "daily.notifications.cron")
+	inaBaseUrl := getEnvString(env, "ina.client.base.url")
+	inaToken := getEnvString(env, "ina.client.token")
+	notificationApiBaseUrl := getEnvString(env, "notifications.api.client.base.url")
+	securityEnabled := getEnvBool(env, "security.enabled")
+	kcConfig := getKeycloakConfig(env, securityEnabled)
+
+	return &ServiceConfigurationData{
+		LogLevel:                  logLevel,
+		SqlLogLevel:               sqlLogLevel,
+		ServerPort:                serverPort,
+		DbUrl:                     dbConnection,
+		FaultCronTime:             faultsDetectorCron,
+		DailyNotificationCronTime: dailyNotificationsCron,
+		InaBaseUrl:                inaBaseUrl,
+		InaToken:                  inaToken,
+		NotificationApiBaseUrl:    notificationApiBaseUrl,
+		SecurityEnabled:           securityEnabled,
+		KeycloakConfig:            kcConfig,
+		DetectionMaxThreads:       int(detectionMaxThreads),
 	}
 }

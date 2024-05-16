@@ -1,9 +1,32 @@
 
 log:
-  level: "info"
+  level: "debug"
+  sql: "info"
 
 server:
   port: "8080"
 
 datasource:
   connection: "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"
+
+faults.detector:
+  cron: "@every 1h"
+  max.threads: 12
+
+daily.notifications:
+  cron: "0 30 9 * * *"
+
+ina.client:
+  base.url: "https://alerta.ina.gob.ar/a6"
+  token: ""
+
+notifications.api.client:
+  base.url: "localhost:8081"
+
+security.enabled: true
+
+keycloak:
+  client: "monitoreo-web"
+  secret: ""
+  url: ""
+  realm: "monitoreo"

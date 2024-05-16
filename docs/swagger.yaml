@@ -1,36 +1,423 @@
 definitions:
+  dtos.AllConfigurations:
+    properties:
+      Id:
+        type: integer
+      Name:
+        type: string
+    type: object
+  dtos.BehaviourStreamsResponse:
+    properties:
+      CountAlertLevel:
+        type: integer
+      CountEvacuationLevel:
+        type: integer
+      CountLowWaterLevel:
+        type: integer
+      TotalValuesCount:
+        type: integer
+    type: object
+  dtos.CalibratedStreamsData:
+    properties:
+      Qualifier:
+        type: string
+      Time:
+        type: string
+      Value:
+        type: number
+    type: object
+  dtos.CalibratedStreamsDataResponse:
+    properties:
+      MainStreams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      P05Streams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      P25Streams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      P75Streams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      P95Streams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+    type: object
+  dtos.Configuration:
+    properties:
+      Id:
+        type: integer
+      Name:
+        minLength: 1
+        type: string
+      Nodes:
+        items:
+          $ref: '#/definitions/dtos.Node'
+        minItems: 1
+        type: array
+      SendNotifications:
+        type: boolean
+    required:
+    - Name
+    - Nodes
+    type: object
+  dtos.ConfiguredStream:
+    properties:
+      CalibrationId:
+        type: integer
+      CheckErrors:
+        type: boolean
+      ConfiguredStreamId:
+        type: integer
+      LowerThreshold:
+        type: number
+      Metrics:
+        items:
+          $ref: '#/definitions/entities.Metric'
+        maxItems: 5
+        minItems: 0
+        type: array
+        uniqueItems: true
+      ObservedRelatedStreamId:
+        type: integer
+      RedundanciesIds:
+        items:
+          type: integer
+        type: array
+      StreamId:
+        minimum: 1
+        type: integer
+      StreamType:
+        allOf:
+        - $ref: '#/definitions/entities.StreamType'
+        maximum: 2
+        minimum: 0
+      UpdateFrequency:
+        minimum: 0
+        type: number
+      UpperThreshold:
+        type: number
+    required:
+    - StreamId
+    type: object
+  dtos.ConfiguredStreamCreate:
+    properties:
+      CalibrationId:
+        type: integer
+      CheckErrors:
+        type: boolean
+      LowerThreshold:
+        type: number
+      Metrics:
+        items:
+          $ref: '#/definitions/entities.Metric'
+        maxItems: 5
+        minItems: 0
+        type: array
+        uniqueItems: true
+      ObservedRelatedStreamId:
+        type: integer
+      RedundanciesIds:
+        items:
+          type: integer
+        type: array
+      StreamId:
+        minimum: 1
+        type: integer
+      StreamType:
+        allOf:
+        - $ref: '#/definitions/entities.StreamType'
+        maximum: 2
+      UpdateFrequency:
+        minimum: 0
+        type: number
+      UpperThreshold:
+        type: number
+    required:
+    - StreamId
+    type: object
+  dtos.CreateConfiguration:
+    properties:
+      Name:
+        minLength: 1
+        type: string
+      Nodes:
+        items:
+          $ref: '#/definitions/dtos.CreateNode'
+        minItems: 1
+        type: array
+      SendNotifications:
+        type: boolean
+    required:
+    - Name
+    - Nodes
+    type: object
+  dtos.CreateNode:
+    properties:
+      ConfiguredStreams:
+        items:
+          $ref: '#/definitions/dtos.ConfiguredStreamCreate'
+        minItems: 1
+        type: array
+      MainStreamId:
+        minimum: 1
+        type: integer
+      Name:
+        minLength: 1
+        type: string
+    required:
+    - ConfiguredStreams
+    - Name
+    type: object
+  dtos.DetectedErrorsOfStream:
+    properties:
+      Content:
+        items:
+          $ref: '#/definitions/dtos.ErrorDto'
+        type: array
+      Pageable:
+        $ref: '#/definitions/dtos.Pageable'
+    type: object
+  dtos.ErrorDto:
+    properties:
+      DetectedDate:
+        type: string
+      ErrorId:
+        type: integer
+      ErrorTypeId:
+        $ref: '#/definitions/entities.ErrorType'
+      ErrorTypeName:
+        type: string
+      ExtraInfo:
+        type: string
+    type: object
+  dtos.ErrorIndicator:
+    properties:
+      Count:
+        type: integer
+      ErrorId:
+        $ref: '#/definitions/entities.ErrorType'
+      ErrorType:
+        type: string
+    type: object
+  dtos.ErrorResponse:
+    properties:
+      Message:
+        type: string
+      Timestamp:
+        type: string
+    type: object
+  dtos.ErrorsCountPerDayAndType:
+    properties:
+      Date:
+        type: string
+      ErrorType:
+        type: string
+      Total:
+        type: integer
+    type: object
+  dtos.FilterValue:
+    properties:
+      Id:
+        type: integer
+      Name:
+        type: string
+    type: object
   dtos.InputsGeneralMetrics:
     properties:
-      totalNetworks:
+      TotalStations:
         type: integer
-      totalStations:
-        type: integer
-      totalStreams:
+      TotalStreams:
         type: integer
     type: object
-  dtos.StreamsPerNetwork:
+  dtos.MetricCard:
     properties:
-      networkId:
+      Name:
         type: string
-      networkName:
-        type: string
-      streamsCount:
-        type: integer
+      Value:
+        type: number
     type: object
-  dtos.StreamsPerNetworkResponse:
+  dtos.Node:
     properties:
-      networks:
+      ConfiguredStreams:
         items:
-          $ref: '#/definitions/dtos.StreamsPerNetwork'
+          $ref: '#/definitions/dtos.ConfiguredStream'
+        minItems: 1
+        type: array
+      Id:
+        type: integer
+      MainStreamId:
+        minimum: 1
+        type: integer
+      Name:
+        minLength: 1
+        type: string
+    required:
+    - ConfiguredStreams
+    - Name
+    type: object
+  dtos.Pageable:
+    properties:
+      Page:
+        type: integer
+      PageSize:
+        type: integer
+      Pages:
+        type: integer
+      TotalElements:
+        type: integer
+    type: object
+  dtos.Redundancies:
+    properties:
+      Redundancies:
+        items:
+          type: integer
+        type: array
+    type: object
+  dtos.StreamCard:
+    properties:
+      CalibrationId:
+        type: integer
+      CheckErrors:
+        type: boolean
+      ConfiguredStreamId:
+        type: integer
+      ObservedRelatedStreamId:
+        type: integer
+      ProcedureId:
+        type: integer
+      ProcedureName:
+        type: string
+      StationId:
+        type: integer
+      StationName:
+        type: string
+      StreamId:
+        type: integer
+      StreamType:
+        $ref: '#/definitions/entities.StreamType'
+      TotalErrors:
+        type: integer
+      VariableId:
+        type: integer
+      VariableName:
+        type: string
+    type: object
+  dtos.StreamCardsResponse:
+    properties:
+      Content:
+        items:
+          $ref: '#/definitions/dtos.StreamCard'
+        type: array
+      Pageable:
+        $ref: '#/definitions/dtos.Pageable'
+    type: object
+  dtos.StreamData:
+    properties:
+      AlertLevel:
+        type: number
+      CalibrationId:
+        type: integer
+      EvacuationLevel:
+        type: number
+      LastUpdate:
+        type: string
+      LowWaterLevel:
+        type: number
+      Metrics:
+        items:
+          $ref: '#/definitions/dtos.MetricCard'
+        type: array
+      NormalLowerThreshold:
+        type: number
+      NormalUpperThreshold:
+        type: number
+      ObservedRelatedStreamId:
+        type: integer
+      Owner:
+        type: string
+      ProcId:
+        type: integer
+      Procedure:
+        type: string
+      Station:
+        type: string
+      StreamType:
+        $ref: '#/definitions/entities.StreamType'
+      Unit:
+        type: string
+      UnitId:
+        type: integer
+      UpdateFrequency:
+        type: number
+      VarId:
+        type: integer
+      VarName:
+        type: string
+    type: object
+  dtos.StreamsData:
+    properties:
+      Time:
+        type: string
+      Value:
+        type: number
+    type: object
+  dtos.StreamsDataResponse:
+    properties:
+      Streams:
+        items:
+          $ref: '#/definitions/dtos.StreamsData'
+        type: array
+    type: object
+  dtos.StreamsPerNode:
+    properties:
+      AlertWaterLevels:
+        type: integer
+      ErrorCount:
+        type: integer
+      LastUpdate:
+        type: string
+      MainStreamId:
+        type: integer
+      NodeId:
+        type: string
+      NodeName:
+        type: string
+      StreamsCount:
+        type: integer
+      TotalWaterLevels:
+        type: integer
+    type: object
+  dtos.StreamsPerNodeResponse:
+    properties:
+      Nodes:
+        items:
+          $ref: '#/definitions/dtos.StreamsPerNode'
         type: array
     type: object
   dtos.StreamsPerStation:
     properties:
-      stationId:
+      AlertWaterLevels:
+        type: integer
+      ErrorCount:
+        type: integer
+      LastUpdate:
         type: string
-      stationName:
+      MainStreamId:
+        type: integer
+      StationId:
         type: string
-      streamsCount:
+      StationName:
+        type: string
+      StreamsCount:
+        type: integer
+      TotalWaterLevels:
         type: integer
     type: object
   dtos.StreamsPerStationResponse:
@@ -40,12 +427,438 @@ definitions:
           $ref: '#/definitions/dtos.StreamsPerStation'
         type: array
     type: object
+  dtos.TotalStreamsWithNullValues:
+    properties:
+      TotalStreams:
+        type: integer
+      TotalStreamsWithNull:
+        type: integer
+    type: object
+  dtos.TotalStreamsWithObservedOutlier:
+    properties:
+      TotalStreams:
+        type: integer
+      TotalStreamsWithObservedOutlier:
+        type: integer
+    type: object
+  entities.ErrorType:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    type: integer
+    x-enum-varnames:
+    - NullValue
+    - Missing4DaysHorizon
+    - OutsideOfErrorBands
+    - ForecastMissing
+    - ObservedOutlier
+    - ForecastOutOfBounds
+  entities.Metric:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    type: integer
+    x-enum-comments:
+      Maximo: Configurable
+      Media: Configurable
+      Mediana: Configurable
+      Minimo: Configurable
+      Nulos: Configurable
+    x-enum-varnames:
+    - Mediana
+    - Media
+    - Maximo
+    - Minimo
+    - Nulos
+    - Observaciones
+    - AguasAlerta
+    - AguasEvacuacion
+    - AguasBajas
+  entities.StreamType:
+    enum:
+    - 0
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - Observed
+    - Forecasted
+    - Curated
 info:
   contact: {}
   description: This API manages the inputs of the forecast model
   title: Inputs API
   version: "1.0"
 paths:
+  /configuracion:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.AllConfigurations'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las configuraciones
+      tags:
+      - Configuracion
+    post:
+      parameters:
+      - description: Add configuration
+        in: body
+        name: configuration
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateConfiguration'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para crear una configuracion
+      tags:
+      - Configuracion
+    put:
+      parameters:
+      - description: Modify configuration
+        in: body
+        name: configuration
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.Configuration'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para modificar una configuracion
+      tags:
+      - Configuracion
+  /configuracion/{id}:
+    delete:
+      parameters:
+      - description: Id de la configuracion
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para eliminar una configuracion por id
+      tags:
+      - Configuracion
+    get:
+      parameters:
+      - description: Id de la configuracion
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.Configuration'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener una configuracion por id
+      tags:
+      - Configuracion
+  /errores/{configuredStreamId}:
+    get:
+      parameters:
+      - description: Id de la configuracion de la serie
+        format: int
+        in: path
+        name: configuredStreamId
+        required: true
+        type: integer
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: Numero de pagina, por defecto 1
+        in: query
+        name: page
+        type: integer
+      - description: Cantidad de series por pagina, por defecto 15
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.DetectedErrorsOfStream'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los errores de una serie dado un id
+      tags:
+      - Errores
+  /errores/indicadores:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: hoy'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: Id de la configuracion
+        format: uint
+        in: query
+        name: configurationId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.ErrorIndicator'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las indicadores de errores
+      tags:
+      - Errores
+  /errores/por-dia:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: hoy'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.ErrorsCountPerDayAndType'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las errores detectados por dia
+      tags:
+      - Errores
+  /errores/series-implicadas:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: hoy'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: Id de la configuracion
+        format: uint
+        in: query
+        name: configurationId
+        required: true
+        type: string
+      - description: Id del tipo de error
+        format: uint
+        in: query
+        name: errorType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.ErrorIndicator'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las indicadores de errores
+      tags:
+      - Errores
+  /filtro/estaciones:
+    get:
+      parameters:
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.FilterValue'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las estaciones
+      tags:
+      - Filtros
+  /filtro/nodos:
+    get:
+      parameters:
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.FilterValue'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los nodos
+      tags:
+      - Filtros
+  /filtro/procedimientos:
+    get:
+      parameters:
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.FilterValue'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los procedimientos
+      tags:
+      - Filtros
+  /filtro/variables:
+    get:
+      parameters:
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.FilterValue'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las variables
+      tags:
+      - Filtros
   /healthcheck:
     get:
       consumes:
@@ -59,8 +872,16 @@ paths:
           schema:
             type: string
       summary: Show the status of the server.
+      tags:
+      - Health
   /inputs/metricas-generales:
     get:
+      parameters:
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -69,8 +890,265 @@ paths:
           schema:
             $ref: '#/definitions/dtos.InputsGeneralMetrics'
       summary: Endpoint para obtener las metricas generales de inputs
+      tags:
+      - Inputs
+  /inputs/series-con-nulos:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.TotalStreamsWithNullValues'
+      summary: Endpoint para obtener la cantidad de series con valores nulos
+      tags:
+      - Inputs
+  /inputs/series-fuera-umbral:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.TotalStreamsWithObservedOutlier'
+      summary: Endpoint para obtener la cantidad de series con valores fuera de los
+        umbrales
+      tags:
+      - Inputs
+  /series:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: Filtro por ID de la serie
+        in: query
+        name: streamId
+        type: integer
+      - description: Filtro por ID de la estacion
+        in: query
+        name: stationId
+        type: integer
+      - description: Filtro por ID de procedimiento
+        in: query
+        name: procId
+        type: integer
+      - description: Filtro por ID de variable
+        in: query
+        name: varId
+        type: integer
+      - description: Filtro por ID de nodo
+        in: query
+        name: nodeId
+        type: integer
+      - description: Numero de pagina, por defecto 1
+        in: query
+        name: page
+        type: integer
+      - description: Cantidad de series por pagina, por defecto 15
+        in: query
+        name: pageSize
+        type: integer
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StreamCardsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las series configuradas de una configuracion
+      tags:
+      - Series
+  /series/{serie_id}:
+    get:
+      parameters:
+      - description: Id de la configuracion de la serie
+        format: string
+        in: query
+        name: configuredStreamId
+        required: true
+        type: string
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: Id de la serie
+        in: path
+        name: serie_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StreamData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los datos de una serie dado un id y su configuracion
+      tags:
+      - Series
+  /series/comportamiento:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.BehaviourStreamsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener las metricas de comportamiento
+      tags:
+      - Outputs
+  /series/curadas/{serie_id}:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: 5 dias despues'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: Id de la serie
+        in: path
+        name: serie_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StreamsDataResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los valores de una serie curada por id
+      tags:
+      - Interfaz INA
   /series/estaciones:
     get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: 5 dias despues'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -79,14 +1157,125 @@ paths:
           schema:
             $ref: '#/definitions/dtos.StreamsPerStationResponse'
       summary: Endpoint para obtener el resumen de las series agrupado por estacion
-  /series/redes:
+      tags:
+      - Series
+  /series/nodos:
     get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: 5 dias despues'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dtos.StreamsPerNetworkResponse'
-      summary: Endpoint para obtener el resumen de las series agrupado por red
+            $ref: '#/definitions/dtos.StreamsPerNodeResponse'
+      summary: Endpoint para obtener el resumen de las series agrupado por nodo
+      tags:
+      - Series
+  /series/observadas/{serie_id}:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: Id de la serie
+        in: path
+        name: serie_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StreamsDataResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los valores de una serie observada por id
+      tags:
+      - Interfaz INA
+  /series/pronosticadas/{calibrado_id}:
+    get:
+      parameters:
+      - description: Id del calibrado
+        in: path
+        name: calibrado_id
+        required: true
+        type: integer
+      - description: Id de la serie
+        format: string
+        in: query
+        name: serieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.CalibratedStreamsDataResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los valores de una serie pronosticadas por id
+      tags:
+      - Interfaz INA
+  /series/redundancias/{configured_stream_id}:
+    get:
+      parameters:
+      - description: Id de la serie configurada
+        in: path
+        name: configured_stream_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.Redundancies'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener los ids de las redundancias de una serie configurada
+        por id
+      tags:
+      - Series
 swagger: "2.0"

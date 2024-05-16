@@ -1,0 +1,10 @@
+version: '3.9'
+name: ina-series-api
+services:
+  series-api:
+    container_name: series-api
+    image: series-api:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config.yaml:/config.yaml

@@ -7,6 +7,549 @@
         "version": "1.0"
     },
     "paths": {
+        "/configuracion": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Configuracion"
+                ],
+                "summary": "Endpoint para obtener las configuraciones",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.AllConfigurations"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Configuracion"
+                ],
+                "summary": "Endpoint para modificar una configuracion",
+                "parameters": [
+                    {
+                        "description": "Modify configuration",
+                        "name": "configuration",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.Configuration"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Configuracion"
+                ],
+                "summary": "Endpoint para crear una configuracion",
+                "parameters": [
+                    {
+                        "description": "Add configuration",
+                        "name": "configuration",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.CreateConfiguration"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/configuracion/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Configuracion"
+                ],
+                "summary": "Endpoint para obtener una configuracion por id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Id de la configuracion",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.Configuration"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Configuracion"
+                ],
+                "summary": "Endpoint para eliminar una configuracion por id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Id de la configuracion",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/errores/indicadores": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Errores"
+                ],
+                "summary": "Endpoint para obtener las indicadores de errores",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: hoy",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "uint",
+                        "description": "Id de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.ErrorIndicator"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/errores/por-dia": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Errores"
+                ],
+                "summary": "Endpoint para obtener las errores detectados por dia",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: hoy",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.ErrorsCountPerDayAndType"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/errores/series-implicadas": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Errores"
+                ],
+                "summary": "Endpoint para obtener las indicadores de errores",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: hoy",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "uint",
+                        "description": "Id de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "uint",
+                        "description": "Id del tipo de error",
+                        "name": "errorType",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.ErrorIndicator"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/errores/{configuredStreamId}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Errores"
+                ],
+                "summary": "Endpoint para obtener los errores de una serie dado un id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int",
+                        "description": "Id de la configuracion de la serie",
+                        "name": "configuredStreamId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Numero de pagina, por defecto 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Cantidad de series por pagina, por defecto 15",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.DetectedErrorsOfStream"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/filtro/estaciones": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Filtros"
+                ],
+                "summary": "Endpoint para obtener las estaciones",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.FilterValue"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/filtro/nodos": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Filtros"
+                ],
+                "summary": "Endpoint para obtener los nodos",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.FilterValue"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/filtro/procedimientos": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Filtros"
+                ],
+                "summary": "Endpoint para obtener los procedimientos",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.FilterValue"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/filtro/variables": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Filtros"
+                ],
+                "summary": "Endpoint para obtener las variables",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.FilterValue"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/healthcheck": {
             "get": {
                 "description": "get the status of the server.",
@@ -15,6 +558,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Health"
                 ],
                 "summary": "Show the status of the server.",
                 "responses": {
@@ -32,7 +578,19 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Inputs"
+                ],
                 "summary": "Endpoint para obtener las metricas generales de inputs",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -43,12 +601,326 @@
                 }
             }
         },
+        "/inputs/series-con-nulos": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inputs"
+                ],
+                "summary": "Endpoint para obtener la cantidad de series con valores nulos",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.TotalStreamsWithNullValues"
+                        }
+                    }
+                }
+            }
+        },
+        "/inputs/series-fuera-umbral": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inputs"
+                ],
+                "summary": "Endpoint para obtener la cantidad de series con valores fuera de los umbrales",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.TotalStreamsWithObservedOutlier"
+                        }
+                    }
+                }
+            }
+        },
+        "/series": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Series"
+                ],
+                "summary": "Endpoint para obtener las series configuradas de una configuracion",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtro por ID de la serie",
+                        "name": "streamId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtro por ID de la estacion",
+                        "name": "stationId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtro por ID de procedimiento",
+                        "name": "procId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtro por ID de variable",
+                        "name": "varId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtro por ID de nodo",
+                        "name": "nodeId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Numero de pagina, por defecto 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Cantidad de series por pagina, por defecto 15",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StreamCardsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/series/comportamiento": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Outputs"
+                ],
+                "summary": "Endpoint para obtener las metricas de comportamiento",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BehaviourStreamsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/series/curadas/{serie_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Interfaz INA"
+                ],
+                "summary": "Endpoint para obtener los valores de una serie curada por id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: 5 dias despues",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Id de la serie",
+                        "name": "serie_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StreamsDataResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/series/estaciones": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Series"
+                ],
                 "summary": "Endpoint para obtener el resumen de las series agrupado por estacion",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: 5 dias despues",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -59,17 +931,247 @@
                 }
             }
         },
-        "/series/redes": {
+        "/series/nodos": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Endpoint para obtener el resumen de las series agrupado por red",
+                "tags": [
+                    "Series"
+                ],
+                "summary": "Endpoint para obtener el resumen de las series agrupado por nodo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: 5 dias despues",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dtos.StreamsPerNetworkResponse"
+                            "$ref": "#/definitions/dtos.StreamsPerNodeResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/series/observadas/{serie_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Interfaz INA"
+                ],
+                "summary": "Endpoint para obtener los valores de una serie observada por id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Id de la serie",
+                        "name": "serie_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StreamsDataResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/series/pronosticadas/{calibrado_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Interfaz INA"
+                ],
+                "summary": "Endpoint para obtener los valores de una serie pronosticadas por id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Id del calibrado",
+                        "name": "calibrado_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "format": "string",
+                        "description": "Id de la serie",
+                        "name": "serieId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.CalibratedStreamsDataResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/series/redundancias/{configured_stream_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Series"
+                ],
+                "summary": "Endpoint para obtener los ids de las redundancias de una serie configurada por id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Id de la serie configurada",
+                        "name": "configured_stream_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.Redundancies"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/series/{serie_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Series"
+                ],
+                "summary": "Endpoint para obtener los datos de una serie dado un id y su configuracion",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "string",
+                        "description": "Id de la configuracion de la serie",
+                        "name": "configuredStreamId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Id de la serie",
+                        "name": "serie_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StreamData"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
                         }
                     }
                 }
@@ -77,41 +1179,610 @@
         }
     },
     "definitions": {
+        "dtos.AllConfigurations": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer"
+                },
+                "Name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.BehaviourStreamsResponse": {
+            "type": "object",
+            "properties": {
+                "CountAlertLevel": {
+                    "type": "integer"
+                },
+                "CountEvacuationLevel": {
+                    "type": "integer"
+                },
+                "CountLowWaterLevel": {
+                    "type": "integer"
+                },
+                "TotalValuesCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.CalibratedStreamsData": {
+            "type": "object",
+            "properties": {
+                "Qualifier": {
+                    "type": "string"
+                },
+                "Time": {
+                    "type": "string"
+                },
+                "Value": {
+                    "type": "number"
+                }
+            }
+        },
+        "dtos.CalibratedStreamsDataResponse": {
+            "type": "object",
+            "properties": {
+                "MainStreams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "P05Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "P25Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "P75Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "P95Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                }
+            }
+        },
+        "dtos.Configuration": {
+            "type": "object",
+            "required": [
+                "Name",
+                "Nodes"
+            ],
+            "properties": {
+                "Id": {
+                    "type": "integer"
+                },
+                "Name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "Nodes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/dtos.Node"
+                    }
+                },
+                "SendNotifications": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "dtos.ConfiguredStream": {
+            "type": "object",
+            "required": [
+                "StreamId"
+            ],
+            "properties": {
+                "CalibrationId": {
+                    "type": "integer"
+                },
+                "CheckErrors": {
+                    "type": "boolean"
+                },
+                "ConfiguredStreamId": {
+                    "type": "integer"
+                },
+                "LowerThreshold": {
+                    "type": "number"
+                },
+                "Metrics": {
+                    "type": "array",
+                    "maxItems": 5,
+                    "minItems": 0,
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "#/definitions/entities.Metric"
+                    }
+                },
+                "ObservedRelatedStreamId": {
+                    "type": "integer"
+                },
+                "RedundanciesIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "StreamId": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "StreamType": {
+                    "maximum": 2,
+                    "minimum": 0,
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entities.StreamType"
+                        }
+                    ]
+                },
+                "UpdateFrequency": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "UpperThreshold": {
+                    "type": "number"
+                }
+            }
+        },
+        "dtos.ConfiguredStreamCreate": {
+            "type": "object",
+            "required": [
+                "StreamId"
+            ],
+            "properties": {
+                "CalibrationId": {
+                    "type": "integer"
+                },
+                "CheckErrors": {
+                    "type": "boolean"
+                },
+                "LowerThreshold": {
+                    "type": "number"
+                },
+                "Metrics": {
+                    "type": "array",
+                    "maxItems": 5,
+                    "minItems": 0,
+                    "uniqueItems": true,
+                    "items": {
+                        "$ref": "#/definitions/entities.Metric"
+                    }
+                },
+                "ObservedRelatedStreamId": {
+                    "type": "integer"
+                },
+                "RedundanciesIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "StreamId": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "StreamType": {
+                    "maximum": 2,
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/entities.StreamType"
+                        }
+                    ]
+                },
+                "UpdateFrequency": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "UpperThreshold": {
+                    "type": "number"
+                }
+            }
+        },
+        "dtos.CreateConfiguration": {
+            "type": "object",
+            "required": [
+                "Name",
+                "Nodes"
+            ],
+            "properties": {
+                "Name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "Nodes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/dtos.CreateNode"
+                    }
+                },
+                "SendNotifications": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "dtos.CreateNode": {
+            "type": "object",
+            "required": [
+                "ConfiguredStreams",
+                "Name"
+            ],
+            "properties": {
+                "ConfiguredStreams": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/dtos.ConfiguredStreamCreate"
+                    }
+                },
+                "MainStreamId": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "Name": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "dtos.DetectedErrorsOfStream": {
+            "type": "object",
+            "properties": {
+                "Content": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.ErrorDto"
+                    }
+                },
+                "Pageable": {
+                    "$ref": "#/definitions/dtos.Pageable"
+                }
+            }
+        },
+        "dtos.ErrorDto": {
+            "type": "object",
+            "properties": {
+                "DetectedDate": {
+                    "type": "string"
+                },
+                "ErrorId": {
+                    "type": "integer"
+                },
+                "ErrorTypeId": {
+                    "$ref": "#/definitions/entities.ErrorType"
+                },
+                "ErrorTypeName": {
+                    "type": "string"
+                },
+                "ExtraInfo": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.ErrorIndicator": {
+            "type": "object",
+            "properties": {
+                "Count": {
+                    "type": "integer"
+                },
+                "ErrorId": {
+                    "$ref": "#/definitions/entities.ErrorType"
+                },
+                "ErrorType": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "Message": {
+                    "type": "string"
+                },
+                "Timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.ErrorsCountPerDayAndType": {
+            "type": "object",
+            "properties": {
+                "Date": {
+                    "type": "string"
+                },
+                "ErrorType": {
+                    "type": "string"
+                },
+                "Total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.FilterValue": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer"
+                },
+                "Name": {
+                    "type": "string"
+                }
+            }
+        },
         "dtos.InputsGeneralMetrics": {
             "type": "object",
             "properties": {
-                "totalNetworks": {
+                "TotalStations": {
                     "type": "integer"
                 },
-                "totalStations": {
-                    "type": "integer"
-                },
-                "totalStreams": {
+                "TotalStreams": {
                     "type": "integer"
                 }
             }
         },
-        "dtos.StreamsPerNetwork": {
+        "dtos.MetricCard": {
             "type": "object",
             "properties": {
-                "networkId": {
+                "Name": {
                     "type": "string"
                 },
-                "networkName": {
-                    "type": "string"
+                "Value": {
+                    "type": "number"
+                }
+            }
+        },
+        "dtos.Node": {
+            "type": "object",
+            "required": [
+                "ConfiguredStreams",
+                "Name"
+            ],
+            "properties": {
+                "ConfiguredStreams": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/dtos.ConfiguredStream"
+                    }
                 },
-                "streamsCount": {
+                "Id": {
+                    "type": "integer"
+                },
+                "MainStreamId": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "Name": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "dtos.Pageable": {
+            "type": "object",
+            "properties": {
+                "Page": {
+                    "type": "integer"
+                },
+                "PageSize": {
+                    "type": "integer"
+                },
+                "Pages": {
+                    "type": "integer"
+                },
+                "TotalElements": {
                     "type": "integer"
                 }
             }
         },
-        "dtos.StreamsPerNetworkResponse": {
+        "dtos.Redundancies": {
             "type": "object",
             "properties": {
-                "networks": {
+                "Redundancies": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dtos.StreamsPerNetwork"
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "dtos.StreamCard": {
+            "type": "object",
+            "properties": {
+                "CalibrationId": {
+                    "type": "integer"
+                },
+                "CheckErrors": {
+                    "type": "boolean"
+                },
+                "ConfiguredStreamId": {
+                    "type": "integer"
+                },
+                "ObservedRelatedStreamId": {
+                    "type": "integer"
+                },
+                "ProcedureId": {
+                    "type": "integer"
+                },
+                "ProcedureName": {
+                    "type": "string"
+                },
+                "StationId": {
+                    "type": "integer"
+                },
+                "StationName": {
+                    "type": "string"
+                },
+                "StreamId": {
+                    "type": "integer"
+                },
+                "StreamType": {
+                    "$ref": "#/definitions/entities.StreamType"
+                },
+                "TotalErrors": {
+                    "type": "integer"
+                },
+                "VariableId": {
+                    "type": "integer"
+                },
+                "VariableName": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.StreamCardsResponse": {
+            "type": "object",
+            "properties": {
+                "Content": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.StreamCard"
+                    }
+                },
+                "Pageable": {
+                    "$ref": "#/definitions/dtos.Pageable"
+                }
+            }
+        },
+        "dtos.StreamData": {
+            "type": "object",
+            "properties": {
+                "AlertLevel": {
+                    "type": "number"
+                },
+                "CalibrationId": {
+                    "type": "integer"
+                },
+                "EvacuationLevel": {
+                    "type": "number"
+                },
+                "LastUpdate": {
+                    "type": "string"
+                },
+                "LowWaterLevel": {
+                    "type": "number"
+                },
+                "Metrics": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.MetricCard"
+                    }
+                },
+                "NormalLowerThreshold": {
+                    "type": "number"
+                },
+                "NormalUpperThreshold": {
+                    "type": "number"
+                },
+                "ObservedRelatedStreamId": {
+                    "type": "integer"
+                },
+                "Owner": {
+                    "type": "string"
+                },
+                "ProcId": {
+                    "type": "integer"
+                },
+                "Procedure": {
+                    "type": "string"
+                },
+                "Station": {
+                    "type": "string"
+                },
+                "StreamType": {
+                    "$ref": "#/definitions/entities.StreamType"
+                },
+                "Unit": {
+                    "type": "string"
+                },
+                "UnitId": {
+                    "type": "integer"
+                },
+                "UpdateFrequency": {
+                    "type": "number"
+                },
+                "VarId": {
+                    "type": "integer"
+                },
+                "VarName": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.StreamsData": {
+            "type": "object",
+            "properties": {
+                "Time": {
+                    "type": "string"
+                },
+                "Value": {
+                    "type": "number"
+                }
+            }
+        },
+        "dtos.StreamsDataResponse": {
+            "type": "object",
+            "properties": {
+                "Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.StreamsData"
+                    }
+                }
+            }
+        },
+        "dtos.StreamsPerNode": {
+            "type": "object",
+            "properties": {
+                "AlertWaterLevels": {
+                    "type": "integer"
+                },
+                "ErrorCount": {
+                    "type": "integer"
+                },
+                "LastUpdate": {
+                    "type": "string"
+                },
+                "MainStreamId": {
+                    "type": "integer"
+                },
+                "NodeId": {
+                    "type": "string"
+                },
+                "NodeName": {
+                    "type": "string"
+                },
+                "StreamsCount": {
+                    "type": "integer"
+                },
+                "TotalWaterLevels": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.StreamsPerNodeResponse": {
+            "type": "object",
+            "properties": {
+                "Nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.StreamsPerNode"
                     }
                 }
             }
@@ -119,13 +1790,28 @@
         "dtos.StreamsPerStation": {
             "type": "object",
             "properties": {
-                "stationId": {
+                "AlertWaterLevels": {
+                    "type": "integer"
+                },
+                "ErrorCount": {
+                    "type": "integer"
+                },
+                "LastUpdate": {
                     "type": "string"
                 },
-                "stationName": {
+                "MainStreamId": {
+                    "type": "integer"
+                },
+                "StationId": {
                     "type": "string"
                 },
-                "streamsCount": {
+                "StationName": {
+                    "type": "string"
+                },
+                "StreamsCount": {
+                    "type": "integer"
+                },
+                "TotalWaterLevels": {
                     "type": "integer"
                 }
             }
@@ -140,6 +1826,92 @@
                     }
                 }
             }
+        },
+        "dtos.TotalStreamsWithNullValues": {
+            "type": "object",
+            "properties": {
+                "TotalStreams": {
+                    "type": "integer"
+                },
+                "TotalStreamsWithNull": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.TotalStreamsWithObservedOutlier": {
+            "type": "object",
+            "properties": {
+                "TotalStreams": {
+                    "type": "integer"
+                },
+                "TotalStreamsWithObservedOutlier": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entities.ErrorType": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "x-enum-varnames": [
+                "NullValue",
+                "Missing4DaysHorizon",
+                "OutsideOfErrorBands",
+                "ForecastMissing",
+                "ObservedOutlier",
+                "ForecastOutOfBounds"
+            ]
+        },
+        "entities.Metric": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+            ],
+            "x-enum-comments": {
+                "Maximo": "Configurable",
+                "Media": "Configurable",
+                "Mediana": "Configurable",
+                "Minimo": "Configurable",
+                "Nulos": "Configurable"
+            },
+            "x-enum-varnames": [
+                "Mediana",
+                "Media",
+                "Maximo",
+                "Minimo",
+                "Nulos",
+                "Observaciones",
+                "AguasAlerta",
+                "AguasEvacuacion",
+                "AguasBajas"
+            ]
+        },
+        "entities.StreamType": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "Observed",
+                "Forecasted",
+                "Curated"
+            ]
         }
     }
 }
