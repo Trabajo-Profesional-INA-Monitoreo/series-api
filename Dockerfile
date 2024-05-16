@@ -13,7 +13,11 @@ COPY . .
 # CGO_ENABLED must be disabled to run go binary in Alpine
 RUN CGO_ENABLED=0 GOOS=linux go build .
 
+FROM alpine as certs
+RUN apk update && apk add ca-certificates
+
 
 FROM busybox:latest
 COPY --from=builder /build/series-api /series-api
+COPY --from=certs /etc/ssl/certs /etc/ssl/certs
 ENTRYPOINT ["/series-api"]
