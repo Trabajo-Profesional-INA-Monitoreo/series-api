@@ -75,6 +75,8 @@ definitions:
         type: boolean
       ConfiguredStreamId:
         type: integer
+      ForecastedRangeHours:
+        type: integer
       LowerThreshold:
         type: number
       Metrics:
@@ -112,6 +114,8 @@ definitions:
         type: integer
       CheckErrors:
         type: boolean
+      ForecastedRangeHours:
+        type: integer
       LowerThreshold:
         type: number
       Metrics:

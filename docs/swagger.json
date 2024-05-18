@@ -1297,6 +1297,9 @@
                 "ConfiguredStreamId": {
                     "type": "integer"
                 },
+                "ForecastedRangeHours": {
+                    "type": "integer"
+                },
                 "LowerThreshold": {
                     "type": "number"
                 },
@@ -1351,6 +1354,9 @@
                 },
                 "CheckErrors": {
                     "type": "boolean"
+                },
+                "ForecastedRangeHours": {
+                    "type": "integer"
                 },
                 "LowerThreshold": {
                     "type": "number"

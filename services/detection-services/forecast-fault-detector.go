@@ -7,7 +7,6 @@ import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
 	log "github.com/sirupsen/logrus"
-	"math"
 	"time"
 )
 
@@ -73,7 +72,7 @@ func (f forecastFaultDetectorService) handleStream(stream entities.Stream) {
 
 func (f forecastFaultDetectorService) checkMainForecastErrors(stream entities.Stream, forecast *responses.Forecast, configuredStream entities.ConfiguredStream, res *responses.LastForecast) {
 	consecutiveOutliers := 0
-	forecastedDays := 0
+	forecastedHours := uint64(0)
 	for _, hourlyForecast := range forecast.MainForecast.Forecasts {
 		timestamp, value, err := convertForecastStringData(hourlyForecast[0], hourlyForecast[2])
 		if err != nil {
@@ -89,9 +88,9 @@ func (f forecastFaultDetectorService) checkMainForecastErrors(stream entities.St
 			consecutiveOutliers = 0
 		}
 
-		forecastedDays = addTimeToForecastedDays(*timestamp, res, forecastedDays)
+		forecastedHours = addTimeToForecastedHours(*timestamp, res)
 	}
-	if forecastedDays < MinForecastedDays {
+	if configuredStream.ForecastedRangeHours != nil && forecastedHours < *configuredStream.ForecastedRangeHours {
 		f.saveForecastWasNotCompleteError(stream, res, forecast, configuredStream)
 	}
 }
@@ -133,14 +132,12 @@ func (f forecastFaultDetectorService) handleValueOutsideBoundaries(stream entiti
 	}
 }
 
-func addTimeToForecastedDays(timestamp time.Time, res *responses.LastForecast, forecastedDays int) int {
+func addTimeToForecastedHours(timestamp time.Time, res *responses.LastForecast) uint64 {
 	if timestamp.After(res.ForecastDate) {
 		diff := timestamp.Sub(res.ForecastDate)
-		if math.Floor(diff.Hours()/DayInHours) > float64(forecastedDays) {
-			forecastedDays++
-		}
+		return uint64(diff.Hours())
 	}
-	return forecastedDays
+	return 0
 }
 
 func countObservedValuesOutsideErrorBands(forecast *responses.Forecast, observedData []responses.ObservedDataResponse) int {

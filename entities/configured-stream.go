@@ -10,6 +10,7 @@ type ConfiguredStream struct {
 	NormalUpperThreshold    float64
 	NormalLowerThreshold    float64
 	CalibrationId           uint64
+	ForecastedRangeHours    *uint64
 	ObservedRelatedStreamId *uint64
 	Metrics                 []ConfiguredMetric
 	NodeId                  uint64

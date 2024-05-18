@@ -8,9 +8,6 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-const DayInHours = 24
-const MinForecastedDays = 4
-
 type FaultDetector interface {
 	DetectFaults()
 }

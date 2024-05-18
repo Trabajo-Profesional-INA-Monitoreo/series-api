@@ -1305,6 +1305,9 @@ const docTemplate = `{
                 "ConfiguredStreamId": {
                     "type": "integer"
                 },
+                "ForecastedRangeHours": {
+                    "type": "integer"
+                },
                 "LowerThreshold": {
                     "type": "number"
                 },
@@ -1359,6 +1362,9 @@ const docTemplate = `{
                 },
                 "CheckErrors": {
                     "type": "boolean"
+                },
+                "ForecastedRangeHours": {
+                    "type": "integer"
                 },
                 "LowerThreshold": {
                     "type": "number"

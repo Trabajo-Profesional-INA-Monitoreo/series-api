@@ -131,6 +131,7 @@ func (db configuredStreamsRepository) FindConfiguredStreamsByNodeId(nodeId uint6
 		"configured_streams.normal_upper_threshold",
 		"configured_streams.normal_lower_threshold",
 		"configured_streams.calibration_id",
+		"configured_streams.forecasted_range_hours",
 		"configured_streams.observed_related_stream_id",
 	).Where(
 		"node_id = ? AND configuration_id = ?", nodeId, configurationId,

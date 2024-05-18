@@ -16,6 +16,7 @@ func ConvertDtoToConfiguratedStreamModify(node dtos.Node, stream *dtos.Configure
 		NormalUpperThreshold:    stream.UpperThreshold,
 		NormalLowerThreshold:    stream.LowerThreshold,
 		CalibrationId:           stream.CalibrationId,
+		ForecastedRangeHours:    stream.ForecastedRangeHours,
 		ObservedRelatedStreamId: stream.ObservedRelatedStreamId,
 	}
 }
@@ -30,6 +31,7 @@ func ConvertDtoToConfiguratedStream(nodeId uint64, stream *dtos.ConfiguredStream
 		NormalUpperThreshold:    stream.UpperThreshold,
 		NormalLowerThreshold:    stream.LowerThreshold,
 		CalibrationId:           stream.CalibrationId,
+		ForecastedRangeHours:    stream.ForecastedRangeHours,
 		ObservedRelatedStreamId: stream.ObservedRelatedStreamId,
 	}
 }
