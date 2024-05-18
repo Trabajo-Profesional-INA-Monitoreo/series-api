@@ -981,6 +981,18 @@ const docTemplate = `{
                         "name": "configurationId",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Numero de pagina, por defecto 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Cantidad de series por pagina, por defecto 15",
+                        "name": "pageSize",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1810,6 +1822,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/dtos.StreamsPerNode"
                     }
+                },
+                "Pageable": {
+                    "$ref": "#/definitions/dtos.Pageable"
                 }
             }
         },

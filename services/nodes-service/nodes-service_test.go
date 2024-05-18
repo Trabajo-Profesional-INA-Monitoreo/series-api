@@ -26,8 +26,8 @@ func (n nodesRepositoryMock) GetNodesById(id uint64) []*dtos.Node {
 	return nil
 }
 
-func (n nodesRepositoryMock) GetStreamsPerNodeById(formatUint uint64) []*dtos.StreamsPerNode {
-	return n.streamsPerNode
+func (n nodesRepositoryMock) GetStreamsPerNodeById(formatUint uint64, page int, pageSize int) ([]*dtos.StreamsPerNode, dtos.Pageable) {
+	return n.streamsPerNode, dtos.Pageable{}
 }
 
 func (n nodesRepositoryMock) MarkAsDeletedOldNodes(id uint64, ids []uint64) {
@@ -36,7 +36,7 @@ func (n nodesRepositoryMock) MarkAsDeletedOldNodes(id uint64, ids []uint64) {
 func (n nodesRepositoryMock) DeleteByConfig(configId uint64) {
 }
 
-func (n nodesRepositoryMock) GetErrorsOfNodes(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfNodes {
+func (n nodesRepositoryMock) GetErrorsOfNodes(configId uint64, timeStart time.Time, timeEnd time.Time, nodeIds []uint64) []dtos.ErrorsOfNodes {
 	return n.errorsPerNode
 }
 
@@ -80,7 +80,13 @@ func TestShouldReturnTheNodesSummary(t *testing.T) {
 	mockClient.ObservedData = []responses.ObservedDataResponse{{Value: &alertLevel}}
 	mockClient.Stream = responses.InaStreamResponse{DateRange: responses.DateRange{TimeEnd: &time.Time{}}, Station: responses.Station{AlertLevel: &alertLevel, EvacuationLevel: &evacLevel, LowWaterLevel: &lowLevel}}
 	nodesService := &nodesServiceImpl{mockRepository, mockClient}
-	res := nodesService.GetNodes(time.Now(), time.Now(), 1)
+	parameters := dtos.NewQueryParameters()
+	parameters.AddParam("timeStart", time.Now())
+	parameters.AddParam("timeEnd", time.Now())
+	parameters.AddParam("configurationId", 1)
+	parameters.AddParam("page", "1")
+	parameters.AddParam("pageSize", "15")
+	res := nodesService.GetNodes(parameters)
 	assert.Equal(t, 1, len(res.Nodes))
 	assert.Equal(t, 1, res.Nodes[0].StreamsCount)
 	assert.Equal(t, 1, res.Nodes[0].ErrorCount)
