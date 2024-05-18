@@ -14,3 +14,8 @@ type TotalStreamsWithObservedOutlier struct {
 	TotalStreams                    int `json:"TotalStreams"`
 	TotalStreamsWithObservedOutlier int `json:"TotalStreamsWithObservedOutlier"`
 }
+
+type TotalStreamsWithDelay struct {
+	TotalStreams          int `json:"TotalStreams"`
+	TotalStreamsWithDelay int `json:"TotalStreamsWithDelay"`
+}

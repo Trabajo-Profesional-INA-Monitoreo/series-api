@@ -10,6 +10,7 @@ type InputsController interface {
 	GetGeneralMetrics(ctx *gin.Context)
 	GetTotalStreamsWithNullValues(ctx *gin.Context)
 	GetTotalStreamsWithObservedOutlier(context *gin.Context)
+	GetTotalStreamsWithDelay(context *gin.Context)
 }
 
 type inputsController struct {
@@ -80,5 +81,28 @@ func (i inputsController) GetTotalStreamsWithObservedOutlier(ctx *gin.Context) {
 		return
 	}
 	res := i.inputsService.GetTotalStreamsWithObservedOutlier(configurationId, timeStart, timeEnd)
+	ctx.JSON(http.StatusOK, res)
+}
+
+// GetTotalStreamsWithDelay godoc
+//
+//	@Summary		Endpoint para obtener la cantidad de series con retardo
+//	@Tags           Inputs
+//	@Produce		json
+//	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
+//	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: mañana"  Format(2006-01-02)
+//	@Param          configurationId     query      int     true  "ID de la configuracion"
+//	@Success		200	{object} dtos.TotalStreamsWithDelay
+//	@Router			/inputs/series-retardos [get]
+func (i inputsController) GetTotalStreamsWithDelay(ctx *gin.Context) {
+	configurationId, done := getUintQueryParam(ctx, "configurationId")
+	if done {
+		return
+	}
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
+		return
+	}
+	res := i.inputsService.GetTotalStreamsWithDelay(configurationId, timeStart, timeEnd)
 	ctx.JSON(http.StatusOK, res)
 }

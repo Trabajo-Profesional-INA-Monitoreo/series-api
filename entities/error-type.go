@@ -9,6 +9,7 @@ const (
 	ForecastMissing
 	ObservedOutlier
 	ForecastOutOfBounds
+	Delay
 )
 
 func MapErrorTypeToString(e ErrorType) string {
@@ -25,6 +26,8 @@ func MapErrorTypeToString(e ErrorType) string {
 		return "ObservedOutlier"
 	case ForecastOutOfBounds:
 		return "ForecastOutOfBounds"
+	case Delay:
+		return "Delay"
 	default:
 		return "UnknownError"
 	}

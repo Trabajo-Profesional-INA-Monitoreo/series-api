@@ -283,6 +283,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/errores/retardo-promedio/por-dia": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Errores"
+                ],
+                "summary": "Endpoint para obtener el retardo promedio detectado por dia",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: hoy",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.DelayPerDay"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/errores/series-implicadas": {
             "get": {
                 "produces": [
@@ -688,6 +739,48 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.TotalStreamsWithObservedOutlier"
+                        }
+                    }
+                }
+            }
+        },
+        "/inputs/series-retardos": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inputs"
+                ],
+                "summary": "Endpoint para obtener la cantidad de series con retardo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
+                        "name": "timeStart",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "2006-01-02",
+                        "description": "Fecha del final del periodo - valor por defecto: mañana",
+                        "name": "timeEnd",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID de la configuracion",
+                        "name": "configurationId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.TotalStreamsWithDelay"
                         }
                     }
                 }
@@ -1479,6 +1572,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.DelayPerDay": {
+            "type": "object",
+            "properties": {
+                "Average": {
+                    "type": "number"
+                },
+                "Date": {
+                    "type": "string"
+                }
+            }
+        },
         "dtos.DetectedErrorsOfStream": {
             "type": "object",
             "properties": {
@@ -1871,6 +1975,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.TotalStreamsWithDelay": {
+            "type": "object",
+            "properties": {
+                "TotalStreams": {
+                    "type": "integer"
+                },
+                "TotalStreamsWithDelay": {
+                    "type": "integer"
+                }
+            }
+        },
         "dtos.TotalStreamsWithNullValues": {
             "type": "object",
             "properties": {
@@ -1901,7 +2016,8 @@ const docTemplate = `{
                 2,
                 3,
                 4,
-                5
+                5,
+                6
             ],
             "x-enum-varnames": [
                 "NullValue",
@@ -1909,7 +2025,8 @@ const docTemplate = `{
                 "OutsideOfErrorBands",
                 "ForecastMissing",
                 "ObservedOutlier",
-                "ForecastOutOfBounds"
+                "ForecastOutOfBounds",
+                "Delay"
             ]
         },
         "entities.Metric": {
