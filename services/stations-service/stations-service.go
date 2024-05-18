@@ -11,7 +11,7 @@ import (
 )
 
 type StationsService interface {
-	GetStations(time.Time, time.Time, uint64) dtos.StreamsPerStationResponse
+	GetStations(*dtos.QueryParameters) dtos.StreamsPerStationResponse
 }
 
 type stationsServiceImpl struct {
@@ -23,8 +23,13 @@ func NewStationsService(repository repositories.StationsRepository, inaClient cl
 	return &stationsServiceImpl{repository: repository, inaClient: inaClient}
 }
 
-func (s stationsServiceImpl) GetStations(timeStart time.Time, timeEnd time.Time, configId uint64) dtos.StreamsPerStationResponse {
-	stations := s.repository.GetStations(configId)
+func (s stationsServiceImpl) GetStations(parameters *dtos.QueryParameters) dtos.StreamsPerStationResponse {
+	configId := parameters.Get("configurationId").(uint64)
+	page := *parameters.GetAsInt("page")
+	pageSize := *parameters.GetAsInt("pageSize")
+	timeStart := parameters.Get("timeStart").(time.Time)
+	timeEnd := parameters.Get("timeEnd").(time.Time)
+	stations, pageable := s.repository.GetStations(configId, page, pageSize)
 	if stations == nil {
 		return dtos.StreamsPerStationResponse{}
 	}
@@ -56,8 +61,12 @@ func (s stationsServiceImpl) GetStations(timeStart time.Time, timeEnd time.Time,
 		station.AlertWaterLevels = calculator.GetAlertsCount()
 		station.TotalWaterLevels = totalValues
 	}
-
-	errorsPerStation := s.repository.GetErrorsOfStations(configId, timeStart, timeEnd)
+	var stationIds []uint64
+	for _, station := range *stations {
+		id, _ := strconv.ParseUint(station.StationId, 10, 64)
+		stationIds = append(stationIds, id)
+	}
+	errorsPerStation := s.repository.GetErrorsOfStations(configId, timeStart, timeEnd, stationIds)
 
 	for _, errors := range errorsPerStation {
 		for _, station := range *stations {
@@ -67,5 +76,5 @@ func (s stationsServiceImpl) GetStations(timeStart time.Time, timeEnd time.Time,
 			}
 		}
 	}
-	return dtos.StreamsPerStationResponse{Stations: *stations}
+	return dtos.StreamsPerStationResponse{Stations: *stations, Pageable: pageable}
 }

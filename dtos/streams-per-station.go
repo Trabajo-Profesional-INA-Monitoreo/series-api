@@ -3,7 +3,8 @@ package dtos
 import "time"
 
 type StreamsPerStationResponse struct {
-	Stations []*StreamsPerStation
+	Stations []*StreamsPerStation `json:"Stations"`
+	Pageable Pageable             `json:"Pageable"`
 }
 
 type StreamsPerStation struct {

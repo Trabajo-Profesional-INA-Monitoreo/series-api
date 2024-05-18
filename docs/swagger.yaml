@@ -426,7 +426,9 @@ definitions:
     type: object
   dtos.StreamsPerStationResponse:
     properties:
-      stations:
+      Pageable:
+        $ref: '#/definitions/dtos.Pageable'
+      Stations:
         items:
           $ref: '#/definitions/dtos.StreamsPerStation'
         type: array
@@ -1152,6 +1154,14 @@ paths:
         in: query
         name: configurationId
         required: true
+        type: integer
+      - description: Numero de pagina, por defecto 1
+        in: query
+        name: page
+        type: integer
+      - description: Cantidad de series por pagina, por defecto 15
+        in: query
+        name: pageSize
         type: integer
       produces:
       - application/json
