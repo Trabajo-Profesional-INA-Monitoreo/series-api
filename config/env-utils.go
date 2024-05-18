@@ -12,6 +12,14 @@ func getEnvUint(env *viper.Viper, key string) uint {
 	}
 	return value
 }
+func getEnvStringWithDefault(env *viper.Viper, key string, defaultValue string) string {
+	value := env.GetString(key)
+	if value == "" {
+		log.Infof("Using default value in configuration: %v=%v", key, defaultValue)
+		return defaultValue
+	}
+	return value
+}
 
 func getEnvString(env *viper.Viper, key string) string {
 	value := env.GetString(key)
