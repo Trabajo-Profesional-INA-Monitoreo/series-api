@@ -15,6 +15,7 @@ func setInputsEndpoints(apiGroup *gin.RouterGroup, inputsRepository repositories
 		testApi.GET("/metricas-generales", controller.GetGeneralMetrics)
 		testApi.GET("/series-con-nulos", controller.GetTotalStreamsWithNullValues)
 		testApi.GET("/series-fuera-umbral", controller.GetTotalStreamsWithObservedOutlier)
+		testApi.GET("/series-retardos", controller.GetTotalStreamsWithDelay)
 	}
 	log.Infof("Configured inputs endpoints")
 }

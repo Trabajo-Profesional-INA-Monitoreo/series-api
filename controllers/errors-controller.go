@@ -15,10 +15,35 @@ type ErrorsController interface {
 	GetErrorIndicators(context *gin.Context)
 	GetStreamsWithRelatedError(ctx *gin.Context)
 	GetErrorsOfConfiguredStream(ctx *gin.Context)
+	GetAverageDelayPerDay(context *gin.Context)
 }
 
 type errorsController struct {
 	errorsService metrics_service.ErrorsService
+}
+
+// GetAverageDelayPerDay godoc
+//
+//	@Summary		Endpoint para obtener el retardo promedio detectado por dia
+//	@Tags           Errores
+//	@Produce		json
+//	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
+//	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: hoy"  Format(2006-01-02)
+//	@Param          configurationId     query      int     true  "ID de la configuracion"
+//	@Success		200	 {array}   dtos.DelayPerDay
+//	@Failure        400  {object}  dtos.ErrorResponse
+//	@Router			/errores/retardo-promedio/por-dia [get]
+func (e errorsController) GetAverageDelayPerDay(ctx *gin.Context) {
+	timeStart, timeEnd, done := getDates(ctx)
+	if done {
+		return
+	}
+	configurationId, done := getUintQueryParam(ctx, "configurationId")
+	if done {
+		return
+	}
+	response := e.errorsService.GetAverageDelayPerDay(timeStart, timeEnd, configurationId)
+	ctx.JSON(http.StatusOK, response)
 }
 
 // GetErrorsPerDay godoc
