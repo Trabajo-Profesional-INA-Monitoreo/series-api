@@ -60,7 +60,7 @@ func (f forecastFaultDetectorService) handleStream(stream entities.Stream) {
 		f.handleMissingForecast(stream, configuredStream, res)
 
 		forecast := res.GetForecastOfStream(stream.StreamId)
-		if forecast.MainForecast.Forecasts != nil {
+		if forecast.MainForecast != nil && forecast.MainForecast.Forecasts != nil {
 			f.checkMainForecastErrors(stream, forecast, configuredStream, res)
 		}
 
