@@ -7,6 +7,7 @@ import (
 	metrics_service "github.com/Trabajo-Profesional-INA-Monitoreo/series-api/services/metrics-service"
 	log "github.com/sirupsen/logrus"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -33,34 +34,12 @@ func (s stationsServiceImpl) GetStations(parameters *dtos.QueryParameters) dtos.
 	if stations == nil {
 		return dtos.StreamsPerStationResponse{}
 	}
+	var wg sync.WaitGroup
 	for _, station := range *stations {
-		id, _ := strconv.ParseUint(station.StationId, 10, 64)
-		mainStream, err := s.inaClient.GetMainStreamFromStation(id)
-		if err != nil {
-			log.Errorf("Error getting station streams: %v for stations summary", err)
-			continue
-		}
-		if mainStream == nil {
-			continue
-		}
-		station.MainStreamId = &mainStream.StreamId
-		station.LastUpdate = mainStream.LastUpdate
-		levels, err := s.inaClient.GetObservedData(mainStream.StreamId, timeStart, timeEnd)
-		if err != nil {
-			log.Errorf("Error getting levels: %v for stations summary", err)
-			continue
-		}
-		calculator := metrics_service.NewCalculatorOfWaterLevels(mainStream.AlertLevel, nil, nil)
-		totalValues := uint64(0)
-		for _, level := range levels {
-			if level.Value != nil {
-				calculator.Compute(*level.Value)
-				totalValues++
-			}
-		}
-		station.AlertWaterLevels = calculator.GetAlertsCount()
-		station.TotalWaterLevels = totalValues
+		wg.Add(1)
+		go s.getLastUpdateAndLevelFromStation(station, timeStart, timeEnd, &wg)
 	}
+
 	var stationIds []uint64
 	for _, station := range *stations {
 		id, _ := strconv.ParseUint(station.StationId, 10, 64)
@@ -76,5 +55,36 @@ func (s stationsServiceImpl) GetStations(parameters *dtos.QueryParameters) dtos.
 			}
 		}
 	}
+	wg.Wait()
 	return dtos.StreamsPerStationResponse{Stations: *stations, Pageable: pageable}
+}
+
+func (s stationsServiceImpl) getLastUpdateAndLevelFromStation(station *dtos.StreamsPerStation, timeStart time.Time, timeEnd time.Time, wg *sync.WaitGroup) {
+	defer wg.Done()
+	id, _ := strconv.ParseUint(station.StationId, 10, 64)
+	mainStream, err := s.inaClient.GetMainStreamFromStation(id)
+	if err != nil {
+		log.Errorf("Error getting station streams: %v for stations summary", err)
+		return
+	}
+	if mainStream == nil {
+		return
+	}
+	station.MainStreamId = &mainStream.StreamId
+	station.LastUpdate = mainStream.LastUpdate
+	levels, err := s.inaClient.GetObservedData(mainStream.StreamId, timeStart, timeEnd)
+	if err != nil {
+		log.Errorf("Error getting levels: %v for stations summary", err)
+		return
+	}
+	calculator := metrics_service.NewCalculatorOfWaterLevels(mainStream.AlertLevel, nil, nil)
+	totalValues := uint64(0)
+	for _, level := range levels {
+		if level.Value != nil {
+			calculator.Compute(*level.Value)
+			totalValues++
+		}
+	}
+	station.AlertWaterLevels = calculator.GetAlertsCount()
+	station.TotalWaterLevels = totalValues
 }

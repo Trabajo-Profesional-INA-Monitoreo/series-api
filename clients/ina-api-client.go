@@ -61,8 +61,7 @@ func (i inaApiClientImpl) GetMainStreamFromStation(stationId uint64) (*responses
 	var decodedBody []responses.InaStreamResponse
 	err = json.NewDecoder(res.Body).Decode(&decodedBody)
 	if err != nil {
-		log.Errorf("Error decoding response: %v", err)
-		return nil, err
+		return nil, fmt.Errorf("error decoding response: %v - url %v", err, url)
 	}
 
 	for _, stream := range decodedBody {
