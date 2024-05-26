@@ -13,11 +13,11 @@ type stationsRepositoryMock struct {
 	errorsPerStation  []dtos.ErrorsOfStations
 }
 
-func (s stationsRepositoryMock) GetStations(configId uint64) *[]*dtos.StreamsPerStation {
-	return &s.streamsPerStation
+func (s stationsRepositoryMock) GetStations(configId uint64, page int, pageSize int) (*[]*dtos.StreamsPerStation, dtos.Pageable) {
+	return &s.streamsPerStation, dtos.Pageable{}
 
 }
-func (s stationsRepositoryMock) GetErrorsOfStations(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfStations {
+func (s stationsRepositoryMock) GetErrorsOfStations(configId uint64, timeStart time.Time, timeEnd time.Time, ids []uint64) []dtos.ErrorsOfStations {
 	return s.errorsPerStation
 }
 
@@ -57,7 +57,13 @@ func TestShouldReturnTheStationsSummary(t *testing.T) {
 	alertLevel := 4.0
 	mockClient.ObservedData = []responses.ObservedDataResponse{{Value: &alertLevel}}
 	stationsService := &stationsServiceImpl{mockRepository, mockClient}
-	res := stationsService.GetStations(time.Now(), time.Now(), 1)
+	parameters := dtos.NewQueryParameters()
+	parameters.AddParam("timeStart", time.Now())
+	parameters.AddParam("timeEnd", time.Now())
+	parameters.AddParam("configurationId", 1)
+	parameters.AddParam("page", "1")
+	parameters.AddParam("pageSize", "15")
+	res := stationsService.GetStations(parameters)
 	assert.Equal(t, 1, len(res.Stations))
 	assert.Equal(t, 1, res.Stations[0].StreamsCount)
 	assert.Equal(t, 1, res.Stations[0].ErrorCount)

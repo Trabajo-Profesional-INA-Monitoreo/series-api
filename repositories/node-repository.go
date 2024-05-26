@@ -12,10 +12,10 @@ type NodeRepository interface {
 	Create(node *entities.Node) (uint64, error)
 	Update(node *entities.Node) error
 	GetNodesById(id uint64) []*dtos.Node
-	GetStreamsPerNodeById(formatUint uint64) []*dtos.StreamsPerNode
+	GetStreamsPerNodeById(formatUint uint64, page int, pageSize int) ([]*dtos.StreamsPerNode, dtos.Pageable)
 	MarkAsDeletedOldNodes(id uint64, ids []uint64)
 	DeleteByConfig(configId uint64)
-	GetErrorsOfNodes(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfNodes
+	GetErrorsOfNodes(configId uint64, timeStart time.Time, timeEnd time.Time, nodeIds []uint64) []dtos.ErrorsOfNodes
 }
 
 type nodeRepository struct {
@@ -40,7 +40,7 @@ func (n nodeRepository) MarkAsDeletedOldNodes(configId uint64, newNodeIds []uint
 	tx.Update("deleted", true)
 }
 
-func (n nodeRepository) GetStreamsPerNodeById(configId uint64) []*dtos.StreamsPerNode {
+func (n nodeRepository) GetStreamsPerNodeById(configId uint64, page int, pageSize int) ([]*dtos.StreamsPerNode, dtos.Pageable) {
 	var nodes []*dtos.StreamsPerNode
 
 	tx := n.connection.Model(
@@ -58,14 +58,31 @@ func (n nodeRepository) GetStreamsPerNodeById(configId uint64) []*dtos.StreamsPe
 		"configured_streams.deleted = false",
 	).Group(
 		"nodes.name, nodes.node_id",
-	).Scan(&nodes)
+	).Limit(pageSize).Offset((page - 1) * pageSize).Scan(&nodes)
 
 	if tx.Error != nil {
 		log.Errorf("Error executing GetNodes query: %v", tx.Error)
 	}
 
+	var totalElements int
+	countTx := n.connection.Model(
+		&entities.Node{},
+	).Select(
+		"count(distinct(nodes.node_id))",
+	).Joins(
+		"JOIN configured_streams ON configured_streams.node_id = nodes.node_id",
+	).Where(
+		"nodes.configuration_id = ?", configId,
+	).Where(
+		"configured_streams.deleted = false",
+	).Find(&totalElements)
+
+	if countTx.Error != nil {
+		log.Errorf("Error executing GetStreamsPerNodeById Count query: %v", countTx.Error)
+	}
+
 	log.Debugf("Get nodes query result: %v", nodes)
-	return nodes
+	return nodes, dtos.NewPageable(totalElements, page, pageSize)
 }
 
 func (n nodeRepository) Update(node *entities.Node) error {
@@ -95,7 +112,7 @@ func (n nodeRepository) GetNodesById(id uint64) []*dtos.Node {
 	return nodes
 }
 
-func (n nodeRepository) GetErrorsOfNodes(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfNodes {
+func (n nodeRepository) GetErrorsOfNodes(configId uint64, timeStart time.Time, timeEnd time.Time, nodeIds []uint64) []dtos.ErrorsOfNodes {
 	var errorsPerNode []dtos.ErrorsOfNodes
 
 	tx := n.connection.Model(
@@ -113,6 +130,8 @@ func (n nodeRepository) GetErrorsOfNodes(configId uint64, timeStart time.Time, t
 		"detected_errors.detected_date >= ? AND detected_errors.detected_date <= ?", timeStart, timeEnd,
 	).Where(
 		"configured_streams.deleted = false",
+	).Where(
+		"configured_streams.node_id IN ?", nodeIds,
 	).Group("configured_streams.node_id").Scan(&errorsPerNode)
 
 	if tx.Error != nil {

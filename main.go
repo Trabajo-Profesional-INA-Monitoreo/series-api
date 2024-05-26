@@ -16,6 +16,7 @@ import (
 func main() {
 	apiConfig := config.GetConfig()
 	config.InitLogger(apiConfig.LogLevel)
+	gin.SetMode(apiConfig.GinLogLevel)
 	server := gin.New()
 
 	repositories := config.CreateRepositories(apiConfig.DbUrl, apiConfig.SqlLogLevel)

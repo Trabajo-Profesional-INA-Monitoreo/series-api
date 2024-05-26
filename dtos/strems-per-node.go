@@ -3,7 +3,8 @@ package dtos
 import "time"
 
 type StreamsPerNodeResponse struct {
-	Nodes []*StreamsPerNode `json:"Nodes"`
+	Nodes    []*StreamsPerNode `json:"Nodes"`
+	Pageable Pageable          `json:"Pageable"`
 }
 
 type StreamsPerNode struct {

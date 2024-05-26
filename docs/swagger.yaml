@@ -75,6 +75,8 @@ definitions:
         type: boolean
       ConfiguredStreamId:
         type: integer
+      ForecastedRangeHours:
+        type: integer
       LowerThreshold:
         type: number
       Metrics:
@@ -112,6 +114,8 @@ definitions:
         type: integer
       CheckErrors:
         type: boolean
+      ForecastedRangeHours:
+        type: integer
       LowerThreshold:
         type: number
       Metrics:
@@ -174,6 +178,13 @@ definitions:
     required:
     - ConfiguredStreams
     - Name
+    type: object
+  dtos.DelayPerDay:
+    properties:
+      Average:
+        type: number
+      Date:
+        type: string
     type: object
   dtos.DetectedErrorsOfStream:
     properties:
@@ -400,6 +411,8 @@ definitions:
         items:
           $ref: '#/definitions/dtos.StreamsPerNode'
         type: array
+      Pageable:
+        $ref: '#/definitions/dtos.Pageable'
     type: object
   dtos.StreamsPerStation:
     properties:
@@ -422,10 +435,19 @@ definitions:
     type: object
   dtos.StreamsPerStationResponse:
     properties:
-      stations:
+      Pageable:
+        $ref: '#/definitions/dtos.Pageable'
+      Stations:
         items:
           $ref: '#/definitions/dtos.StreamsPerStation'
         type: array
+    type: object
+  dtos.TotalStreamsWithDelay:
+    properties:
+      TotalStreams:
+        type: integer
+      TotalStreamsWithDelay:
+        type: integer
     type: object
   dtos.TotalStreamsWithNullValues:
     properties:
@@ -449,6 +471,7 @@ definitions:
     - 3
     - 4
     - 5
+    - 6
     type: integer
     x-enum-varnames:
     - NullValue
@@ -457,6 +480,7 @@ definitions:
     - ForecastMissing
     - ObservedOutlier
     - ForecastOutOfBounds
+    - Delay
   entities.Metric:
     enum:
     - 0
@@ -722,6 +746,40 @@ paths:
       summary: Endpoint para obtener las errores detectados por dia
       tags:
       - Errores
+  /errores/retardo-promedio/por-dia:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: hoy'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.DelayPerDay'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.ErrorResponse'
+      summary: Endpoint para obtener el retardo promedio detectado por dia
+      tags:
+      - Errores
   /errores/series-implicadas:
     get:
       parameters:
@@ -949,6 +1007,34 @@ paths:
         umbrales
       tags:
       - Inputs
+  /inputs/series-retardos:
+    get:
+      parameters:
+      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
+        format: "2006-01-02"
+        in: query
+        name: timeStart
+        type: string
+      - description: 'Fecha del final del periodo - valor por defecto: mañana'
+        format: "2006-01-02"
+        in: query
+        name: timeEnd
+        type: string
+      - description: ID de la configuracion
+        in: query
+        name: configurationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.TotalStreamsWithDelay'
+      summary: Endpoint para obtener la cantidad de series con retardo
+      tags:
+      - Inputs
   /series:
     get:
       parameters:
@@ -1149,6 +1235,14 @@ paths:
         name: configurationId
         required: true
         type: integer
+      - description: Numero de pagina, por defecto 1
+        in: query
+        name: page
+        type: integer
+      - description: Cantidad de series por pagina, por defecto 15
+        in: query
+        name: pageSize
+        type: integer
       produces:
       - application/json
       responses:
@@ -1176,6 +1270,14 @@ paths:
         in: query
         name: configurationId
         required: true
+        type: integer
+      - description: Numero de pagina, por defecto 1
+        in: query
+        name: page
+        type: integer
+      - description: Cantidad de series por pagina, por defecto 15
+        in: query
+        name: pageSize
         type: integer
       produces:
       - application/json

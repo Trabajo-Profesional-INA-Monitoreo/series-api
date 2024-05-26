@@ -11,6 +11,7 @@ type InputsService interface {
 	GetGeneralMetrics(configurationId uint64) dtos.InputsGeneralMetrics
 	GetTotalStreamsWithNullValues(configurationId uint64, timeStart time.Time, timeEnd time.Time) dtos.TotalStreamsWithNullValues
 	GetTotalStreamsWithObservedOutlier(configurationId uint64, timeStart time.Time, timeEnd time.Time) dtos.TotalStreamsWithObservedOutlier
+	GetTotalStreamsWithDelay(id uint64, start time.Time, end time.Time) dtos.TotalStreamsWithDelay
 }
 
 type inputsService struct {
@@ -55,4 +56,15 @@ func (s inputsService) GetTotalStreamsWithObservedOutlier(configurationId uint64
 	totalStreams := <-streamsResult
 
 	return dtos.TotalStreamsWithObservedOutlier{TotalStreams: totalStreams, TotalStreamsWithObservedOutlier: streamsWithObservedOutlier}
+}
+
+func (s inputsService) GetTotalStreamsWithDelay(configurationId uint64, timeStart time.Time, timeEnd time.Time) dtos.TotalStreamsWithDelay {
+	streamsResult := make(chan int, 1)
+	go func() {
+		streamsResult <- s.repository.GetTotalStreams(configurationId)
+	}()
+	streamsWithDelay := s.repository.GetTotalStreamsByError(configurationId, timeStart, timeEnd, entities.Delay)
+	totalStreams := <-streamsResult
+
+	return dtos.TotalStreamsWithDelay{TotalStreams: totalStreams, TotalStreamsWithDelay: streamsWithDelay}
 }

@@ -73,6 +73,41 @@ func (f observedFaultDetectorService) checkNullValues(data []responses.ObservedD
 	}
 }
 
+func (f observedFaultDetectorService) checkDelay(data []responses.ObservedDataResponse, stream entities.Stream, configuredStream entities.ConfiguredStream) {
+
+	if len(data) == 0 {
+		return
+	}
+
+	observed := data[len(data)-1]
+
+	isDelayed := valueIsDelayed(configuredStream, observed)
+	minutesDelayed := time.Now().Sub(observed.TimeStart).Minutes()
+
+	if isDelayed {
+		reqId := fmt.Sprintf("%v", observed.TimeStart)
+		detectedError := f.errorsRepository.GetDetectedErrorForStreamWithIdAndType(stream.StreamId, reqId, entities.Delay)
+		detected := detectedError.RequestId == reqId
+		if !detected {
+			log.Debugf("Detected delayed value in observed stream for: %v", stream.StreamId)
+			detected := entities.DetectedError{
+				StreamId:         stream.StreamId,
+				Stream:           &stream,
+				ConfiguredStream: []entities.ConfiguredStream{configuredStream},
+				DetectedDate:     time.Now(),
+				RequestId:        reqId,
+				ErrorType:        entities.Delay,
+				ExtraInfo:        fmt.Sprintf("Delay total: %v", minutesDelayed),
+			}
+			f.errorsRepository.Create(detected)
+		} else if !contains(detectedError.ConfiguredStream, configuredStream) {
+			detectedError.ConfiguredStream = append(detectedError.ConfiguredStream, configuredStream)
+			f.errorsRepository.Update(detectedError)
+		}
+	}
+
+}
+
 func (f observedFaultDetectorService) handleStream(stream entities.Stream) {
 	configuredStreams := f.configuredStreamsRepository.FindConfiguredStreamsWithCheckErrorsForStream(stream)
 	data, err := getObservedDataFromStream(stream.StreamId, time.Now().Add(time.Duration(-24)*time.Hour), time.Now(), f.inaApiClient)
@@ -83,5 +118,6 @@ func (f observedFaultDetectorService) handleStream(stream entities.Stream) {
 	f.checkNullValues(data, stream, configuredStreams)
 	for _, configuredStream := range configuredStreams {
 		f.checkOutliers(data, stream, configuredStream)
+		f.checkDelay(data, stream, configuredStream)
 	}
 }

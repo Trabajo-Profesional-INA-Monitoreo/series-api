@@ -11,6 +11,7 @@ type ConfiguredStream struct {
 	UpperThreshold          float64             `gorm:"column:normal_upper_threshold" json:"UpperThreshold"`
 	LowerThreshold          float64             `binding:"ltecsfield=UpperThreshold" gorm:"column:normal_lower_threshold" json:"LowerThreshold"`
 	CalibrationId           uint64              `binding:"excluded_unless=StreamType 1" gorm:"column:calibration_id" json:"CalibrationId"`
+	ForecastedRangeHours    *uint64             `binding:"excluded_unless=StreamType 1" json:"ForecastedRangeHours"`
 	RedundanciesIds         *[]uint64           `gorm:"-" json:"RedundanciesIds"`
 	Metrics                 *[]entities.Metric  `binding:"omitempty,gte=0,lte=5,unique,dive,gte=0,lte=4" gorm:"-" json:"Metrics"`
 	ObservedRelatedStreamId *uint64             `binding:"excluded_unless=StreamType 1" json:"ObservedRelatedStreamId"`
@@ -24,6 +25,7 @@ type ConfiguredStreamCreate struct {
 	UpperThreshold          float64             `gorm:"column:normal_upper_threshold" json:"UpperThreshold"`
 	LowerThreshold          float64             `binding:"ltecsfield=UpperThreshold" gorm:"column:normal_lower_threshold" json:"LowerThreshold"`
 	CalibrationId           uint64              `binding:"excluded_unless=StreamType 1" gorm:"column:calibration_id" json:"CalibrationId"`
+	ForecastedRangeHours    *uint64             `binding:"excluded_unless=StreamType 1" json:"ForecastedRangeHours"`
 	RedundanciesIds         []uint64            `gorm:"-" json:"RedundanciesIds"`
 	Metrics                 []entities.Metric   `binding:"omitempty,gte=0,lte=5,unique,dive,gte=0,lte=4" gorm:"-" json:"Metrics"`
 	ObservedRelatedStreamId *uint64             `binding:"excluded_unless=StreamType 1" json:"ObservedRelatedStreamId"`

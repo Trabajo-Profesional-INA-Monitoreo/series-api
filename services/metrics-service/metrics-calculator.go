@@ -17,6 +17,9 @@ type metricParameters struct {
 }
 
 func GetMetricsForForecastedStream(data *responses.Forecast, neededMetrics []entities.ConfiguredMetric, waterLevelCalculator WaterLevelsCalculator) *[]dtos.MetricCard {
+	if data.MainForecast == nil {
+		return &[]dtos.MetricCard{}
+	}
 	metricsValues := &metricParameters{
 		setUpFirstValues: false,
 		validValues:      responses.ConvertToFloats(data.MainForecast.Forecasts),

@@ -20,6 +20,7 @@ type ErrorMetricsRepository interface {
 	GetErrorIndicators(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorIndicator
 	GetRelatedStreamsToError(parameters *dtos.QueryParameters) ([]dtos.ErrorRelatedStream, error)
 	GetErrorsOfConfiguredStream(parameters *dtos.QueryParameters) (*dtos.DetectedErrorsOfStream, error)
+	GetAverageDelayPerDay(start time.Time, end time.Time, id uint64) []*dtos.DelayPerDay
 }
 
 type ErrorsRepository interface {
@@ -202,4 +203,35 @@ func (e errorsRepository) GetErrorsOfConfiguredStream(parameters *dtos.QueryPara
 	}
 
 	return dtos.NewDetectedErrorsOfStream(errors, dtos.NewPageable(totalElements, page, pageSize)), nil
+}
+
+func (e errorsRepository) GetAverageDelayPerDay(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.DelayPerDay {
+	var results []*dtos.DelayPerDay
+
+	err := e.connection.Model(
+		&entities.DetectedError{},
+	).Select(
+		"AVG(to_number(REGEXP_REPLACE(detected_errors.extra_info, 'Delay total: ', ''), '99999999D999S')) as average",
+		"DATE(detected_errors.detected_date) as date",
+	).Joins(
+		"JOIN configured_streams_errors ON configured_streams_errors.detected_error_error_id = detected_errors.error_id",
+	).Joins(
+		"JOIN configured_streams ON configured_streams.configured_stream_id = configured_streams_errors.configured_stream_configured_stream_id",
+	).Where(
+		"detected_date >= ? AND detected_date <= ?", timeStart, timeEnd,
+	).Where(
+		"configured_streams.configuration_id = ?", configId,
+	).Where(
+		"detected_errors.error_type = ?", entities.Delay,
+	).Where(
+		"configured_streams.deleted = false",
+	).Group(
+		"DATE(detected_errors.detected_date)",
+	).Find(&results)
+
+	if err.Error != nil {
+		log.Errorf("Error executing GetAverageDelayPerDay query: %v", err)
+	}
+
+	return results
 }

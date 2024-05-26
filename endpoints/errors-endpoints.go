@@ -13,6 +13,7 @@ func setErrorEndpoints(apiGroup *gin.RouterGroup, errorsRepository repositories.
 	testApi := apiGroup.Group("/errores")
 	{
 		testApi.GET("/por-dia", controller.GetErrorsPerDay)
+		testApi.GET("/retardo-promedio/por-dia", controller.GetAverageDelayPerDay)
 		testApi.GET("/indicadores", controller.GetErrorIndicators)
 		testApi.GET("/series-implicadas", controller.GetStreamsWithRelatedError)
 		testApi.GET("/:configuredStreamId", controller.GetErrorsOfConfiguredStream)

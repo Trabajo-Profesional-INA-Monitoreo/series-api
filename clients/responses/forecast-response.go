@@ -2,6 +2,7 @@ package responses
 
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
+	log "github.com/sirupsen/logrus"
 	"strconv"
 	"time"
 )
@@ -37,6 +38,9 @@ func (f LastForecast) GetForecastOfStream(streamId uint64) *Forecast {
 				forecast.P95Forecast = stream
 			}
 		}
+	}
+	if forecast.MainForecast == nil {
+		log.Warnf("Requested forecast for stream %v but it was not found on request, check if config is correct", streamId)
 	}
 	return forecast
 }

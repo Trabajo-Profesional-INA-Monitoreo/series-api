@@ -9,6 +9,7 @@ import (
 type ServiceConfigurationData struct {
 	LogLevel                    string
 	SqlLogLevel                 string
+	GinLogLevel                 string
 	ServerPort                  string
 	DbUrl                       string
 	FaultCronTime               string
@@ -37,6 +38,7 @@ func initEnv() (*viper.Viper, error) {
 	// Add env variables supported
 	_ = v.BindEnv("log", "level")
 	_ = v.BindEnv("log", "sql")
+	_ = v.BindEnv("log", "gin")
 	_ = v.BindEnv("server", "port")
 	_ = v.BindEnv("datasource", "connection")
 	_ = v.BindEnv("faults", "detector", "cron")
@@ -69,8 +71,9 @@ func GetConfig() *ServiceConfigurationData {
 		log.Fatalf("Failed to read environment, exiting")
 	}
 
-	logLevel := getEnvString(env, "log.level")
-	sqlLogLevel := getEnvString(env, "log.sql")
+	logLevel := getEnvStringWithDefault(env, "log.level", "info")
+	sqlLogLevel := getEnvStringWithDefault(env, "log.sql", "warn")
+	ginLogLevel := getEnvStringWithDefault(env, "log.gin", "release")
 	serverPort := getEnvString(env, "server.port")
 	dbConnection := getEnvString(env, "datasource.connection")
 	faultsDetectorCron := getEnvString(env, "faults.detector.cron")
@@ -85,6 +88,7 @@ func GetConfig() *ServiceConfigurationData {
 	return &ServiceConfigurationData{
 		LogLevel:                  logLevel,
 		SqlLogLevel:               sqlLogLevel,
+		GinLogLevel:               ginLogLevel,
 		ServerPort:                serverPort,
 		DbUrl:                     dbConnection,
 		FaultCronTime:             faultsDetectorCron,

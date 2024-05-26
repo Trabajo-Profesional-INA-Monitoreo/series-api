@@ -2,6 +2,7 @@
 log:
   level: "debug"
   sql: "info"
+  gin: "release"
 
 server:
   port: "8080"

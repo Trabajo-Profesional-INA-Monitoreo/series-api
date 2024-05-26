@@ -9,8 +9,8 @@ import (
 )
 
 type StationsRepository interface {
-	GetStations(configId uint64) *[]*dtos.StreamsPerStation
-	GetErrorsOfStations(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfStations
+	GetStations(configId uint64, page int, pageSize int) (*[]*dtos.StreamsPerStation, dtos.Pageable)
+	GetErrorsOfStations(configId uint64, timeStart time.Time, timeEnd time.Time, stationIds []uint64) []dtos.ErrorsOfStations
 }
 
 type stationsRepository struct {
@@ -21,7 +21,7 @@ func NewStationsRepository(connection *gorm.DB) StationsRepository {
 	return &stationsRepository{connection}
 }
 
-func (db *stationsRepository) GetStations(configId uint64) *[]*dtos.StreamsPerStation {
+func (db *stationsRepository) GetStations(configId uint64, page int, pageSize int) (*[]*dtos.StreamsPerStation, dtos.Pageable) {
 	var stations *[]*dtos.StreamsPerStation
 
 	tx := db.connection.Model(
@@ -40,17 +40,36 @@ func (db *stationsRepository) GetStations(configId uint64) *[]*dtos.StreamsPerSt
 		"configured_streams.deleted = false",
 	).Group(
 		"stations.name, stations.station_id",
-	).Scan(&stations)
+	).Limit(pageSize).Offset((page - 1) * pageSize).Scan(&stations)
 
 	if tx.Error != nil {
 		log.Errorf("Error executing GetStations query: %v", tx.Error)
 	}
 
+	var totalElements int
+	countTx := db.connection.Model(
+		&entities.Stream{},
+	).Select(
+		"COUNT(DISTINCT stations.station_id)",
+	).Joins(
+		"JOIN stations ON  stations.station_id = streams.station_id",
+	).Joins(
+		"JOIN configured_streams ON configured_streams.stream_id = streams.stream_id",
+	).Where(
+		"configured_streams.configuration_id = ?", configId,
+	).Where(
+		"configured_streams.deleted = false",
+	).Find(&totalElements)
+
+	if countTx.Error != nil {
+		log.Errorf("Error executing GetStations Count query: %v", countTx.Error)
+	}
+
 	log.Debugf("Get stations query result: %v", stations)
-	return stations
+	return stations, dtos.NewPageable(totalElements, page, pageSize)
 }
 
-func (db *stationsRepository) GetErrorsOfStations(configId uint64, timeStart time.Time, timeEnd time.Time) []dtos.ErrorsOfStations {
+func (db *stationsRepository) GetErrorsOfStations(configId uint64, timeStart time.Time, timeEnd time.Time, stationIds []uint64) []dtos.ErrorsOfStations {
 	var errorsPerStation []dtos.ErrorsOfStations
 
 	tx := db.connection.Model(
@@ -68,6 +87,8 @@ func (db *stationsRepository) GetErrorsOfStations(configId uint64, timeStart tim
 		"detected_errors.detected_date >= ? AND detected_errors.detected_date <= ?", timeStart, timeEnd,
 	).Where(
 		"configured_streams.deleted = false",
+	).Where(
+		"streams.station_id IN ?", stationIds,
 	).Group("streams.station_id").Scan(&errorsPerStation)
 
 	if tx.Error != nil {
