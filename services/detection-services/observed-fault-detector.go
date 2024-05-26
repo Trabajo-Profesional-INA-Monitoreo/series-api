@@ -7,6 +7,7 @@ import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/repositories"
 	log "github.com/sirupsen/logrus"
+	"math"
 	"time"
 )
 
@@ -97,7 +98,7 @@ func (f observedFaultDetectorService) checkDelay(data []responses.ObservedDataRe
 				DetectedDate:     time.Now(),
 				RequestId:        reqId,
 				ErrorType:        entities.Delay,
-				ExtraInfo:        fmt.Sprintf("Delay total: %v", minutesDelayed),
+				ExtraInfo:        fmt.Sprintf("Delay total en minutos: %v", math.Ceil(minutesDelayed)),
 			}
 			f.errorsRepository.Create(detected)
 		} else if !contains(detectedError.ConfiguredStream, configuredStream) {
