@@ -52,7 +52,7 @@ keycloak:
 
 ## Documentación
 
-Se puede ver la especificación de la API en `[host]:[puerto]/swagger/index.html` o en la carpeta `/docs`
+Se puede ver la especificación de la API en `[host]:[puerto]/api/v1/swagger/index.html` o en la carpeta `/docs`
 
 Para actualizarla ejecutar `swag init` y seguir las especificaciones de la [documentación](https://github.com/swaggo/swag#api-operation)
 

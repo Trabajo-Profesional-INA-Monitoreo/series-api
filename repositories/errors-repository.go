@@ -211,7 +211,7 @@ func (e errorsRepository) GetAverageDelayPerDay(timeStart time.Time, timeEnd tim
 	err := e.connection.Model(
 		&entities.DetectedError{},
 	).Select(
-		"AVG(to_number(REGEXP_REPLACE(detected_errors.extra_info, 'Delay total: ', ''), '99999999D999S')) as average",
+		"AVG(to_number(REGEXP_REPLACE(detected_errors.extra_info, 'Delay total en minutos: ', ''), '99999999D999S')) as average",
 		"DATE(detected_errors.detected_date) as date",
 	).Joins(
 		"JOIN configured_streams_errors ON configured_streams_errors.detected_error_error_id = detected_errors.error_id",
