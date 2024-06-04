@@ -9,5 +9,5 @@ import (
 
 func setUpSwagger(server *gin.Engine) {
 	docs.SwaggerInfo.BasePath = "/api/v1"
-	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	server.GET("/api/v1/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 }
