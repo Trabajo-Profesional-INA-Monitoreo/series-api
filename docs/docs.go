@@ -309,8 +309,9 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "ID de la configuracion",
-                        "name": "configurationId",
+                        "format": "int",
+                        "description": "Id de la configuracion de la serie",
+                        "name": "configuredStreamId",
                         "in": "query",
                         "required": true
                     }
