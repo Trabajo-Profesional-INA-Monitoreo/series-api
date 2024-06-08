@@ -14,6 +14,10 @@ definitions:
         type: integer
       CountLowWaterLevel:
         type: integer
+      StreamLevels:
+        items:
+          $ref: '#/definitions/dtos.StreamLevel'
+        type: array
       TotalValuesCount:
         type: integer
     type: object
@@ -372,6 +376,13 @@ definitions:
       VarName:
         type: string
     type: object
+  dtos.StreamLevel:
+    properties:
+      Level:
+        type: string
+      StreamId:
+        type: integer
+    type: object
   dtos.StreamsData:
     properties:
       Time:
@@ -444,6 +455,10 @@ definitions:
     type: object
   dtos.TotalStreamsWithDelay:
     properties:
+      Streams:
+        items:
+          type: integer
+        type: array
       TotalStreams:
         type: integer
       TotalStreamsWithDelay:
@@ -451,6 +466,10 @@ definitions:
     type: object
   dtos.TotalStreamsWithNullValues:
     properties:
+      Streams:
+        items:
+          type: integer
+        type: array
       TotalStreams:
         type: integer
       TotalStreamsWithNull:
@@ -458,6 +477,10 @@ definitions:
     type: object
   dtos.TotalStreamsWithObservedOutlier:
     properties:
+      Streams:
+        items:
+          type: integer
+        type: array
       TotalStreams:
         type: integer
       TotalStreamsWithObservedOutlier:

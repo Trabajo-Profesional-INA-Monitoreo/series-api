@@ -1319,6 +1319,12 @@
                 "CountLowWaterLevel": {
                     "type": "integer"
                 },
+                "StreamLevels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.StreamLevel"
+                    }
+                },
                 "TotalValuesCount": {
                     "type": "integer"
                 }
@@ -1859,6 +1865,17 @@
                 }
             }
         },
+        "dtos.StreamLevel": {
+            "type": "object",
+            "properties": {
+                "Level": {
+                    "type": "string"
+                },
+                "StreamId": {
+                    "type": "integer"
+                }
+            }
+        },
         "dtos.StreamsData": {
             "type": "object",
             "properties": {
@@ -1970,6 +1987,12 @@
         "dtos.TotalStreamsWithDelay": {
             "type": "object",
             "properties": {
+                "Streams": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "TotalStreams": {
                     "type": "integer"
                 },
@@ -1981,6 +2004,12 @@
         "dtos.TotalStreamsWithNullValues": {
             "type": "object",
             "properties": {
+                "Streams": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "TotalStreams": {
                     "type": "integer"
                 },
@@ -1992,6 +2021,12 @@
         "dtos.TotalStreamsWithObservedOutlier": {
             "type": "object",
             "properties": {
+                "Streams": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "TotalStreams": {
                     "type": "integer"
                 },

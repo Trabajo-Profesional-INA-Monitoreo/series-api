@@ -1327,6 +1327,12 @@ const docTemplate = `{
                 "CountLowWaterLevel": {
                     "type": "integer"
                 },
+                "StreamLevels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.StreamLevel"
+                    }
+                },
                 "TotalValuesCount": {
                     "type": "integer"
                 }
@@ -1867,6 +1873,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.StreamLevel": {
+            "type": "object",
+            "properties": {
+                "Level": {
+                    "type": "string"
+                },
+                "StreamId": {
+                    "type": "integer"
+                }
+            }
+        },
         "dtos.StreamsData": {
             "type": "object",
             "properties": {
@@ -1978,6 +1995,12 @@ const docTemplate = `{
         "dtos.TotalStreamsWithDelay": {
             "type": "object",
             "properties": {
+                "Streams": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "TotalStreams": {
                     "type": "integer"
                 },
@@ -1989,6 +2012,12 @@ const docTemplate = `{
         "dtos.TotalStreamsWithNullValues": {
             "type": "object",
             "properties": {
+                "Streams": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "TotalStreams": {
                     "type": "integer"
                 },
@@ -2000,6 +2029,12 @@ const docTemplate = `{
         "dtos.TotalStreamsWithObservedOutlier": {
             "type": "object",
             "properties": {
+                "Streams": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "TotalStreams": {
                     "type": "integer"
                 },
