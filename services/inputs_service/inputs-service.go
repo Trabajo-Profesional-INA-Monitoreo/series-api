@@ -41,10 +41,10 @@ func (s inputsService) GetTotalStreamsWithNullValues(configurationId uint64, tim
 	go func() {
 		streamsResult <- s.repository.GetTotalStreams(configurationId)
 	}()
-	streamsWithNull := s.repository.GetTotalStreamsByError(configurationId, timeStart, timeEnd, entities.NullValue)
+	streamsWithNull, streams := s.repository.GetTotalStreamsByError(configurationId, timeStart, timeEnd, entities.NullValue)
 	totalStreams := <-streamsResult
 
-	return dtos.TotalStreamsWithNullValues{TotalStreams: totalStreams, TotalStreamsWithNull: streamsWithNull}
+	return dtos.TotalStreamsWithNullValues{TotalStreams: totalStreams, TotalStreamsWithNull: streamsWithNull, Streams: streams}
 }
 
 func (s inputsService) GetTotalStreamsWithObservedOutlier(configurationId uint64, timeStart time.Time, timeEnd time.Time) dtos.TotalStreamsWithObservedOutlier {
@@ -52,10 +52,10 @@ func (s inputsService) GetTotalStreamsWithObservedOutlier(configurationId uint64
 	go func() {
 		streamsResult <- s.repository.GetTotalStreams(configurationId)
 	}()
-	streamsWithObservedOutlier := s.repository.GetTotalStreamsByError(configurationId, timeStart, timeEnd, entities.ObservedOutlier)
+	streamsWithObservedOutlier, streams := s.repository.GetTotalStreamsByError(configurationId, timeStart, timeEnd, entities.ObservedOutlier)
 	totalStreams := <-streamsResult
 
-	return dtos.TotalStreamsWithObservedOutlier{TotalStreams: totalStreams, TotalStreamsWithObservedOutlier: streamsWithObservedOutlier}
+	return dtos.TotalStreamsWithObservedOutlier{TotalStreams: totalStreams, TotalStreamsWithObservedOutlier: streamsWithObservedOutlier, Streams: streams}
 }
 
 func (s inputsService) GetTotalStreamsWithDelay(configurationId uint64, timeStart time.Time, timeEnd time.Time) dtos.TotalStreamsWithDelay {
@@ -63,8 +63,8 @@ func (s inputsService) GetTotalStreamsWithDelay(configurationId uint64, timeStar
 	go func() {
 		streamsResult <- s.repository.GetTotalStreams(configurationId)
 	}()
-	streamsWithDelay := s.repository.GetTotalStreamsByError(configurationId, timeStart, timeEnd, entities.Delay)
+	streamsWithDelay, streams := s.repository.GetTotalStreamsByError(configurationId, timeStart, timeEnd, entities.Delay)
 	totalStreams := <-streamsResult
 
-	return dtos.TotalStreamsWithDelay{TotalStreams: totalStreams, TotalStreamsWithDelay: streamsWithDelay}
+	return dtos.TotalStreamsWithDelay{TotalStreams: totalStreams, TotalStreamsWithDelay: streamsWithDelay, Streams: streams}
 }

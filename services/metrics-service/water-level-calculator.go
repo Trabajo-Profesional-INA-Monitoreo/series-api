@@ -11,6 +11,7 @@ type WaterLevelsCalculator interface {
 	GetAlertsCount() uint64
 	GetEvacuationCount() uint64
 	GetLowWaterCount() uint64
+	GetStreamLevels(id uint64) []dtos.StreamLevel
 }
 
 type calculateWaterLevels struct {
@@ -26,6 +27,9 @@ type noWaterLevel struct {
 }
 
 const waterLevel = 2
+const alertLevel = "Alerta"
+const evacuationLevel = "Evacuación"
+const lowWaterLevel = "Aguas Bajas"
 
 func NewCalculatorOfWaterLevelsDependingOnVariable(station entities.Station, variableId uint64) WaterLevelsCalculator {
 	if variableId != waterLevel {
@@ -52,6 +56,29 @@ func NewCalculatorOfWaterLevels(alertLevel *float64, evacuationLevel *float64, l
 	}
 }
 
+func (c *calculateWaterLevels) GetStreamLevels(id uint64) []dtos.StreamLevel {
+	var levels []dtos.StreamLevel
+	if c.countEvacuationLevel > 0 {
+		levels = append(levels, dtos.StreamLevel{
+			StreamId: id,
+			Level:    evacuationLevel,
+		})
+	}
+	if c.countAlertLevel > 0 {
+		levels = append(levels, dtos.StreamLevel{
+			StreamId: id,
+			Level:    alertLevel,
+		})
+	}
+	if c.countLowWaterLevel > 0 {
+		levels = append(levels, dtos.StreamLevel{
+			StreamId: id,
+			Level:    lowWaterLevel,
+		})
+	}
+	return levels
+}
+
 func (c *calculateWaterLevels) Compute(level float64) {
 	if c.evacuationLevel != nil && level >= *c.evacuationLevel {
 		c.countEvacuationLevel++
@@ -75,14 +102,14 @@ func (c *calculateWaterLevels) AddMetrics(metrics []dtos.MetricCard) []dtos.Metr
 	return metrics
 }
 
-func (n *calculateWaterLevels) GetAlertsCount() uint64 {
-	return uint64(n.countAlertLevel)
+func (c *calculateWaterLevels) GetAlertsCount() uint64 {
+	return uint64(c.countAlertLevel)
 }
-func (n *calculateWaterLevels) GetEvacuationCount() uint64 {
-	return uint64(n.countEvacuationLevel)
+func (c *calculateWaterLevels) GetEvacuationCount() uint64 {
+	return uint64(c.countEvacuationLevel)
 }
-func (n *calculateWaterLevels) GetLowWaterCount() uint64 {
-	return uint64(n.countLowWaterLevel)
+func (c *calculateWaterLevels) GetLowWaterCount() uint64 {
+	return uint64(c.countLowWaterLevel)
 }
 
 func (n noWaterLevel) Compute(_ float64) {
@@ -100,4 +127,8 @@ func (n noWaterLevel) GetEvacuationCount() uint64 {
 }
 func (n noWaterLevel) GetLowWaterCount() uint64 {
 	return 0
+}
+
+func (n noWaterLevel) GetStreamLevels(id uint64) []dtos.StreamLevel {
+	return nil
 }

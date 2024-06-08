@@ -9,7 +9,7 @@ import (
 type InputsRepository interface {
 	GetTotalStreams(configurationId uint64) int
 	GetTotalStations(configurationId uint64) int
-	GetTotalStreamsByError(id uint64, start time.Time, end time.Time, value entities.ErrorType) int
+	GetTotalStreamsByError(id uint64, start time.Time, end time.Time, value entities.ErrorType) (int, []int64)
 }
 
 type inputsRepository struct {
@@ -48,11 +48,11 @@ func (db *inputsRepository) GetTotalStations(configurationId uint64) int {
 	return int(count)
 }
 
-func (db *inputsRepository) GetTotalStreamsByError(configId uint64, timeStart time.Time, timeEnd time.Time, error entities.ErrorType) int {
-	var count int64
+func (db *inputsRepository) GetTotalStreamsByError(configId uint64, timeStart time.Time, timeEnd time.Time, error entities.ErrorType) (int, []int64) {
+	var streams []int64
 	db.connection.Model(
 		&entities.ConfiguredStream{},
-	).Select("COUNT(detected_errors.error_id)").Joins(
+	).Select("streams.stream_id").Joins(
 		"JOIN streams ON streams.stream_id = configured_streams.stream_id",
 	).Joins(
 		"JOIN configured_streams_errors ON configured_streams_errors.configured_stream_configured_stream_id=configured_streams.configured_stream_id",
@@ -68,6 +68,6 @@ func (db *inputsRepository) GetTotalStreamsByError(configId uint64, timeStart ti
 		"streams.stream_type = ?", entities.Observed,
 	).Where(
 		"configured_streams.deleted = false",
-	).Find(&count)
-	return int(count)
+	).Group("streams.stream_id").Find(&streams)
+	return len(streams), streams
 }
