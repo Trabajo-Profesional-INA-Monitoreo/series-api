@@ -782,9 +782,10 @@ paths:
         in: query
         name: timeEnd
         type: string
-      - description: ID de la configuracion
+      - description: Id de la configuracion de la serie
+        format: int
         in: query
-        name: configurationId
+        name: configuredStreamId
         required: true
         type: integer
       produces:

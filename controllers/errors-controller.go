@@ -29,7 +29,7 @@ type errorsController struct {
 //	@Produce		json
 //	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
 //	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: hoy"  Format(2006-01-02)
-//	@Param          configurationId     query      int     true  "ID de la configuracion"
+//	@Param          configuredStreamId      query     int  true  "Id de la configuracion de la serie"  Format(int)
 //	@Success		200	 {array}   dtos.DelayPerDay
 //	@Failure        400  {object}  dtos.ErrorResponse
 //	@Router			/errores/retardo-promedio/por-dia [get]
@@ -38,11 +38,11 @@ func (e errorsController) GetAverageDelayPerDay(ctx *gin.Context) {
 	if done {
 		return
 	}
-	configurationId, done := getUintQueryParam(ctx, "configurationId")
+	configuredStreamId, done := getUintQueryParam(ctx, "configuredStreamId")
 	if done {
 		return
 	}
-	response := e.errorsService.GetAverageDelayPerDay(timeStart, timeEnd, configurationId)
+	response := e.errorsService.GetAverageDelayPerDay(timeStart, timeEnd, configuredStreamId)
 	ctx.JSON(http.StatusOK, response)
 }
 
