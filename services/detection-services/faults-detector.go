@@ -27,13 +27,14 @@ func NewFaultDetectorService(streamsRepository repositories.StreamRepository,
 	configuredStreamsRepository repositories.ConfiguredStreamsRepository,
 	errorsRepository repositories.ErrorDetectionRepository,
 	inaApiClient clients.InaAPiClient,
+	notificationsClient clients.NotificationsAPiClient,
 	detectionMaxThreads int,
 ) FaultDetector {
 	return &faultDetectorService{
 		streamsRepository:            streamsRepository,
 		detectionMaxThreads:          detectionMaxThreads,
-		observedFaultDetectorService: newObservedFaultDetectorService(configuredStreamsRepository, errorsRepository, inaApiClient),
-		forecastFaultDetectorService: newForecastFaultDetectorService(configuredStreamsRepository, errorsRepository, inaApiClient),
+		observedFaultDetectorService: newObservedFaultDetectorService(configuredStreamsRepository, errorsRepository, inaApiClient, notificationsClient),
+		forecastFaultDetectorService: newForecastFaultDetectorService(configuredStreamsRepository, errorsRepository, inaApiClient, notificationsClient),
 	}
 }
 

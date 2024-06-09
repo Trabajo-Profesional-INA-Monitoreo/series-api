@@ -14,6 +14,7 @@ func SetUpFaultDetectorJobs(repositories *config.Repositories, apiConfig *config
 		repositories.ConfiguredStreamRepository,
 		repositories.ErrorsRepository,
 		clients.NewInaApiClientImpl(apiConfig),
+		clients.NewNotificationsAPiClientImpl(apiConfig),
 		apiConfig.DetectionMaxThreads,
 	)
 	err := c.AddFunc(apiConfig.FaultCronTime, faultDetector.DetectFaults)
