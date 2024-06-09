@@ -227,6 +227,8 @@ func (e errorsRepository) GetAverageDelayPerDay(timeStart time.Time, timeEnd tim
 		"configured_streams.deleted = false",
 	).Group(
 		"DATE(detected_errors.detected_date)",
+	).Order(
+		"DATE(detected_errors.detected_date)",
 	).Find(&results)
 
 	if err.Error != nil {
