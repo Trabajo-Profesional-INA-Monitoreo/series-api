@@ -23,8 +23,6 @@ definitions:
     type: object
   dtos.CalibratedStreamsData:
     properties:
-      Qualifier:
-        type: string
       Time:
         type: string
       Value:
@@ -33,6 +31,10 @@ definitions:
   dtos.CalibratedStreamsDataResponse:
     properties:
       MainStreams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      P01Streams:
         items:
           $ref: '#/definitions/dtos.CalibratedStreamsData'
         type: array
@@ -49,6 +51,10 @@ definitions:
           $ref: '#/definitions/dtos.CalibratedStreamsData'
         type: array
       P95Streams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      P99Streams:
         items:
           $ref: '#/definitions/dtos.CalibratedStreamsData'
         type: array

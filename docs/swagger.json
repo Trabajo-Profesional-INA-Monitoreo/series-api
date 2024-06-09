@@ -1334,9 +1334,6 @@
         "dtos.CalibratedStreamsData": {
             "type": "object",
             "properties": {
-                "Qualifier": {
-                    "type": "string"
-                },
                 "Time": {
                     "type": "string"
                 },
@@ -1349,6 +1346,12 @@
             "type": "object",
             "properties": {
                 "MainStreams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "P01Streams": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dtos.CalibratedStreamsData"
@@ -1373,6 +1376,12 @@
                     }
                 },
                 "P95Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "P99Streams": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dtos.CalibratedStreamsData"
