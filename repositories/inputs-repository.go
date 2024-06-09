@@ -38,13 +38,13 @@ func (db *inputsRepository) GetTotalStations(configurationId uint64) int {
 	var count int64
 	db.connection.Model(
 		&entities.Stream{},
-	).Select("COUNT(streams.station_id)").Joins(
+	).Select("COUNT(DISTINCT streams.station_id)").Joins(
 		"JOIN configured_streams ON configured_streams.stream_id = streams.stream_id",
 	).Where(
 		"configured_streams.configuration_id = ?", configurationId,
 	).Where(
 		"configured_streams.deleted = false",
-	).Group("streams.station_id").Find(&count)
+	).Find(&count)
 	return int(count)
 }
 
