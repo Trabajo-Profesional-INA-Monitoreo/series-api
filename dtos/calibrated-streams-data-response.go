@@ -8,10 +8,11 @@ type CalibratedStreamsDataResponse struct {
 	P75Streams  []CalibratedStreamsData `json:"P75Streams"`
 	P95Streams  []CalibratedStreamsData `json:"P95Streams"`
 	P25Streams  []CalibratedStreamsData `json:"P25Streams"`
+	P99Streams  []CalibratedStreamsData `json:"P99Streams"`
+	P01Streams  []CalibratedStreamsData `json:"P01Streams"`
 }
 
 type CalibratedStreamsData struct {
-	Time      time.Time `json:"Time"`
-	Value     float64   `json:"Value"`
-	Qualifier string    `json:"Qualifier"`
+	Time  time.Time `json:"Time"`
+	Value float64   `json:"Value"`
 }

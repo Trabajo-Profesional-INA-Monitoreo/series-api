@@ -11,7 +11,7 @@ type ErrorsService interface {
 	GetErrorIndicators(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorIndicator
 	GetRelatedStreams(parameters *dtos.QueryParameters) ([]dtos.ErrorRelatedStream, error)
 	GetErrorsOfConfiguredStream(parameters *dtos.QueryParameters) (*dtos.DetectedErrorsOfStream, error)
-	GetAverageDelayPerDay(start time.Time, end time.Time, id uint64) []*dtos.DelayPerDay
+	GetAverageDelayPerDay(start time.Time, end time.Time, configuredStreamId uint64) []*dtos.DelayPerDay
 }
 
 type errorsService struct {
@@ -22,8 +22,8 @@ func NewErrorsService(repository repositories.ErrorMetricsRepository) ErrorsServ
 	return &errorsService{repository: repository}
 }
 
-func (e errorsService) GetAverageDelayPerDay(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.DelayPerDay {
-	return e.repository.GetAverageDelayPerDay(timeStart, timeEnd, configId)
+func (e errorsService) GetAverageDelayPerDay(timeStart time.Time, timeEnd time.Time, configuredStreamId uint64) []*dtos.DelayPerDay {
+	return e.repository.GetAverageDelayPerDay(timeStart, timeEnd, configuredStreamId)
 }
 
 func (e errorsService) GetErrorsPerDay(timeStart time.Time, timeEnd time.Time, configId uint64) []*dtos.ErrorsCountPerDayAndType {

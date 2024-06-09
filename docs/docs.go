@@ -309,8 +309,9 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "ID de la configuracion",
-                        "name": "configurationId",
+                        "format": "int",
+                        "description": "Id de la configuracion de la serie",
+                        "name": "configuredStreamId",
                         "in": "query",
                         "required": true
                     }
@@ -1341,9 +1342,6 @@ const docTemplate = `{
         "dtos.CalibratedStreamsData": {
             "type": "object",
             "properties": {
-                "Qualifier": {
-                    "type": "string"
-                },
                 "Time": {
                     "type": "string"
                 },
@@ -1356,6 +1354,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "MainStreams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "P01Streams": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dtos.CalibratedStreamsData"
@@ -1380,6 +1384,12 @@ const docTemplate = `{
                     }
                 },
                 "P95Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "P99Streams": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dtos.CalibratedStreamsData"

@@ -24,6 +24,9 @@ func newObservedFaultDetectorService(configuredStreamsRepository repositories.De
 func (f observedFaultDetectorService) checkOutliers(data []responses.ObservedDataResponse, stream entities.Stream, configuredStream entities.ConfiguredStream) {
 	consecutiveOutliers := 0
 	for _, observed := range data {
+		if observed.Value == nil {
+			continue
+		}
 		isOutlier := valueIsAnOutlier(configuredStream, observed)
 		if isOutlier && consecutiveOutliers == 0 {
 			reqId := fmt.Sprintf("%v", observed.TimeStart)
