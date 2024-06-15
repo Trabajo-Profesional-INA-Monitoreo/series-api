@@ -28,7 +28,7 @@ func (n notificationsService) SendDailyNotification() {
 }
 
 func (n notificationsService) createMessage(date time.Time, totalErrors int64, errorsByConfigurationId []*dtos.NotificationsErrorsCountPerConfigurationId, errorsByConfigurationIdAndErrorType []*dtos.NotificationsErrorsCountPerType) string {
-	mensaje := fmt.Sprintf("Resumen del dia %v/%v/%v \n\n", date.Day(), int(date.Month()), date.Year())
+	mensaje := fmt.Sprintf("Resumen del día %v/%v/%v \n\n", date.Day(), int(date.Month()), date.Year())
 
 	if totalErrors == 0 {
 		mensaje += fmt.Sprintf("Se detectaron %v errores totales.\n", totalErrors)
@@ -37,7 +37,7 @@ func (n notificationsService) createMessage(date time.Time, totalErrors int64, e
 	mensaje += fmt.Sprintf("Se detectaron %v errores totales:\n\n", totalErrors)
 
 	for _, configuration := range errorsByConfigurationId {
-		mensaje += fmt.Sprintf("* En la configuracion con id %v \"%v\", se detectaron %v errores.\n\n", configuration.ConfigurationId, configuration.Name, configuration.Total)
+		mensaje += fmt.Sprintf("* En la configuración con id %v \"%v\", se detectaron %v errores.\n\n", configuration.ConfigurationId, configuration.Name, configuration.Total)
 		mensaje += fmt.Sprintf("De los cuales:\n")
 		for _, errorType := range errorsByConfigurationIdAndErrorType {
 			if configuration.ConfigurationId == errorType.ConfigurationId {
