@@ -8,9 +8,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func SetUpNotificationsJobs(apiConfig *config.ServiceConfigurationData, c *cron.Cron) {
+func SetUpNotificationsJobs(repositories *config.Repositories, apiConfig *config.ServiceConfigurationData, c *cron.Cron) {
 	notificationsService := services.NewNotificationsService(
 		clients.NewNotificationsAPiClientImpl(apiConfig),
+		repositories,
 	)
 
 	err := c.AddFunc(apiConfig.DailyNotificationCronTime, notificationsService.SendDailyNotification)

@@ -21,6 +21,7 @@ type Repositories struct {
 	InputsRepository           repositories.InputsRepository
 	StationsRepository         repositories.StationsRepository
 	OutputsRepository          repositories.OutputsRepository
+	NotificationsRepository    repositories.NotificationsRepository
 }
 
 func loggerStringToGormLogger(loggerConfig string) logger.LogLevel {
@@ -79,6 +80,7 @@ func CreateRepositories(connectionData string, loggerConfig string) *Repositorie
 		InputsRepository:           repositories.NewInputsRepository(connection),
 		StationsRepository:         repositories.NewStationsRepository(connection),
 		OutputsRepository:          repositories.NewOutputsRepository(connection),
+		NotificationsRepository:    repositories.NewNotificationsRepository(connection),
 	}
 	log.Infof("Done creating repositories")
 	return &repos

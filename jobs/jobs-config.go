@@ -10,6 +10,6 @@ func SetUpJobs(repositories *config.Repositories, apiConfig *config.ServiceConfi
 	log.Infof("Setting up jobs")
 	c := cron.New()
 	SetUpFaultDetectorJobs(repositories, apiConfig, c)
-	SetUpNotificationsJobs(apiConfig, c)
+	SetUpNotificationsJobs(repositories, apiConfig, c)
 	c.Start()
 }
