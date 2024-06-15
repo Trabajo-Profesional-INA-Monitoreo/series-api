@@ -15,15 +15,19 @@ type observedFaultDetectorService struct {
 	configuredStreamsRepository repositories.DetectionConfiguredStreamsRepository
 	errorsRepository            repositories.ErrorDetectionRepository
 	inaApiClient                clients.InaAPiClient
+	notificationsClient         clients.NotificationsAPiClient
 }
 
-func newObservedFaultDetectorService(configuredStreamsRepository repositories.DetectionConfiguredStreamsRepository, errorsRepository repositories.ErrorDetectionRepository, inaApiClient clients.InaAPiClient) StreamFaultDetector {
-	return &observedFaultDetectorService{configuredStreamsRepository: configuredStreamsRepository, errorsRepository: errorsRepository, inaApiClient: inaApiClient}
+func newObservedFaultDetectorService(configuredStreamsRepository repositories.DetectionConfiguredStreamsRepository, errorsRepository repositories.ErrorDetectionRepository, inaApiClient clients.InaAPiClient, notificationsClient clients.NotificationsAPiClient) StreamFaultDetector {
+	return &observedFaultDetectorService{configuredStreamsRepository: configuredStreamsRepository, errorsRepository: errorsRepository, inaApiClient: inaApiClient, notificationsClient: notificationsClient}
 }
 
 func (f observedFaultDetectorService) checkOutliers(data []responses.ObservedDataResponse, stream entities.Stream, configuredStream entities.ConfiguredStream) {
 	consecutiveOutliers := 0
 	for _, observed := range data {
+		if observed.Value == nil {
+			continue
+		}
 		isOutlier := valueIsAnOutlier(configuredStream, observed)
 		if isOutlier && consecutiveOutliers == 0 {
 			reqId := fmt.Sprintf("%v", observed.TimeStart)
@@ -41,6 +45,7 @@ func (f observedFaultDetectorService) checkOutliers(data []responses.ObservedDat
 					ExtraInfo:        fmt.Sprintf("Valor %v - Timestamp %v", *observed.Value, observed.TimeStart),
 				}
 				f.errorsRepository.Create(detected)
+				go f.notificationsClient.SendNotification(detected.ToString())
 			} else if !contains(detectedError.ConfiguredStream, configuredStream) {
 				detectedError.ConfiguredStream = append(detectedError.ConfiguredStream, configuredStream)
 				f.errorsRepository.Update(detectedError)

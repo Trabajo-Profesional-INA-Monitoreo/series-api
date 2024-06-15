@@ -6,16 +6,19 @@ type InputsGeneralMetrics struct {
 }
 
 type TotalStreamsWithNullValues struct {
-	TotalStreams         int `json:"TotalStreams"`
-	TotalStreamsWithNull int `json:"TotalStreamsWithNull"`
+	TotalStreams         int     `json:"TotalStreams"`
+	TotalStreamsWithNull int     `json:"TotalStreamsWithNull"`
+	Streams              []int64 `json:"Streams"`
 }
 
 type TotalStreamsWithObservedOutlier struct {
-	TotalStreams                    int `json:"TotalStreams"`
-	TotalStreamsWithObservedOutlier int `json:"TotalStreamsWithObservedOutlier"`
+	TotalStreams                    int     `json:"TotalStreams"`
+	TotalStreamsWithObservedOutlier int     `json:"TotalStreamsWithObservedOutlier"`
+	Streams                         []int64 `json:"Streams"`
 }
 
 type TotalStreamsWithDelay struct {
-	TotalStreams          int `json:"TotalStreams"`
-	TotalStreamsWithDelay int `json:"TotalStreamsWithDelay"`
+	TotalStreams          int     `json:"TotalStreams"`
+	TotalStreamsWithDelay int     `json:"TotalStreamsWithDelay"`
+	Streams               []int64 `json:"Streams"`
 }

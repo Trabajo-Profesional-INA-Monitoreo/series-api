@@ -60,6 +60,18 @@ func observedIsOutsideErrorBands(forecast *responses.Forecast, forecastedIndex i
 			return true
 		}
 	}
+	if forecast.P01Forecast != nil {
+		value, _ := strconv.ParseFloat(forecast.P01Forecast.Forecasts[forecastedIndex][2], 64)
+		if *observed < value {
+			return true
+		}
+	}
+	if forecast.P99Forecast != nil {
+		value, _ := strconv.ParseFloat(forecast.P99Forecast.Forecasts[forecastedIndex][2], 64)
+		if *observed > value {
+			return true
+		}
+	}
 	return false
 }
 

@@ -309,8 +309,9 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "ID de la configuracion",
-                        "name": "configurationId",
+                        "format": "int",
+                        "description": "Id de la configuracion de la serie",
+                        "name": "configuredStreamId",
                         "in": "query",
                         "required": true
                     }
@@ -1327,6 +1328,12 @@ const docTemplate = `{
                 "CountLowWaterLevel": {
                     "type": "integer"
                 },
+                "StreamLevels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.StreamLevel"
+                    }
+                },
                 "TotalValuesCount": {
                     "type": "integer"
                 }
@@ -1335,9 +1342,6 @@ const docTemplate = `{
         "dtos.CalibratedStreamsData": {
             "type": "object",
             "properties": {
-                "Qualifier": {
-                    "type": "string"
-                },
                 "Time": {
                     "type": "string"
                 },
@@ -1350,6 +1354,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "MainStreams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "P01Streams": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dtos.CalibratedStreamsData"
@@ -1374,6 +1384,12 @@ const docTemplate = `{
                     }
                 },
                 "P95Streams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CalibratedStreamsData"
+                    }
+                },
+                "P99Streams": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dtos.CalibratedStreamsData"
@@ -1867,6 +1883,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.StreamLevel": {
+            "type": "object",
+            "properties": {
+                "Level": {
+                    "type": "string"
+                },
+                "StreamId": {
+                    "type": "integer"
+                }
+            }
+        },
         "dtos.StreamsData": {
             "type": "object",
             "properties": {
@@ -1978,6 +2005,12 @@ const docTemplate = `{
         "dtos.TotalStreamsWithDelay": {
             "type": "object",
             "properties": {
+                "Streams": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "TotalStreams": {
                     "type": "integer"
                 },
@@ -1989,6 +2022,12 @@ const docTemplate = `{
         "dtos.TotalStreamsWithNullValues": {
             "type": "object",
             "properties": {
+                "Streams": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "TotalStreams": {
                     "type": "integer"
                 },
@@ -2000,6 +2039,12 @@ const docTemplate = `{
         "dtos.TotalStreamsWithObservedOutlier": {
             "type": "object",
             "properties": {
+                "Streams": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "TotalStreams": {
                     "type": "integer"
                 },

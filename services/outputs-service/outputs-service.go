@@ -40,6 +40,10 @@ func (s outputsServiceImpl) getLevelsCountForAllStreams(behaviourStreams []dtos.
 		behaviourResponse.CountAlertLevel += calculator.GetAlertsCount()
 		behaviourResponse.CountLowWaterLevel += calculator.GetLowWaterCount()
 		behaviourResponse.CountEvacuationLevel += calculator.GetEvacuationCount()
+		levels := calculator.GetStreamLevels(stream.StreamId)
+		if levels != nil && len(levels) > 0 {
+			behaviourResponse.StreamLevels = append(behaviourResponse.StreamLevels, levels...)
+		}
 	}
 	return behaviourResponse
 }

@@ -14,13 +14,15 @@ definitions:
         type: integer
       CountLowWaterLevel:
         type: integer
+      StreamLevels:
+        items:
+          $ref: '#/definitions/dtos.StreamLevel'
+        type: array
       TotalValuesCount:
         type: integer
     type: object
   dtos.CalibratedStreamsData:
     properties:
-      Qualifier:
-        type: string
       Time:
         type: string
       Value:
@@ -29,6 +31,10 @@ definitions:
   dtos.CalibratedStreamsDataResponse:
     properties:
       MainStreams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      P01Streams:
         items:
           $ref: '#/definitions/dtos.CalibratedStreamsData'
         type: array
@@ -45,6 +51,10 @@ definitions:
           $ref: '#/definitions/dtos.CalibratedStreamsData'
         type: array
       P95Streams:
+        items:
+          $ref: '#/definitions/dtos.CalibratedStreamsData'
+        type: array
+      P99Streams:
         items:
           $ref: '#/definitions/dtos.CalibratedStreamsData'
         type: array
@@ -372,6 +382,13 @@ definitions:
       VarName:
         type: string
     type: object
+  dtos.StreamLevel:
+    properties:
+      Level:
+        type: string
+      StreamId:
+        type: integer
+    type: object
   dtos.StreamsData:
     properties:
       Time:
@@ -444,6 +461,10 @@ definitions:
     type: object
   dtos.TotalStreamsWithDelay:
     properties:
+      Streams:
+        items:
+          type: integer
+        type: array
       TotalStreams:
         type: integer
       TotalStreamsWithDelay:
@@ -451,6 +472,10 @@ definitions:
     type: object
   dtos.TotalStreamsWithNullValues:
     properties:
+      Streams:
+        items:
+          type: integer
+        type: array
       TotalStreams:
         type: integer
       TotalStreamsWithNull:
@@ -458,6 +483,10 @@ definitions:
     type: object
   dtos.TotalStreamsWithObservedOutlier:
     properties:
+      Streams:
+        items:
+          type: integer
+        type: array
       TotalStreams:
         type: integer
       TotalStreamsWithObservedOutlier:
@@ -759,9 +788,10 @@ paths:
         in: query
         name: timeEnd
         type: string
-      - description: ID de la configuracion
+      - description: Id de la configuracion de la serie
+        format: int
         in: query
-        name: configurationId
+        name: configuredStreamId
         required: true
         type: integer
       produces:
