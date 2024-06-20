@@ -7,7 +7,6 @@ require (
 	github.com/gin-contrib/cors v1.7.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/robfig/cron v1.2.0
-	github.com/robfig/cron/v3 v3.0.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.17.0
 	github.com/stretchr/testify v1.8.4

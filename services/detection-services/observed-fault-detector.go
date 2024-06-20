@@ -88,8 +88,7 @@ func (f observedFaultDetectorService) checkDelay(data []responses.ObservedDataRe
 	observed := data[len(data)-1]
 
 	isDelayed := valueIsDelayed(configuredStream, observed)
-	minutesDelayed := time.Now().Sub(observed.TimeStart).Minutes()
-
+	minutesDelayed := time.Now().UTC().Sub(observed.TimeStart).Minutes()
 	if isDelayed {
 		reqId := fmt.Sprintf("%v", observed.TimeStart)
 		detectedError := f.errorsRepository.GetDetectedErrorForStreamWithIdAndType(stream.StreamId, reqId, entities.Delay)

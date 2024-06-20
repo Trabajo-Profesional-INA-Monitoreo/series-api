@@ -26,5 +26,6 @@ func NewBehaviourStreamsResponse() *BehaviourStreamsResponse {
 		CountAlertLevel:      0,
 		CountEvacuationLevel: 0,
 		CountLowWaterLevel:   0,
+		StreamLevels:         []StreamLevel{},
 	}
 }
