@@ -41,7 +41,9 @@ func (n notificationsAPiClient) SendNotification(message string) error {
 	defer closeReaderAndPrintError(res.Body)
 
 	if res.StatusCode != 201 {
-		return errors.Join(exceptions.MapCodeToError(res.StatusCode), fmt.Errorf("Notifications api response error: got %v", res.StatusCode))
+		err := fmt.Errorf("notifications api response error: got %v", res.StatusCode)
+		log.Errorf(err.Error())
+		return errors.Join(exceptions.MapCodeToError(res.StatusCode), err)
 	}
 
 	return nil
