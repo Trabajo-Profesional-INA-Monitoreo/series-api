@@ -18,7 +18,7 @@ func valueIsAnOutlier(configuredStream entities.ConfiguredStream, observed respo
 }
 
 func valueIsDelayed(configuredStream entities.ConfiguredStream, observed responses.ObservedDataResponse) bool {
-	return time.Now().Sub(observed.TimeStart).Minutes() > configuredStream.UpdateFrequency
+	return time.Now().UTC().Sub(observed.TimeStart).Minutes() > configuredStream.UpdateFrequency
 }
 
 func contains(configuredStreams []entities.ConfiguredStream, configuredStream entities.ConfiguredStream) bool {
