@@ -7,7 +7,6 @@ import (
 )
 
 type InaServiceApi interface {
-	GetCuredSerieById(id uint64, start time.Time, end time.Time) (dtos.StreamsDataResponse, error)
 	GetObservatedSerieById(id uint64, start time.Time, end time.Time) (dtos.StreamsDataResponse, error)
 	GetPredictedSerieById(id uint64, streamId uint64) (dtos.CalibratedStreamsDataResponse, error)
 }
@@ -18,10 +17,6 @@ type inaServiceApiImpl struct {
 
 func NewInaServiceApi(inaApiClient clients.InaAPiClient) InaServiceApi {
 	return &inaServiceApiImpl{inaApiClient: inaApiClient}
-}
-
-func (s inaServiceApiImpl) GetCuredSerieById(id uint64, start time.Time, end time.Time) (dtos.StreamsDataResponse, error) {
-	return s.getDataFromObservedStream(id, start, end)
 }
 
 func (s inaServiceApiImpl) GetObservatedSerieById(id uint64, start time.Time, end time.Time) (dtos.StreamsDataResponse, error) {

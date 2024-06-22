@@ -10,7 +10,6 @@ import (
 )
 
 type InaController interface {
-	GetCuredSerieById(ctx *gin.Context)
 	GetObservatedSerieById(ctx *gin.Context)
 	GetPredictedSerieById(ctx *gin.Context)
 }
@@ -21,40 +20,6 @@ type inaControllerImpl struct {
 
 func NewInaController(inaService services.InaServiceApi) InaController {
 	return &inaControllerImpl{inaService: inaService}
-}
-
-// GetCuredSerieById godoc
-//
-//	@Summary		Endpoint para obtener los valores de una serie curada por id
-//	@Tags           Interfaz INA
-//	@Produce		json
-//	@Param          timeStart    query     string  false  "Fecha de comienzo del periodo - valor por defecto: 7 dias atras"  Format(2006-01-02)
-//	@Param          timeEnd      query     string  false  "Fecha del final del periodo - valor por defecto: 5 dias despues"  Format(2006-01-02)
-//	@Param          serie_id     path      int     true  "Id de la serie"
-//	@Success		200	{object} dtos.StreamsDataResponse
-//	@Failure        400  {object}  dtos.ErrorResponse
-//	@Failure        404  {object}  dtos.ErrorResponse
-//	@Router			/series/curadas/{serie_id} [get]
-func (s inaControllerImpl) GetCuredSerieById(ctx *gin.Context) {
-	id, done := getUintPathParam(ctx, "serie_id")
-	if done {
-		return
-	}
-	timeStart, timeEnd, done := getDates(ctx)
-	if done {
-		return
-	}
-
-	res, err := s.inaService.GetCuredSerieById(id, timeStart, timeEnd)
-	if errors.Is(err, &exceptions.NotFound{}) {
-		ctx.JSON(http.StatusNotFound, dtos.NewErrorResponse(err))
-		return
-	}
-	if errors.Is(err, &exceptions.BadRequest{}) {
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorResponse(err))
-		return
-	}
-	ctx.JSON(http.StatusOK, res)
 }
 
 // GetObservatedSerieById godoc

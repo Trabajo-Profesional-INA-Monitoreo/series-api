@@ -27,7 +27,6 @@ func setSeriesEndpoints(apiGroup *gin.RouterGroup, repositories *config.Reposito
 		testApi.GET("/nodos", nodesController.GetNodes)
 		testApi.GET("/estaciones", stationsController.GetStations)
 		testApi.GET("/comportamiento", outputsController.GetOutputMetrics)
-		testApi.GET("/curadas/:serie_id", inaController.GetCuredSerieById)
 		testApi.GET("/observadas/:serie_id", inaController.GetObservatedSerieById)
 		testApi.GET("/pronosticadas/:calibrado_id", inaController.GetPredictedSerieById)
 	}
