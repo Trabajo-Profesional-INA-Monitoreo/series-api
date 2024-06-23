@@ -18,5 +18,5 @@ type DetectedError struct {
 
 func (error DetectedError) ToString() string {
 	var errorType = error.ErrorType.Translate()
-	return fmt.Sprintf("Se detectó un error de tipo: %v \nEl error se detectó a las: %v en la serie %v ", errorType, error.DetectedDate.Format("2006-01-02 15:04:05"), error.Stream.StreamId)
+	return fmt.Sprintf("Se detectó un error de tipo: %v \nEl error se detectó a las: %v en la serie %v ", errorType, error.DetectedDate.Local().Format("2006-01-02 15:04:05"), error.Stream.StreamId)
 }

@@ -89,7 +89,7 @@ func (db configuredStreamsRepository) FindConfiguredStreamsWithCheckErrorsForStr
 
 	db.connection.Model(
 		&entities.ConfiguredStream{},
-	).Where("stream_id = ? AND check_errors = true", stream.StreamId).Find(&configured)
+	).Where("stream_id = ? AND check_errors = true AND deleted = false", stream.StreamId).Find(&configured)
 
 	return configured
 }
@@ -99,7 +99,7 @@ func (db configuredStreamsRepository) FindConfiguredStreamById(configStreamId ui
 
 	result := db.connection.Model(
 		&entities.ConfiguredStream{},
-	).Preload("Metrics").Where("configured_stream_id = ?", configStreamId).Find(&configured)
+	).Preload("Metrics").Where("configured_stream_id = ? AND deleted = false", configStreamId).Find(&configured)
 
 	if result.Error != nil {
 		log.Errorf("Error executing FindConfiguredStreamById query: %v", result.Error)
