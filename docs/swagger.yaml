@@ -1211,42 +1211,6 @@ paths:
       summary: Endpoint para obtener las metricas de comportamiento
       tags:
       - Outputs
-  /series/curadas/{serie_id}:
-    get:
-      parameters:
-      - description: 'Fecha de comienzo del periodo - valor por defecto: 7 dias atras'
-        format: "2006-01-02"
-        in: query
-        name: timeStart
-        type: string
-      - description: 'Fecha del final del periodo - valor por defecto: 5 dias despues'
-        format: "2006-01-02"
-        in: query
-        name: timeEnd
-        type: string
-      - description: Id de la serie
-        in: path
-        name: serie_id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dtos.StreamsDataResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/dtos.ErrorResponse'
-      summary: Endpoint para obtener los valores de una serie curada por id
-      tags:
-      - Interfaz INA
   /series/estaciones:
     get:
       parameters:

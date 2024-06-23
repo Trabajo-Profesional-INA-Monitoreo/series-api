@@ -937,60 +937,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/series/curadas/{serie_id}": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Interfaz INA"
-                ],
-                "summary": "Endpoint para obtener los valores de una serie curada por id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "format": "2006-01-02",
-                        "description": "Fecha de comienzo del periodo - valor por defecto: 7 dias atras",
-                        "name": "timeStart",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "format": "2006-01-02",
-                        "description": "Fecha del final del periodo - valor por defecto: 5 dias despues",
-                        "name": "timeEnd",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Id de la serie",
-                        "name": "serie_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.StreamsDataResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/series/estaciones": {
             "get": {
                 "produces": [
