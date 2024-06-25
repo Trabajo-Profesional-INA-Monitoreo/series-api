@@ -3,6 +3,7 @@ package metrics_service
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/entities"
+	"slices"
 )
 
 type WaterLevelsCalculator interface {
@@ -26,13 +27,13 @@ type calculateWaterLevels struct {
 type noWaterLevel struct {
 }
 
-const waterLevel = 2
 const alertLevel = "Alerta"
 const evacuationLevel = "Evacuación"
 const lowWaterLevel = "Aguas Bajas"
 
 func NewCalculatorOfWaterLevelsDependingOnVariable(station entities.Station, variableId uint64) WaterLevelsCalculator {
-	if variableId != waterLevel {
+	waterLevelIds := []uint64{2, 28, 33, 39, 49, 50, 67, 85}
+	if !slices.Contains[[]uint64, uint64](waterLevelIds, variableId) {
 		return &noWaterLevel{}
 	}
 	return &calculateWaterLevels{
