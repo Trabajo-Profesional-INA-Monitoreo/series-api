@@ -3,6 +3,7 @@ package responses
 import (
 	"github.com/Trabajo-Profesional-INA-Monitoreo/series-api/dtos"
 	log "github.com/sirupsen/logrus"
+	"slices"
 	"strconv"
 	"time"
 )
@@ -61,13 +62,13 @@ func ConvertToFloats(forecast [][]string) []float64 {
 }
 
 func (f LastForecast) ConvertToCalibratedStreamsDataResponse(streamId uint64) dtos.CalibratedStreamsDataResponse {
-	var P05Streams = convertToCalibratedStreamsData(f, "p05", streamId, "error_band_05")
-	var MainStreams = convertToCalibratedStreamsData(f, "main", streamId, "")
-	var P75Streams = convertToCalibratedStreamsData(f, "p75", streamId, "error_band_75")
-	var P95Streams = convertToCalibratedStreamsData(f, "p95", streamId, "error_band_95")
-	var P25Streams = convertToCalibratedStreamsData(f, "p25", streamId, "error_band_25")
-	var P99Streams = convertToCalibratedStreamsData(f, "p99", streamId, "error_band_99")
-	var P01Streams = convertToCalibratedStreamsData(f, "p01", streamId, "error_band_01")
+	var P05Streams = convertToCalibratedStreamsData(f, []string{"p05", "error_band_05"}, streamId)
+	var MainStreams = convertToCalibratedStreamsData(f, []string{"main", "medio"}, streamId)
+	var P75Streams = convertToCalibratedStreamsData(f, []string{"p75", "error_band_75", "superior"}, streamId)
+	var P95Streams = convertToCalibratedStreamsData(f, []string{"p95", "error_band_95"}, streamId)
+	var P25Streams = convertToCalibratedStreamsData(f, []string{"p25", "error_band_25", "inferior"}, streamId)
+	var P99Streams = convertToCalibratedStreamsData(f, []string{"p99", "error_band_99"}, streamId)
+	var P01Streams = convertToCalibratedStreamsData(f, []string{"p01", "error_band_01"}, streamId)
 
 	return dtos.CalibratedStreamsDataResponse{
 		P05Streams,
@@ -80,11 +81,11 @@ func (f LastForecast) ConvertToCalibratedStreamsDataResponse(streamId uint64) dt
 	}
 }
 
-func convertToCalibratedStreamsData(f LastForecast, qualifier string, streamId uint64, alternativeQualifier string) []dtos.CalibratedStreamsData {
-	var calibratedStreams []dtos.CalibratedStreamsData
+func convertToCalibratedStreamsData(f LastForecast, qualifiers []string, streamId uint64) []dtos.CalibratedStreamsData {
+	calibratedStreams := []dtos.CalibratedStreamsData{}
 
 	for _, stream := range f.Streams {
-		if stream.StreamId == streamId && (stream.Qualifier == qualifier || stream.Qualifier == alternativeQualifier) {
+		if stream.StreamId == streamId && slices.Contains(qualifiers, stream.Qualifier) {
 			for _, forecast := range stream.Forecasts {
 				value, _ := strconv.ParseFloat(forecast[2], 64)
 				date, _ := time.Parse("2006-01-02T15:04:05Z07:00", forecast[0])
@@ -93,6 +94,7 @@ func convertToCalibratedStreamsData(f LastForecast, qualifier string, streamId u
 					Value: value,
 				})
 			}
+			break
 		}
 	}
 
