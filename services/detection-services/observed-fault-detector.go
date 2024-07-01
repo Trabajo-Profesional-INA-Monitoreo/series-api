@@ -45,7 +45,9 @@ func (f observedFaultDetectorService) checkOutliers(data []responses.ObservedDat
 					ExtraInfo:        fmt.Sprintf("Valor %v - Timestamp %v", *observed.Value, observed.TimeStart),
 				}
 				f.errorsRepository.Create(detected)
-				go f.notificationsClient.SendNotification(detected.ToString())
+				if configuredStream.Configuration.SendNotifications {
+					go f.notificationsClient.SendNotification(detected.ToString())
+				}
 			} else if !contains(detectedError.ConfiguredStream, configuredStream) {
 				detectedError.ConfiguredStream = append(detectedError.ConfiguredStream, configuredStream)
 				f.errorsRepository.Update(detectedError)

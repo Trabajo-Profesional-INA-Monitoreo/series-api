@@ -89,7 +89,7 @@ func (db configuredStreamsRepository) FindConfiguredStreamsWithCheckErrorsForStr
 
 	db.connection.Model(
 		&entities.ConfiguredStream{},
-	).Where("stream_id = ? AND check_errors = true AND deleted = false", stream.StreamId).Find(&configured)
+	).Preload("Configuration").Where("stream_id = ? AND check_errors = true AND deleted = false", stream.StreamId).Find(&configured)
 
 	return configured
 }
