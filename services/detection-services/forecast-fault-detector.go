@@ -41,7 +41,9 @@ func (f forecastFaultDetectorService) handleMissingForecast(stream entities.Stre
 			ExtraInfo:        fmt.Sprintf("Fecha ultimo pronostico %v - Tiempo transcurrido %v", res.ForecastDate, diff.String()),
 		}
 		f.errorsRepository.Create(detected)
-		go f.notificationsClient.SendNotification(detected.ToString())
+		if configuredStream.Configuration.SendNotifications {
+			go f.notificationsClient.SendNotification(detected.ToString())
+		}
 	} else if detected && !contains(detectedError.ConfiguredStream, configuredStream) {
 		// We already detected the error, we need to save the relationship to the current ConfiguredStream
 		detectedError := f.errorsRepository.GetDetectedErrorForStreamWithIdAndType(stream.StreamId, reqErrorId, entities.ForecastMissing)
@@ -128,7 +130,9 @@ func (f forecastFaultDetectorService) handleValueOutsideBoundaries(stream entiti
 			ExtraInfo:        fmt.Sprintf("Valor %v - Timestamp %v - Corrida %v - Fecha pronostico %v", value, *timestamp, res.RunId, res.ForecastDate),
 		}
 		f.errorsRepository.Create(detected)
-		go f.notificationsClient.SendNotification(detected.ToString())
+		if configuredStream.Configuration.SendNotifications {
+			go f.notificationsClient.SendNotification(detected.ToString())
+		}
 	} else if !contains(detectedError.ConfiguredStream, configuredStream) {
 		detectedError.ConfiguredStream = append(detectedError.ConfiguredStream, configuredStream)
 		f.errorsRepository.Update(detectedError)
@@ -177,7 +181,9 @@ func (f forecastFaultDetectorService) saveObservedValuesAreOutsideErrorBands(str
 			ExtraInfo:        fmt.Sprintf("Corrida %v - Fecha pronostico %v - Cantidad valores fuera de bandas %v", res.RunId, res.ForecastDate, outsideBands),
 		}
 		f.errorsRepository.Create(detected)
-		go f.notificationsClient.SendNotification(detected.ToString())
+		if configuredStream.Configuration.SendNotifications {
+			go f.notificationsClient.SendNotification(detected.ToString())
+		}
 	} else if !contains(detectedError.ConfiguredStream, configuredStream) {
 		detectedError.ConfiguredStream = append(detectedError.ConfiguredStream, configuredStream)
 		f.errorsRepository.Update(detectedError)
